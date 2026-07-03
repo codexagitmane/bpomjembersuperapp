@@ -1,0 +1,16 @@
+{
+  "name": "bpom-jember-superapp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sistem Super Terintegrasi Balai POM di Jember",
+  "scripts": {
+    "dev:web": "pnpm --filter @bpom/web dev",
+    "dev:mobile": "pnpm --filter @bpom/mobile start",
+    "build:shared": "pnpm --filter @bpom/shared build",
+    "build:web": "pnpm --filter @bpom/web build",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

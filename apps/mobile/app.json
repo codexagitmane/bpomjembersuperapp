@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "SIGAP BPOM Jember",
+    "slug": "sigap-bpom-jember",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "sigapbpomjember",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "go.id.bpomjember.sigap",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Kamera digunakan untuk mengambil foto selfie saat presensi masuk/pulang.",
+        "NSLocationWhenInUseUsageDescription": "Lokasi digunakan untuk memverifikasi Anda berada di area kantor saat presensi."
+      }
+    },
+    "android": {
+      "package": "go.id.bpomjember.sigap",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1F3A",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["CAMERA", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0B1F3A"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Kamera digunakan untuk mengambil foto selfie saat presensi masuk/pulang."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Lokasi digunakan untuk memverifikasi Anda berada di area kantor saat presensi."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
