@@ -1,8 +1,8 @@
-# SIGAP BPOM Jember
+# LENTERA BPOM Jember
 
 Sistem Informasi Terintegrasi untuk Balai Pengawas Obat dan Makanan (BPOM) di
-Jember — satu platform untuk 4 fungsi organisasi (Pemeriksaan, Informasi &
-Komunikasi, Penindakan, Tata Usaha), 5 peran pengguna internal, dan layanan
+Jember — satu platform untuk 5 fungsi (Pemeriksaan, Informasi &
+Komunikasi, Penindakan, Tata Usaha, Pengujian), 5 peran pengguna internal, dan layanan
 publik untuk masyarakat.
 
 ## Arsitektur
