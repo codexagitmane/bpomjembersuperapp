@@ -80,20 +80,6 @@ docker compose exec api php artisan migrate --seed
 > secara sintaks — mohon jalankan `docker compose up --build` di mesin Anda
 > dan laporkan bila ada masalah build sebelum dipakai di produksi.
 
-## Akun Demo
-
-| Role | Email | Password |
-|---|---|---|
-| Superadmin | superadmin@bpomjember.go.id | BpomJember@2026 |
-| Kepala Balai | kepala.balai@bpomjember.go.id | BpomJember@2026 |
-| Kepala Subag TU | kasubag.tu@bpomjember.go.id | BpomJember@2026 |
-| Pegawai ASN/PPPK | pegawai.asn@bpomjember.go.id | BpomJember@2026 |
-| Pegawai Outsourcing | pegawai.outsourcing@bpomjember.go.id | BpomJember@2026 |
-| Masyarakat (eksternal) | masyarakat@example.com | Masyarakat@123 |
-
-⚠️ **Akun-akun ini HANYA untuk development/demo.** Hapus atau ganti seeder
-`DemoUsersSeeder` sebelum deploy ke produksi.
-
 ## Modul yang Sudah Fungsional Penuh (backend + web + mobile)
 
 - **Auth & RBAC** — login, registrasi mandiri (masyarakat), 6 role, token
