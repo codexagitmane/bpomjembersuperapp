@@ -58,3 +58,6 @@ packages/*/dist/
 .vscode/
 .idea/
 Thumbs.db
+
+# --- Claude Code local state ---
+.claude/
