@@ -29,3 +29,19 @@ export const api = createApiClient({
     }
   },
 });
+
+/**
+ * Mengunduh file (Excel/PDF) dari endpoint API yang mengembalikan blob,
+ * dengan menyertakan token auth. Memicu dialog "Save As" di browser.
+ */
+export async function downloadFile(path: string, filename: string, params?: Record<string, string | number>) {
+  const res = await api.get(path, { params, responseType: "blob" });
+  const url = window.URL.createObjectURL(res.data as Blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}

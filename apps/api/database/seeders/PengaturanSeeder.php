@@ -39,6 +39,15 @@ class PengaturanSeeder extends Seeder
             ['key' => 'jam_kerja.sabtu.mulai', 'value' => '07:30', 'tipe' => 'string'],
             ['key' => 'jam_kerja.sabtu.selesai', 'value' => '12:00', 'tipe' => 'string'],
             ['key' => 'jam_kerja.batas_absen', 'value' => '22:00', 'tipe' => 'string'],
+
+            // Konfigurasi slot booking konsultasi/pengaduan (dapat diubah petugas
+            // Infokom dari UI). Slot dibangun dari jam_mulai s/d jam_selesai dengan
+            // interval menit tertentu; kuota = jumlah booking maksimal per slot.
+            ['key' => 'booking.jam_mulai', 'value' => '08:00', 'tipe' => 'string'],
+            ['key' => 'booking.jam_selesai', 'value' => '15:00', 'tipe' => 'string'],
+            ['key' => 'booking.interval_menit', 'value' => '60', 'tipe' => 'number'],
+            ['key' => 'booking.kuota_per_slot', 'value' => '1', 'tipe' => 'number'],
+            ['key' => 'booking.hari_libur', 'value' => json_encode(['sabtu', 'minggu']), 'tipe' => 'json'],
         ];
 
         foreach ($items as $item) {

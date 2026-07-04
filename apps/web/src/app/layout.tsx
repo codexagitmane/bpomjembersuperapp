@@ -10,7 +10,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "SIGAP BPOM Jember — Sistem Terintegrasi Balai POM di Jember",
+  title: "LENTERA BPOM Jember — Sistem Terintegrasi Balai POM di Jember",
   description:
     "Sistem Informasi Terintegrasi Balai Pengawas Obat dan Makanan (BPOM) di Jember — layanan internal & publik dalam satu platform.",
 };

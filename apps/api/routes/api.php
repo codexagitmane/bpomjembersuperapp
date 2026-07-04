@@ -4,12 +4,15 @@ use App\Http\Controllers\Api\AdminVerifikasiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BarangBuktiController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DashboardKasubagController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\BookingKonsultasiController;
 use App\Http\Controllers\Api\IzinKeluarMasukController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\PengajuanBmnController;
 use App\Http\Controllers\Api\PresensiController;
+use App\Http\Controllers\Api\RekapPresensiController;
+use App\Http\Controllers\Api\RosterKeamananController;
 use App\Http\Controllers\Api\SigApotekController;
 use App\Http\Controllers\Api\WfhLocationController;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +53,22 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('/presensi', [PresensiController::class, 'semuaPresensi'])
         ->middleware('role:superadmin|kepala_balai|kepala_subag_tu');
+
+    // Rekap presensi bulanan + ekspor Excel/PDF (Kasubag TU, Kepala Balai, Superadmin).
+    Route::middleware('role:superadmin|kepala_balai|kepala_subag_tu')->group(function () {
+        Route::get('/rekap-presensi', [RekapPresensiController::class, 'index']);
+        Route::get('/rekap-presensi/excel', [RekapPresensiController::class, 'excel']);
+        Route::get('/rekap-presensi/pdf', [RekapPresensiController::class, 'pdf']);
+        Route::get('/dashboard/kasubag', [DashboardKasubagController::class, 'index']);
+    });
+
+    // Roster shift petugas keamanan (Kasubag TU / Superadmin).
+    Route::middleware('role:superadmin|kepala_subag_tu')->prefix('roster-keamanan')->group(function () {
+        Route::get('/', [RosterKeamananController::class, 'index']);
+        Route::post('/', [RosterKeamananController::class, 'store']);
+        Route::post('/generate', [RosterKeamananController::class, 'generateOtomatis']);
+        Route::delete('/{rosterKeamanan}', [RosterKeamananController::class, 'destroy']);
+    });
 
     // --- Izin Keluar Masuk Kantor (Fungsi Tata Usaha) ---
     Route::prefix('izin-keluar-masuk')->middleware('role:superadmin|kepala_balai|kepala_subag_tu|pegawai_asn_pppk|pegawai_outsourcing_magang')->group(function () {
@@ -104,11 +123,17 @@ Route::middleware('auth:sanctum')->group(function () {
     // Bisa diakses akun internal maupun eksternal (masyarakat).
     Route::prefix('booking-konsultasi')->group(function () {
         Route::get('/', [BookingKonsultasiController::class, 'index']);
+        Route::get('/slot', [BookingKonsultasiController::class, 'slotTersedia']);
         Route::post('/', [BookingKonsultasiController::class, 'store']);
     });
     Route::get('/booking-konsultasi-semua', [BookingKonsultasiController::class, 'semua'])
         ->middleware('role:superadmin|kepala_balai|pegawai_asn_pppk');
     Route::patch('/booking-konsultasi/{booking}/status', [BookingKonsultasiController::class, 'updateStatus'])
+        ->middleware('role:superadmin|kepala_balai|pegawai_asn_pppk');
+    // Konfigurasi slot booking (petugas Infokom).
+    Route::get('/booking-config', [BookingKonsultasiController::class, 'getConfig'])
+        ->middleware('role:superadmin|kepala_balai|pegawai_asn_pppk');
+    Route::put('/booking-config', [BookingKonsultasiController::class, 'updateConfig'])
         ->middleware('role:superadmin|kepala_balai|pegawai_asn_pppk');
 
     // --- Publikasi Berita (Fungsi Infokom) ---

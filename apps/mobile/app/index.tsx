@@ -23,7 +23,7 @@ export default function SplashScreen() {
           <ShieldCheck size={36} color="#fff" strokeWidth={2.25} />
         </View>
       </View>
-      <Text style={styles.title}>SIGAP BPOM Jember</Text>
+      <Text style={styles.title}>LENTERA BPOM Jember</Text>
       <Text style={styles.subtitle}>Sistem Informasi Terintegrasi{"\n"}Pengawasan Obat & Makanan</Text>
       <Text style={styles.footer}>Balai Pengawas Obat dan Makanan di Jember</Text>
     </View>

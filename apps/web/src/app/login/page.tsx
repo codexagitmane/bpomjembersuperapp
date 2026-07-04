@@ -55,7 +55,7 @@ export default function LoginPage() {
           <div className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-bpom-400 to-bpom-600 shadow-lg">
             <ShieldCheck className="size-6 text-white" />
           </div>
-          <span className="text-lg font-bold">SIGAP BPOM Jember</span>
+          <span className="text-lg font-bold">LENTERA BPOM Jember</span>
         </div>
 
         <motion.div
@@ -89,7 +89,7 @@ export default function LoginPage() {
             <div className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-bpom-400 to-bpom-600 shadow-lg">
               <ShieldCheck className="size-7 text-white" />
             </div>
-            <span className="text-lg font-bold text-navy-900">SIGAP BPOM Jember</span>
+            <span className="text-lg font-bold text-navy-900">LENTERA BPOM Jember</span>
           </div>
 
           <h1 className="text-2xl font-extrabold text-navy-900">Masuk ke Akun Anda</h1>

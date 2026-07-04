@@ -41,7 +41,7 @@ export default function SplashPage() {
           transition={{ delay: 0.25, duration: 0.5 }}
           className="text-center"
         >
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">SIGAP BPOM Jember</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight text-white">LENTERA BPOM Jember</h1>
           <p className="mt-1.5 text-sm font-medium text-navy-200">
             Sistem Informasi Terintegrasi Pengawasan Obat & Makanan
           </p>

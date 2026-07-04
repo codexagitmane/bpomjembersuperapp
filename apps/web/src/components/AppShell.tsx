@@ -13,6 +13,8 @@ import {
   LayoutDashboard,
   ClipboardCheck,
   UserCheck,
+  Building2,
+  CalendarRange,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { ROLE_LABELS, type RoleSlug } from "@bpom/shared";
@@ -28,12 +30,24 @@ const NAV_ITEMS = [
 // ini hanya visibilitas navigasi.
 const ROLE_NAV: Record<string, { href: string; label: string; icon: typeof Newspaper }[]> = {
   superadmin: [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard", label: "Dashboard Kabalai", icon: LayoutDashboard },
+    { href: "/dashboard-tu", label: "Dashboard TU", icon: Building2 },
     { href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck },
     { href: "/admin/verifikasi", label: "Verifikasi", icon: UserCheck },
+    { href: "/rekap-presensi", label: "Rekap Presensi", icon: CalendarRange },
+    { href: "/roster-keamanan", label: "Roster Keamanan", icon: ShieldCheck },
   ],
-  kepala_balai: [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }],
-  kepala_subag_tu: [{ href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck }],
+  kepala_balai: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard-tu", label: "Dashboard TU", icon: Building2 },
+    { href: "/rekap-presensi", label: "Rekap Presensi", icon: CalendarRange },
+  ],
+  kepala_subag_tu: [
+    { href: "/dashboard-tu", label: "Dashboard TU", icon: Building2 },
+    { href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck },
+    { href: "/rekap-presensi", label: "Rekap Presensi", icon: CalendarRange },
+    { href: "/roster-keamanan", label: "Roster Keamanan", icon: ShieldCheck },
+  ],
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -70,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-bpom-400 to-bpom-600">
             <ShieldCheck className="size-5 text-white" />
           </div>
-          <span className="text-base font-extrabold text-navy-900">SIGAP Jember</span>
+          <span className="text-base font-extrabold text-navy-900">LENTERA Jember</span>
         </Link>
 
         <nav className="flex flex-1 flex-col gap-1">
@@ -109,7 +123,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-bpom-400 to-bpom-600">
               <ShieldCheck className="size-4.5 text-white" />
             </div>
-            <span className="text-sm font-extrabold text-navy-900">SIGAP Jember</span>
+            <span className="text-sm font-extrabold text-navy-900">LENTERA Jember</span>
           </div>
           <div className="hidden md:block" />
 
@@ -127,9 +141,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 px-5 pb-24 pt-5 md:px-8 md:pb-8 md:pt-6">{children}</main>
       </div>
 
-      {/* Bottom nav — mobile */}
+      {/* Bottom nav — mobile (maks 4 item agar tidak overflow; item peran
+          diprioritaskan lalu dilengkapi menu dasar) */}
       <nav className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-around border-t border-navy-900/5 bg-white/95 py-2 backdrop-blur-md md:hidden">
-        {[...(ROLE_NAV[user.role] ?? []), ...NAV_ITEMS].map((item) => {
+        {[...(ROLE_NAV[user.role] ?? []), ...NAV_ITEMS].slice(0, 4).map((item) => {
           const active = pathname.startsWith(item.href);
           return (
             <Link

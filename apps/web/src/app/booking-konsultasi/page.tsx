@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarCheck, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { CalendarCheck, Send, CheckCircle2, AlertCircle, Clock } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -9,7 +9,13 @@ import { Input } from "@/components/ui/Input";
 import { Select, Textarea } from "@/components/ui/Field";
 import { api } from "@/lib/api";
 import { extractApiErrorMessage } from "@bpom/shared";
-import { formatTanggalIndonesia, formatJam } from "@/lib/utils";
+import { formatTanggalIndonesia, formatJam, cn } from "@/lib/utils";
+
+interface Slot {
+  jam: string;
+  sisa: number;
+  penuh: boolean;
+}
 
 interface Booking {
   id: number;
@@ -48,6 +54,10 @@ export default function BookingKonsultasiPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slotInfo, setSlotInfo] = useState<{ libur: boolean; alasan: string | null } | null>(null);
+  const [loadingSlot, setLoadingSlot] = useState(false);
+
   async function loadRiwayat() {
     const { data } = await api.get("/booking-konsultasi");
     setRiwayat(data.data ?? []);
@@ -56,6 +66,26 @@ export default function BookingKonsultasiPage() {
   useEffect(() => {
     loadRiwayat().finally(() => setLoading(false));
   }, []);
+
+  // Muat slot yang tersedia saat tanggal berubah.
+  useEffect(() => {
+    if (!form.tanggal) {
+      setSlots([]);
+      setSlotInfo(null);
+      return;
+    }
+    setLoadingSlot(true);
+    setForm((f) => ({ ...f, jam_slot: "" }));
+    api
+      .get("/booking-konsultasi/slot", { params: { tanggal: form.tanggal } })
+      .then(({ data }) => {
+        setSlots(data.slots ?? []);
+        setSlotInfo({ libur: data.libur, alasan: data.alasan });
+      })
+      .catch(() => setSlots([]))
+      .finally(() => setLoadingSlot(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.tanggal]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -96,23 +126,51 @@ export default function BookingKonsultasiPage() {
                 <option value="pengaduan">Pengaduan</option>
               </Select>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Tanggal"
-                  type="date"
-                  min={minDate}
-                  value={form.tanggal}
-                  onChange={(e) => setForm((f) => ({ ...f, tanggal: e.target.value }))}
-                  required
-                />
-                <Input
-                  label="Jam"
-                  type="time"
-                  value={form.jam_slot}
-                  onChange={(e) => setForm((f) => ({ ...f, jam_slot: e.target.value }))}
-                  required
-                />
-              </div>
+              <Input
+                label="Tanggal"
+                type="date"
+                min={minDate}
+                value={form.tanggal}
+                onChange={(e) => setForm((f) => ({ ...f, tanggal: e.target.value }))}
+                required
+              />
+
+              {/* Slot jam dinamis sesuai konfigurasi petugas */}
+              {form.tanggal && (
+                <div className="flex flex-col gap-1.5">
+                  <label className="flex items-center gap-1.5 text-sm font-medium text-navy-800">
+                    <Clock className="size-3.5" /> Pilih Jam
+                  </label>
+                  {loadingSlot && <p className="text-xs text-navy-400">Memuat slot tersedia...</p>}
+                  {!loadingSlot && slotInfo?.libur && (
+                    <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-600">
+                      {slotInfo.alasan}
+                    </p>
+                  )}
+                  {!loadingSlot && !slotInfo?.libur && slots.length > 0 && (
+                    <div className="grid grid-cols-4 gap-2">
+                      {slots.map((s) => (
+                        <button
+                          key={s.jam}
+                          type="button"
+                          disabled={s.penuh}
+                          onClick={() => setForm((f) => ({ ...f, jam_slot: s.jam }))}
+                          className={cn(
+                            "rounded-xl border px-2 py-2.5 text-sm font-bold transition-all",
+                            s.penuh
+                              ? "cursor-not-allowed border-navy-100 bg-navy-50 text-navy-300 line-through"
+                              : form.jam_slot === s.jam
+                                ? "border-navy-900 bg-navy-900 text-white shadow-md"
+                                : "border-navy-100 bg-white text-navy-700 hover:border-navy-300"
+                          )}
+                        >
+                          {s.jam}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <Input
                 label="Subjek"

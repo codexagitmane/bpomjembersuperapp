@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             DemoUsersSeeder::class,
             BeritaSeeder::class,
             SigApotekSeeder::class,
+            RosterKeamananSeeder::class,
         ]);
     }
 }

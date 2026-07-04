@@ -56,7 +56,7 @@ export default function LoginScreen() {
           <View style={styles.logoBox}>
             <ShieldCheck size={26} color="#fff" />
           </View>
-          <Text style={styles.logoText}>SIGAP BPOM Jember</Text>
+          <Text style={styles.logoText}>LENTERA BPOM Jember</Text>
         </View>
 
         <Text style={styles.title}>Masuk ke Akun Anda</Text>
