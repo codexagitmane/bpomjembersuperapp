@@ -8,33 +8,23 @@ use App\Models\PengajuanBmn;
 use App\Models\Presensi;
 use App\Models\User;
 use App\Models\WfhLocation;
+use App\Services\TrenKehadiranService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 /** Dashboard operasional Tata Usaha — Kasubag TU & Superadmin. */
 class DashboardKasubagController extends Controller
 {
-    public function index()
+    public function index(Request $request, TrenKehadiranService $trenService)
     {
         $today = Carbon::today();
+        $periode = $request->input('periode', 'bulan');
         $totalPegawai = User::where('account_type', 'internal')->where('is_active', true)->count();
         $presensiHariIni = Presensi::whereDate('tanggal', $today)->get();
 
-        // Tren kehadiran 7 hari terakhir (untuk grafik).
-        $tren = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $tgl = $today->copy()->subDays($i);
-            $hadir = Presensi::whereDate('tanggal', $tgl)->whereNotNull('jam_masuk')->count();
-            $terlambat = Presensi::whereDate('tanggal', $tgl)->where('status_masuk', 'terlambat')->count();
-            $tren[] = [
-                'tanggal' => $tgl->toDateString(),
-                'label' => $tgl->translatedFormat('D'),
-                'hadir' => $hadir,
-                'terlambat' => $terlambat,
-            ];
-        }
-
         return response()->json([
             'tanggal' => $today->toDateString(),
+            'periode' => $periode,
             'presensi_hari_ini' => [
                 'total_pegawai' => $totalPegawai,
                 'hadir' => $presensiHariIni->whereNotNull('jam_masuk')->count(),
@@ -50,7 +40,7 @@ class DashboardKasubagController extends Controller
                 'bmn_diproses' => PengajuanBmn::where('status', 'diproses')->count(),
                 'wfh_menunggu' => WfhLocation::where('status', 'diajukan')->count(),
             ],
-            'tren_kehadiran' => $tren,
+            'tren_kehadiran' => $trenService->tren($periode),
         ]);
     }
 }

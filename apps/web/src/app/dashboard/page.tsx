@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -8,7 +8,6 @@ import {
   Clock,
   UserX,
   Home,
-  Briefcase,
   CalendarCheck,
   DoorOpen,
   Wrench,
@@ -21,11 +20,23 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui/Card";
+import { LineChart } from "@/components/charts/LineChart";
+import { DonutChart } from "@/components/charts/DonutChart";
 import { api } from "@/lib/api";
 import { formatTanggalIndonesia, cn } from "@/lib/utils";
 
+type Periode = "bulan" | "triwulan" | "semester" | "tahun";
+
+const PERIODE_LABEL: Record<Periode, string> = {
+  bulan: "30 Hari",
+  triwulan: "Triwulan",
+  semester: "Semester",
+  tahun: "Tahun",
+};
+
 interface DashboardData {
   tanggal: string;
+  tren_kehadiran: { label: string; hadir: number; terlambat: number }[];
   presensi: {
     total_pegawai: number;
     hadir: number;
@@ -62,16 +73,22 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
+  const [periode, setPeriode] = useState<Periode>("bulan");
+
+  const load = useCallback(async () => {
+    try {
+      const { data } = await api.get("/dashboard/kabalai", { params: { periode } });
+      setData(data);
+    } catch (err: unknown) {
+      if ((err as { response?: { status?: number } })?.response?.status === 403) setForbidden(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [periode]);
 
   useEffect(() => {
-    api
-      .get("/dashboard/kabalai")
-      .then(({ data }) => setData(data))
-      .catch((err) => {
-        if (err?.response?.status === 403) setForbidden(true);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    load();
+  }, [load]);
 
   if (forbidden) {
     return (
@@ -138,6 +155,41 @@ export default function DashboardPage() {
                 delay={3}
               />
             </div>
+
+            {/* Tren kehadiran per periode */}
+            <SectionTitle>Tren Kehadiran</SectionTitle>
+            <Card>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-navy-700">
+                  Kehadiran & keterlambatan — {PERIODE_LABEL[periode]} terakhir
+                </p>
+                <div className="flex rounded-xl bg-navy-50 p-1">
+                  {(Object.keys(PERIODE_LABEL) as Periode[]).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPeriode(p)}
+                      className={cn(
+                        "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+                        periode === p ? "bg-navy-900 text-white shadow-sm" : "text-navy-500 hover:text-navy-800"
+                      )}
+                    >
+                      {PERIODE_LABEL[p]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {data.tren_kehadiran.length > 0 ? (
+                <LineChart
+                  labels={data.tren_kehadiran.map((t) => t.label)}
+                  series={[
+                    { name: "Hadir", color: "#0f854e", data: data.tren_kehadiran.map((t) => t.hadir) },
+                    { name: "Terlambat", color: "#f5a524", data: data.tren_kehadiran.map((t) => t.terlambat) },
+                  ]}
+                />
+              ) : (
+                <p className="py-8 text-center text-sm text-navy-400">Belum ada data kehadiran pada periode ini.</p>
+              )}
+            </Card>
 
             {/* Layanan & operasional */}
             <SectionTitle>Layanan & Operasional</SectionTitle>
@@ -209,6 +261,40 @@ export default function DashboardPage() {
                 accent="navy"
                 delay={3}
               />
+            </div>
+
+            <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+              <Card>
+                <h3 className="mb-4 text-sm font-bold text-navy-700">Status Izin Apotek (SIG)</h3>
+                {data.apotek.total > 0 ? (
+                  <DonutChart
+                    centerLabel={`${data.apotek.total} apotek terdaftar`}
+                    slices={[
+                      { label: "Aktif", value: data.apotek.aktif, color: "#17a361" },
+                      { label: "Kadaluarsa", value: data.apotek.kadaluarsa, color: "#f5a524" },
+                      { label: "Dicabut", value: data.apotek.dicabut, color: "#e5484d" },
+                    ]}
+                  />
+                ) : (
+                  <p className="py-8 text-center text-sm text-navy-400">Belum ada data apotek.</p>
+                )}
+              </Card>
+              <Card>
+                <h3 className="mb-4 text-sm font-bold text-navy-700">Status Barang Bukti</h3>
+                {sum(data.barang_bukti) > 0 ? (
+                  <DonutChart
+                    centerLabel={`${sum(data.barang_bukti)} total tercatat`}
+                    slices={[
+                      { label: "Disimpan", value: data.barang_bukti["disimpan"] ?? 0, color: "#0b5cad" },
+                      { label: "Dalam Proses", value: data.barang_bukti["dalam_proses"] ?? 0, color: "#f5a524" },
+                      { label: "Dimusnahkan", value: data.barang_bukti["dimusnahkan"] ?? 0, color: "#e5484d" },
+                      { label: "Dikembalikan", value: data.barang_bukti["dikembalikan"] ?? 0, color: "#17a361" },
+                    ].filter((s) => s.value > 0)}
+                  />
+                ) : (
+                  <p className="py-8 text-center text-sm text-navy-400">Belum ada data barang bukti.</p>
+                )}
+              </Card>
             </div>
 
             {/* Aktivitas terbaru */}

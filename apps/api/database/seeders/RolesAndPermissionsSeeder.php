@@ -32,6 +32,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'izin_keluar_masuk',
             'pengajuan_bmn',
             'barang_bukti',
+            'manajemen_bahan_lab',
         ];
 
         foreach ($aplikasiSlugs as $slug) {
@@ -42,7 +43,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'superadmin' => $aplikasiSlugs, // akses penuh
             'kepala_balai' => $aplikasiSlugs, // akses penuh (monitoring lintas fungsi)
             'kepala_subag_tu' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn'],
-            'pegawai_asn_pppk' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'sig_apotek', 'barang_bukti', 'booking_konsultasi'],
+            'pegawai_asn_pppk' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'sig_apotek', 'barang_bukti', 'booking_konsultasi', 'manajemen_bahan_lab'],
             'pegawai_outsourcing_magang' => ['presensi', 'izin_keluar_masuk'],
             'masyarakat' => ['booking_konsultasi'],
         ];

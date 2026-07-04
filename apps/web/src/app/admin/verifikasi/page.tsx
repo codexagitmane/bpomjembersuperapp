@@ -1,13 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { UserCheck, Home, Check, X, ShieldOff, Mail, Phone } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { UserCheck, Home, Check, X, ShieldOff, Mail, Phone, MapPinned } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { api } from "@/lib/api";
 import { extractApiErrorMessage } from "@bpom/shared";
 import { formatTanggalIndonesia, cn } from "@/lib/utils";
+
+// Leaflet mengakses `window` — hanya render di client.
+const WfhMap = dynamic(() => import("@/components/WfhMap").then((m) => m.WfhMap), {
+  ssr: false,
+  loading: () => <div className="h-80 animate-pulse rounded-2xl bg-navy-100/60 md:h-96" />,
+});
 
 interface AkunPending {
   id: number;
@@ -35,6 +42,20 @@ export default function VerifikasiPage() {
   const [forbidden, setForbidden] = useState(false);
   const [actingId, setActingId] = useState<number | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [fokusWfhId, setFokusWfhId] = useState<number | null>(null);
+
+  // Identitas array stabil agar WfhMap tidak re-render marker tiap render.
+  const petaPoints = useMemo(
+    () =>
+      wfh.map((w) => ({
+        id: w.id,
+        label: w.label,
+        nama: w.user.name,
+        latitude: w.latitude,
+        longitude: w.longitude,
+      })),
+    [wfh]
+  );
 
   const load = useCallback(async () => {
     try {
@@ -131,6 +152,14 @@ export default function VerifikasiPage() {
           <div className="mt-4 rounded-xl bg-navy-50 px-4 py-3 text-sm font-medium text-navy-700">{msg}</div>
         )}
 
+        {/* Peta real-time lokasi WFH: marker rumah berdenyut, radius kantor,
+            garis animasi ke kantor terdekat + jarak. */}
+        {tab === "wfh" && !loading && wfh.length > 0 && (
+          <div className="mt-4">
+            <WfhMap points={petaPoints} focusId={fokusWfhId} />
+          </div>
+        )}
+
         <div className="mt-4 flex flex-col gap-3">
           {loading &&
             [...Array(3)].map((_, i) => <div key={i} className="h-24 animate-pulse rounded-2xl bg-navy-100/60" />)}
@@ -184,14 +213,12 @@ export default function VerifikasiPage() {
                     <p className="mt-1 text-xs text-navy-500">
                       {w.label} — {w.alamat ?? "(tanpa alamat)"}
                     </p>
-                    <a
-                      href={`https://www.openstreetmap.org/?mlat=${w.latitude}&mlon=${w.longitude}#map=17/${w.latitude}/${w.longitude}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-1 inline-block text-xs font-semibold text-bpom-600 hover:underline"
+                    <button
+                      onClick={() => setFokusWfhId(w.id)}
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-bpom-600 hover:underline"
                     >
-                      Lihat titik di peta ({w.latitude.toFixed(5)}, {w.longitude.toFixed(5)}) ↗
-                    </a>
+                      <MapPinned className="size-3.5" /> Fokus di peta ({w.latitude.toFixed(5)}, {w.longitude.toFixed(5)})
+                    </button>
                   </div>
                   <div className="flex gap-2">
                     <Button size="sm" variant="secondary" loading={actingId === w.id} onClick={() => prosesWfh(w.id, "setujui")}>

@@ -36,6 +36,7 @@ export const FUNGSI = {
   INFOKOM: "infokom",
   PENINDAKAN: "penindakan",
   TATA_USAHA: "tata_usaha",
+  PENGUJIAN: "pengujian",
 } as const;
 
 export type FungsiSlug = (typeof FUNGSI)[keyof typeof FUNGSI];
@@ -45,6 +46,7 @@ export const FUNGSI_LABELS: Record<FungsiSlug, string> = {
   [FUNGSI.INFOKOM]: "Fungsi Informasi dan Komunikasi",
   [FUNGSI.PENINDAKAN]: "Fungsi Penindakan",
   [FUNGSI.TATA_USAHA]: "Fungsi Tata Usaha",
+  [FUNGSI.PENGUJIAN]: "Fungsi Pengujian",
 };
 
 export const APLIKASI = {
@@ -54,6 +56,7 @@ export const APLIKASI = {
   IZIN_KELUAR_MASUK: "izin_keluar_masuk",
   PENGAJUAN_BMN: "pengajuan_bmn",
   BARANG_BUKTI: "barang_bukti",
+  MANAJEMEN_BAHAN_LAB: "manajemen_bahan_lab",
 } as const;
 
 export type AplikasiSlug = (typeof APLIKASI)[keyof typeof APLIKASI];
@@ -118,6 +121,14 @@ export const APLIKASI_LIST: AplikasiDef[] = [
     icon: "Boxes",
     externalAccess: false,
   },
+  {
+    slug: APLIKASI.MANAJEMEN_BAHAN_LAB,
+    nama: "Dashboard SIMBA — Manajemen Bahan Laboratorium",
+    deskripsi: "Pencatatan stok, pemakaian, dan analitik bahan/reagen laboratorium pengujian.",
+    fungsi: FUNGSI.PENGUJIAN,
+    icon: "TestTube2",
+    externalAccess: false,
+  },
 ];
 
 /** Matriks akses aplikasi per-role. Superadmin selalu punya akses penuh. */
@@ -136,6 +147,7 @@ export const ROLE_APLIKASI_ACCESS: Record<RoleSlug, AplikasiSlug[] | "all"> = {
     APLIKASI.SIG_APOTEK,
     APLIKASI.BARANG_BUKTI,
     APLIKASI.BOOKING_KONSULTASI,
+    APLIKASI.MANAJEMEN_BAHAN_LAB,
   ],
   [ROLES.PEGAWAI_OUTSOURCING_MAGANG]: [APLIKASI.PRESENSI, APLIKASI.IZIN_KELUAR_MASUK],
   [ROLES.MASYARAKAT]: [APLIKASI.BOOKING_KONSULTASI],

@@ -11,14 +11,17 @@ use App\Models\PengajuanBmn;
 use App\Models\Presensi;
 use App\Models\SigApotek;
 use App\Models\User;
+use App\Services\TrenKehadiranService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 /** Dashboard monitoring lintas-modul — khusus Kepala Balai & Superadmin. */
 class DashboardController extends Controller
 {
-    public function kabalai()
+    public function kabalai(Request $request, TrenKehadiranService $trenService)
     {
         $today = Carbon::today();
+        $periode = $request->input('periode', 'bulan');
 
         $totalPegawaiAktif = User::where('account_type', 'internal')->where('is_active', true)->count();
         $presensiHariIni = Presensi::whereDate('tanggal', $today)->get();
@@ -63,7 +66,9 @@ class DashboardController extends Controller
 
         return response()->json([
             'tanggal' => $today->toDateString(),
+            'periode' => $periode,
             'presensi' => $presensi,
+            'tren_kehadiran' => $trenService->tren($periode),
             'booking' => $booking,
             'izin' => $izin,
             'bmn' => $bmn,

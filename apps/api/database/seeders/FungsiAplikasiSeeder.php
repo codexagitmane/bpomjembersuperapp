@@ -19,6 +19,8 @@ class FungsiAplikasiSeeder extends Seeder
                 'deskripsi' => 'Penindakan pelanggaran dan pengelolaan barang bukti.'],
             ['slug' => 'tata_usaha', 'nama' => 'Fungsi Tata Usaha', 'icon' => 'Building2', 'urutan' => 4,
                 'deskripsi' => 'Administrasi kepegawaian, sarana, dan operasional kantor.'],
+            ['slug' => 'pengujian', 'nama' => 'Fungsi Pengujian', 'icon' => 'FlaskConical', 'urutan' => 5,
+                'deskripsi' => 'Pengujian laboratorium dan manajemen bahan analisis (SIMBA).'],
         ];
 
         foreach ($fungsiList as $data) {
@@ -61,6 +63,12 @@ class FungsiAplikasiSeeder extends Seeder
                 'nama' => 'Monitoring Barang Bukti',
                 'deskripsi' => 'Pelacakan status dan rantai pengelolaan barang bukti penindakan.',
                 'icon' => 'Boxes', 'is_external_access' => false, 'urutan' => 6,
+            ],
+            [
+                'fungsi' => 'pengujian', 'slug' => 'manajemen_bahan_lab',
+                'nama' => 'Dashboard SIMBA — Manajemen Bahan Laboratorium',
+                'deskripsi' => 'Pencatatan stok, pemakaian, dan analitik bahan/reagen laboratorium pengujian.',
+                'icon' => 'TestTube2', 'is_external_access' => false, 'urutan' => 7,
             ],
         ];
 

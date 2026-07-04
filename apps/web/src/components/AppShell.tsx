@@ -15,6 +15,7 @@ import {
   UserCheck,
   Building2,
   CalendarRange,
+  FlaskConical,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { ROLE_LABELS, type RoleSlug } from "@bpom/shared";
@@ -32,6 +33,7 @@ const ROLE_NAV: Record<string, { href: string; label: string; icon: typeof Newsp
   superadmin: [
     { href: "/dashboard", label: "Dashboard Kabalai", icon: LayoutDashboard },
     { href: "/dashboard-tu", label: "Dashboard TU", icon: Building2 },
+    { href: "/dashboard-simba", label: "Dashboard SIMBA", icon: FlaskConical },
     { href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck },
     { href: "/admin/verifikasi", label: "Verifikasi", icon: UserCheck },
     { href: "/rekap-presensi", label: "Rekap Presensi", icon: CalendarRange },
@@ -40,6 +42,7 @@ const ROLE_NAV: Record<string, { href: string; label: string; icon: typeof Newsp
   kepala_balai: [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard-tu", label: "Dashboard TU", icon: Building2 },
+    { href: "/dashboard-simba", label: "Dashboard SIMBA", icon: FlaskConical },
     { href: "/rekap-presensi", label: "Rekap Presensi", icon: CalendarRange },
   ],
   kepala_subag_tu: [
@@ -48,6 +51,7 @@ const ROLE_NAV: Record<string, { href: string; label: string; icon: typeof Newsp
     { href: "/rekap-presensi", label: "Rekap Presensi", icon: CalendarRange },
     { href: "/roster-keamanan", label: "Roster Keamanan", icon: ShieldCheck },
   ],
+  pegawai_asn_pppk: [{ href: "/dashboard-simba", label: "Dashboard SIMBA", icon: FlaskConical }],
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {

@@ -131,8 +131,25 @@ docker compose exec api php artisan migrate --seed
 - **Monitoring Barang Bukti** — pencatatan + rantai pengelolaan (chain of
   custody log), khusus Fungsi Penindakan.
 - **SIG Monitoring Distribusi Apotek** — peta interaktif (Leaflet) di web,
-  daftar tabular di mobile.
+  daftar tabular di mobile; impor data via Excel dan Shapefile (SHP).
 - **Berita & Informasi** — feed publik.
+- **Dashboard Kepala Balai** — ringkasan semua modul + **tren kehadiran
+  multi-periode** (30 hari / triwulan / semester / tahun) dengan line chart,
+  serta pie chart status izin apotek & barang bukti.
+- **Dashboard Tata Usaha (Kasubag TU)** — monitoring kehadiran harian,
+  rekap presensi bulanan per pegawai dengan **ekspor Excel & PDF**.
+- **Roster Keamanan** — penjadwalan shift petugas keamanan selang-sehari
+  (lintas hari, termasuk hari libur), terintegrasi aturan presensi.
+- **Dashboard SIMBA (Fungsi Pengujian)** — analitik bahan laboratorium:
+  total penggunaan, bahan aktif/kedaluwarsa, tren penggunaan per bulan,
+  top-5 bahan, daftar bahan perlu pengadaan, daftar tanggal ED (paginasi),
+  filter bulan & penguji.
+- **Manajemen Bahan Laboratorium** — CRUD stok bahan/reagen + pencatatan
+  pemakaian per sampel dengan validasi stok server-side.
+- **Peta Verifikasi WFH real-time** — admin melihat semua pengajuan lokasi
+  WFH di peta Leaflet animasi: marker rumah berdenyut, radius geofence kedua
+  kantor, garis animasi ke kantor terdekat + jarak, dan flyTo saat memilih
+  pengajuan.
 
 ## Keamanan yang Sudah Diimplementasikan
 

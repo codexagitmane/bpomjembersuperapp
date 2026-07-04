@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Api\AdminVerifikasiController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BahanLabController;
 use App\Http\Controllers\Api\BarangBuktiController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DashboardKasubagController;
+use App\Http\Controllers\Api\DashboardSimbaController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\BookingKonsultasiController;
 use App\Http\Controllers\Api\IzinKeluarMasukController;
@@ -106,6 +108,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/import-shp', [SigApotekController::class, 'importShapefile'])->middleware('throttle:10,10');
         Route::patch('/{sigApotek}', [SigApotekController::class, 'update']);
     });
+
+    // --- Manajemen Bahan Laboratorium & Dashboard SIMBA (Fungsi Pengujian) ---
+    Route::prefix('bahan-lab')->middleware('role:superadmin|kepala_balai|pegawai_asn_pppk')->group(function () {
+        Route::get('/', [BahanLabController::class, 'index']);
+        Route::post('/', [BahanLabController::class, 'store']);
+        Route::patch('/{bahanLab}', [BahanLabController::class, 'update']);
+        Route::post('/{bahanLab}/pemakaian', [BahanLabController::class, 'catatPemakaian']);
+        Route::get('/{bahanLab}/riwayat', [BahanLabController::class, 'riwayatPemakaian']);
+    });
+    Route::get('/dashboard/simba', [DashboardSimbaController::class, 'index'])
+        ->middleware('role:superadmin|kepala_balai|pegawai_asn_pppk');
 
     // --- Verifikasi oleh Tim IT/Admin (Superadmin) ---
     Route::prefix('admin')->middleware('role:superadmin')->group(function () {
