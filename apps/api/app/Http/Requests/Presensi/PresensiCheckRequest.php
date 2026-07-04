@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Presensi;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * Dipakai untuk check-in maupun check-out. Foto WAJIB dikirim sebagai file
@@ -20,6 +21,7 @@ class PresensiCheckRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'mode' => ['required', Rule::in(['wfo', 'wfh', 'dinas'])],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'accuracy_meter' => ['nullable', 'numeric', 'min:0', 'max:500'],
@@ -31,6 +33,7 @@ class PresensiCheckRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'mode.required' => 'Pilih mode presensi (WFO / WFH / Dinas).',
             'foto.required' => 'Foto selfie wajib disertakan.',
             'foto.image' => 'File yang diunggah harus berupa gambar.',
             'foto.max' => 'Ukuran foto maksimal 5 MB.',

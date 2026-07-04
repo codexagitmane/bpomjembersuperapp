@@ -89,10 +89,30 @@ docker compose exec api php artisan migrate --seed
 | Kepala Subag TU | kasubag.tu@bpomjember.go.id | BpomJember@2026 |
 | Pegawai ASN/PPPK | pegawai.asn@bpomjember.go.id | BpomJember@2026 |
 | Pegawai Outsourcing | pegawai.outsourcing@bpomjember.go.id | BpomJember@2026 |
+| Magang | magang@bpomjember.go.id | BpomJember@2026 |
+| Petugas Keamanan | keamanan@bpomjember.go.id | BpomJember@2026 |
+| Petugas Kebersihan | kebersihan@bpomjember.go.id | BpomJember@2026 |
+| Pengemudi | pengemudi@bpomjember.go.id | BpomJember@2026 |
 | Masyarakat (eksternal) | masyarakat@example.com | Masyarakat@123 |
 
 ⚠️ **Akun-akun ini HANYA untuk development/demo.** Hapus atau ganti seeder
 `DemoUsersSeeder` sebelum deploy ke produksi.
+
+## Aturan Presensi (sesuai kebijakan BPOM Jember)
+
+- **Dua titik kantor** (radius geofence 100 m): Kantor Utama (-8.17874, 113.70650)
+  dan Gedung Laboratorium (-8.18324, 113.67008).
+- **Jam kerja**: Senin–Kamis 07.30–16.00 • Jumat 07.30–16.30 • Sabtu 07.30–12.00
+  (khusus petugas kebersihan) • batas maksimal absen 22.00 WIB.
+- **Jenis pegawai** (atribut `jenis_pegawai`, terpisah dari role RBAC): pegawai,
+  magang, keamanan, kebersihan, pengemudi, pelayanan.
+- **Petugas keamanan**: shift lintas hari — check-in maks 07.30, check-out
+  keesokan hari maks 07.30; boleh absen setiap hari termasuk libur.
+- **Mode presensi**: WFO (radius salah satu titik kantor), WFH (lokasi rumah
+  terdaftar & terverifikasi admin), Dinas (di luar radius, lokasi tetap dicatat).
+- **Registrasi masyarakat** tidak langsung aktif — wajib diverifikasi tim
+  IT/admin; notifikasi aktivasi dikirim via email. Booking yang dikonfirmasi
+  petugas juga memicu email ke masyarakat.
 
 ## Modul yang Sudah Fungsional Penuh (backend + web + mobile)
 
@@ -146,13 +166,14 @@ docker compose exec api php artisan migrate --seed
 ### Yang perlu ditambahkan sebelum audit keamanan produksi (rekomendasi)
 
 - Autentikasi dua faktor (2FA/OTP) untuk role manajerial.
-- Verifikasi email untuk registrasi akun masyarakat (saat ini langsung aktif).
+- Registrasi masyarakat sudah melewati verifikasi manual admin; pertimbangkan
+  tambahan verifikasi email/OTP otomatis untuk lapisan kedua.
 - Web Application Firewall (WAF) di depan API (mis. Cloudflare/AWS WAF).
 - Pertimbangkan pola BFF (cookie httpOnly) untuk token web alih-alih
   `localStorage`, guna mengurangi permukaan serangan XSS terhadap token.
 - Penetration testing formal sebelum go-live.
-- Ganti koordinat kantor di `PengaturanSeeder` (saat ini **placeholder**) dan
-  di `packages/shared/src/constants.ts` dengan hasil survei GPS aktual.
+- Koordinat dua titik kantor sudah diisi sesuai data resmi dari BPOM Jember
+  (Kantor Utama & Gedung Laboratorium).
 
 ## Status Pengembangan
 

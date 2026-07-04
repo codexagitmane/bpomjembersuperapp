@@ -30,11 +30,33 @@ import { Card, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { colors, radius } from "@/theme";
 
-interface KantorInfo {
+interface TitikKantor {
+  slug: string;
+  nama: string;
   latitude: number;
   longitude: number;
-  radius_meter: number;
 }
+
+interface KantorInfo {
+  titik_kantor: TitikKantor[];
+  radius_meter: number;
+  batas_absen: string;
+  jadwal_hari_ini: {
+    boleh_absen: boolean;
+    alasan: string | null;
+    jam_masuk: string | null;
+    jam_pulang: string | null;
+    shift_lintas_hari: boolean;
+  };
+}
+
+type ModePresensi = "wfo" | "wfh" | "dinas";
+
+const MODE_OPTIONS: { value: ModePresensi; label: string }[] = [
+  { value: "wfo", label: "WFO" },
+  { value: "wfh", label: "WFH" },
+  { value: "dinas", label: "Dinas" },
+];
 interface PresensiHariIni {
   id: number;
   jam_masuk: string | null;
@@ -51,6 +73,7 @@ const STATUS_LABEL: Record<string, { label: string; tone: "success" | "warning" 
   terlambat: { label: "Terlambat", tone: "warning" },
   pulang_awal: { label: "Pulang Awal", tone: "warning" },
   di_luar_geofence: { label: "Di Luar Radius", tone: "danger" },
+  lewat_batas: { label: "Lewat Batas", tone: "danger" },
 };
 
 export default function PresensiScreen() {
@@ -62,6 +85,7 @@ export default function PresensiScreen() {
   const [riwayat, setRiwayat] = useState<RiwayatItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [mode, setMode] = useState<ModePresensi>("wfo");
   const [coords, setCoords] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
@@ -117,8 +141,15 @@ export default function PresensiScreen() {
       : "selesai";
 
   const distance =
-    coords && kantor ? haversineDistanceMeter(coords.lat, coords.lng, kantor.latitude, kantor.longitude) : null;
+    coords && kantor && kantor.titik_kantor.length
+      ? Math.min(
+          ...kantor.titik_kantor.map((t) =>
+            haversineDistanceMeter(coords.lat, coords.lng, t.latitude, t.longitude)
+          )
+        )
+      : null;
   const diDalamRadius = distance !== null && kantor ? distance <= kantor.radius_meter : null;
+  const jadwal = kantor?.jadwal_hari_ini;
 
   async function handleCapture() {
     if (!cameraRef.current) return;
@@ -133,6 +164,7 @@ export default function PresensiScreen() {
     setSubmitSuccess(null);
 
     const form = new FormData();
+    form.append("mode", mode);
     form.append("latitude", String(coords.lat));
     form.append("longitude", String(coords.lng));
     form.append("accuracy_meter", String(Math.round(coords.accuracy)));
@@ -191,6 +223,33 @@ export default function PresensiScreen() {
               <Text style={styles.cardTitle}>
                 {aksi === "check-in" ? "Presensi Masuk" : "Presensi Pulang"}
               </Text>
+
+              {jadwal && !jadwal.boleh_absen && (
+                <View style={styles.errorBox}>
+                  <AlertCircle size={16} color="#be123c" />
+                  <Text style={styles.errorText}>{jadwal.alasan}</Text>
+                </View>
+              )}
+              {jadwal?.boleh_absen && (
+                <Text style={styles.jadwalText}>
+                  Jadwal: {jadwal.jam_masuk} – {jadwal.jam_pulang}
+                  {jadwal.shift_lintas_hari ? " (shift lintas hari)" : ""} • batas absen {kantor?.batas_absen} WIB
+                </Text>
+              )}
+
+              <View style={styles.modeRow}>
+                {MODE_OPTIONS.map((opt) => (
+                  <Pressable
+                    key={opt.value}
+                    onPress={() => setMode(opt.value)}
+                    style={[styles.modeChip, mode === opt.value && styles.modeChipActive]}
+                  >
+                    <Text style={[styles.modeChipText, mode === opt.value && styles.modeChipTextActive]}>
+                      {opt.label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
 
               <View style={styles.locationRow}>
                 <MapPin size={16} color={colors.navy600} />
@@ -341,6 +400,18 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   errorText: { fontSize: 12.5, fontWeight: "600", color: "#be123c", flex: 1 },
+  jadwalText: { fontSize: 12, color: colors.textMuted, marginBottom: 10 },
+  modeRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
+  modeChip: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderRadius: radius.md,
+    backgroundColor: colors.navy50,
+  },
+  modeChipActive: { backgroundColor: colors.navy900 },
+  modeChipText: { fontSize: 13, fontWeight: "700", color: colors.navy600 },
+  modeChipTextActive: { color: "#fff" },
   locationRow: {
     flexDirection: "row",
     alignItems: "center",

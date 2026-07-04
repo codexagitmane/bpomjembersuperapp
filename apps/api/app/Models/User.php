@@ -21,6 +21,7 @@ class User extends Authenticatable
         'nip_nik',
         'phone',
         'account_type',
+        'jenis_pegawai',
         'avatar_path',
         'is_active',
     ];

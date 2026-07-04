@@ -9,8 +9,9 @@ class SigApotek extends Model
     protected $table = 'sig_apotek';
 
     protected $fillable = [
-        'nama_apotek', 'alamat', 'latitude', 'longitude', 'nomor_izin', 'status_izin',
-        'penanggung_jawab', 'tanggal_pemeriksaan_terakhir', 'hasil_pemeriksaan_terakhir', 'created_by',
+        'nama_apotek', 'alamat', 'kecamatan', 'latitude', 'longitude', 'nomor_izin', 'status_izin',
+        'penanggung_jawab', 'tanggal_pemeriksaan_terakhir', 'hasil_pemeriksaan_terakhir',
+        'jumlah_pelanggaran', 'keterangan_pelanggaran', 'created_by',
     ];
 
     protected function casts(): array

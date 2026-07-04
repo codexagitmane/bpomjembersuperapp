@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AdminVerifikasiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BarangBuktiController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\BookingKonsultasiController;
 use App\Http\Controllers\Api\IzinKeluarMasukController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\PengajuanBmnController;
 use App\Http\Controllers\Api\PresensiController;
 use App\Http\Controllers\Api\SigApotekController;
+use App\Http\Controllers\Api\WfhLocationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,6 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/kantor-info', [PresensiController::class, 'kantorInfo']);
         Route::get('/hari-ini', [PresensiController::class, 'hariIni']);
         Route::get('/riwayat', [PresensiController::class, 'riwayat']);
+        Route::get('/wfh-lokasi', [WfhLocationController::class, 'index']);
+        Route::post('/wfh-lokasi', [WfhLocationController::class, 'store']);
         Route::middleware('throttle:20,1')->group(function () {
             Route::post('/check-in', [PresensiController::class, 'checkIn']);
             Route::post('/check-out', [PresensiController::class, 'checkOut']);
@@ -78,8 +83,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('sig-apotek')->middleware('role:superadmin|kepala_balai|pegawai_asn_pppk')->group(function () {
         Route::get('/', [SigApotekController::class, 'index']);
         Route::post('/', [SigApotekController::class, 'store']);
+        Route::post('/import-excel', [SigApotekController::class, 'importSpreadsheet'])->middleware('throttle:10,10');
+        Route::post('/import-shp', [SigApotekController::class, 'importShapefile'])->middleware('throttle:10,10');
         Route::patch('/{sigApotek}', [SigApotekController::class, 'update']);
     });
+
+    // --- Verifikasi oleh Tim IT/Admin (Superadmin) ---
+    Route::prefix('admin')->middleware('role:superadmin')->group(function () {
+        Route::get('/akun-pending', [AdminVerifikasiController::class, 'akunPending']);
+        Route::patch('/akun/{user}/aktivasi', [AdminVerifikasiController::class, 'aktivasiAkun']);
+        Route::get('/wfh-pending', [AdminVerifikasiController::class, 'wfhPending']);
+        Route::patch('/wfh/{wfhLocation}/verifikasi', [AdminVerifikasiController::class, 'verifikasiWfh']);
+    });
+
+    // --- Dashboard Monitoring (khusus Kepala Balai & Superadmin) ---
+    Route::get('/dashboard/kabalai', [DashboardController::class, 'kabalai'])
+        ->middleware('role:superadmin|kepala_balai');
 
     // --- Booking Layanan Konsultasi & Pengaduan (Fungsi Infokom) ---
     // Bisa diakses akun internal maupun eksternal (masyarakat).

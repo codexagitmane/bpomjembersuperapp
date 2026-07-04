@@ -56,9 +56,10 @@ class AuthController extends Controller
         }
 
         if (! $user->is_active) {
-            throw ValidationException::withMessages([
-                'email' => 'Akun Anda dinonaktifkan. Hubungi administrator.',
-            ]);
+            $pesan = $user->account_type === 'eksternal'
+                ? 'Akun Anda belum aktif — menunggu verifikasi petugas BPOM Jember. Anda akan menerima email saat akun diaktifkan.'
+                : 'Akun Anda dinonaktifkan. Hubungi administrator.';
+            throw ValidationException::withMessages(['email' => $pesan]);
         }
 
         RateLimiter::clear($throttleKey);
@@ -92,24 +93,24 @@ class AuthController extends Controller
      */
     public function registerEksternal(RegisterEksternalRequest $request)
     {
+        // Akun masyarakat TIDAK langsung aktif — wajib diverifikasi tim IT/admin
+        // BPOM Jember terlebih dahulu (anti akun spam/bot).
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
             'password' => $request->input('password'),
             'account_type' => 'eksternal',
-            'is_active' => true,
+            'is_active' => false,
         ]);
 
         $user->assignRole('masyarakat');
 
-        AuditLog::catat($user->id, 'registrasi_eksternal', 'auth', 'Registrasi akun masyarakat baru.');
-
-        $token = $user->createToken('default', ['*'], now()->addMinutes((int) config('sanctum.expiration')))->plainTextToken;
+        AuditLog::catat($user->id, 'registrasi_eksternal', 'auth', 'Registrasi akun masyarakat baru (menunggu verifikasi).');
 
         return response()->json([
-            'user' => $this->formatUser($user),
-            'token' => $token,
+            'message' => 'Registrasi berhasil. Akun Anda akan aktif setelah diverifikasi petugas BPOM Jember — pemberitahuan dikirim ke email Anda.',
+            'perlu_verifikasi' => true,
         ], 201);
     }
 
@@ -151,6 +152,7 @@ class AuthController extends Controller
             'nip_nik' => $user->nip_nik,
             'phone' => $user->phone,
             'account_type' => $user->account_type,
+            'jenis_pegawai' => $user->jenis_pegawai,
             'role' => $user->getRoleNames()->first(),
             'avatar_url' => $user->avatar_path ? asset('storage/'.$user->avatar_path) : null,
             'is_active' => $user->is_active,

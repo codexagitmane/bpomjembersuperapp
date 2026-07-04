@@ -142,13 +142,37 @@ export const ROLE_APLIKASI_ACCESS: Record<RoleSlug, AplikasiSlug[] | "all"> = {
 };
 
 /**
- * Koordinat kantor Balai POM di Jember untuk validasi geofence presensi.
- * ⚠️ PLACEHOLDER — ganti dengan koordinat GPS hasil survei lapangan yang akurat
- * sebelum dipakai di produksi. Ambil titik dari Google Maps di depan kantor.
+ * Titik lokasi kantor Balai POM di Jember untuk geofence presensi.
+ * Sumber kebenaran runtime adalah tabel `pengaturan` di backend —
+ * konstanta ini hanya fallback/refrensi untuk klien.
  */
-export const KANTOR_BPOM_JEMBER = {
-  nama: "Kantor Balai POM di Jember",
-  latitude: -8.1723,
-  longitude: 113.7002,
-  radiusMeter: 150,
-};
+export const TITIK_KANTOR_BPOM_JEMBER = [
+  {
+    slug: "kantor_utama",
+    nama: "Kantor Utama BPOM Jember",
+    latitude: -8.178740897147627,
+    longitude: 113.70649700614,
+  },
+  {
+    slug: "gedung_lab",
+    nama: "Gedung Laboratorium",
+    latitude: -8.18323735847084,
+    longitude: 113.67008016307047,
+  },
+] as const;
+
+export const RADIUS_GEOFENCE_METER = 100;
+
+export const JENIS_PEGAWAI = [
+  "pegawai",
+  "magang",
+  "keamanan",
+  "kebersihan",
+  "pengemudi",
+  "pelayanan",
+] as const;
+
+export type JenisPegawai = (typeof JENIS_PEGAWAI)[number];
+
+export const MODE_PRESENSI = ["wfo", "wfh", "dinas"] as const;
+export type ModePresensi = (typeof MODE_PRESENSI)[number];

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\BookingDikonfirmasiMail;
 use App\Models\AuditLog;
 use App\Models\BookingKonsultasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class BookingKonsultasiController extends Controller
@@ -74,6 +76,12 @@ class BookingKonsultasiController extends Controller
             ...$validated,
             'ditangani_oleh' => $request->user()->id,
         ]);
+
+        // Notifikasi email ke masyarakat saat booking dikonfirmasi petugas.
+        if ($validated['status'] === 'dikonfirmasi') {
+            $booking->load('user');
+            Mail::to($booking->user->email)->queue(new BookingDikonfirmasiMail($booking));
+        }
 
         AuditLog::catat($request->user()->id, 'booking_status_diubah', 'infokom', "Booking #{$booking->id} -> {$validated['status']}.");
 

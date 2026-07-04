@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Newspaper, LayoutGrid, UserRound, LogOut, ShieldCheck, Loader2 } from "lucide-react";
+import {
+  Newspaper,
+  LayoutGrid,
+  UserRound,
+  LogOut,
+  ShieldCheck,
+  Loader2,
+  LayoutDashboard,
+  ClipboardCheck,
+  UserCheck,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { ROLE_LABELS, type RoleSlug } from "@bpom/shared";
 import { cn } from "@/lib/utils";
@@ -13,6 +23,18 @@ const NAV_ITEMS = [
   { href: "/beranda/fungsi", label: "Fungsi", icon: LayoutGrid },
   { href: "/beranda/profil", label: "Profil", icon: UserRound },
 ];
+
+// Menu tambahan sesuai role — server tetap menegakkan RBAC via API;
+// ini hanya visibilitas navigasi.
+const ROLE_NAV: Record<string, { href: string; label: string; icon: typeof Newspaper }[]> = {
+  superadmin: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck },
+    { href: "/admin/verifikasi", label: "Verifikasi", icon: UserCheck },
+  ],
+  kepala_balai: [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }],
+  kepala_subag_tu: [{ href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck }],
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, isLoading, logout } = useAuth();
@@ -52,7 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Link>
 
         <nav className="flex flex-1 flex-col gap-1">
-          {NAV_ITEMS.map((item) => {
+          {[...(ROLE_NAV[user.role] ?? []), ...NAV_ITEMS].map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link
@@ -107,7 +129,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Bottom nav — mobile */}
       <nav className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-around border-t border-navy-900/5 bg-white/95 py-2 backdrop-blur-md md:hidden">
-        {NAV_ITEMS.map((item) => {
+        {[...(ROLE_NAV[user.role] ?? []), ...NAV_ITEMS].map((item) => {
           const active = pathname.startsWith(item.href);
           return (
             <Link

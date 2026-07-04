@@ -11,9 +11,9 @@ class Presensi extends Model
     protected $fillable = [
         'user_id', 'tanggal',
         'jam_masuk', 'lokasi_masuk_lat', 'lokasi_masuk_lng', 'jarak_masuk_meter',
-        'akurasi_masuk_meter', 'foto_masuk_path', 'status_masuk', 'ip_masuk', 'device_masuk',
+        'akurasi_masuk_meter', 'foto_masuk_path', 'status_masuk', 'mode_masuk', 'titik_masuk', 'ip_masuk', 'device_masuk',
         'jam_keluar', 'lokasi_keluar_lat', 'lokasi_keluar_lng', 'jarak_keluar_meter',
-        'akurasi_keluar_meter', 'foto_keluar_path', 'status_keluar', 'ip_keluar', 'device_keluar',
+        'akurasi_keluar_meter', 'foto_keluar_path', 'status_keluar', 'mode_keluar', 'titik_keluar', 'ip_keluar', 'device_keluar',
         'catatan',
     ];
 
