@@ -16,28 +16,25 @@
 </style>
 </head>
 <body>
-  <h1>REKAP PRESENSI PEGAWAI — BALAI POM DI JEMBER</h1>
-  <p class="sub">Periode: {{ $rekap['periode'] }} &nbsp;|&nbsp; Hari kerja: {{ $rekap['hari_kerja'] }} hari
+  <h1>REKAP PRESENSI PEGAWAI ({{ strtoupper($rekap['mode']) }}) — BALAI POM DI JEMBER</h1>
+  <p class="sub">Periode: {{ $rekap['periode'] }}
+    @isset($rekap['hari_kerja']) &nbsp;|&nbsp; Hari kerja: {{ $rekap['hari_kerja'] }} hari @endisset
     &nbsp;|&nbsp; Total pegawai: {{ $rekap['ringkasan']['total_pegawai'] }}</p>
   <table>
     <thead>
       <tr>
-        <th>No</th><th>Nama</th><th>NIP/NIK</th><th>Jenis</th>
-        <th>Hadir</th><th>Tepat Waktu</th><th>Terlambat</th><th>WFH</th><th>Dinas</th>
+        @foreach($rekap['headers'] as $h)
+        <th>{{ $h }}</th>
+        @endforeach
       </tr>
     </thead>
     <tbody>
       @foreach($rekap['rows'] as $i => $row)
       <tr>
         <td class="center">{{ $i + 1 }}</td>
-        <td>{{ $row['nama'] }}</td>
-        <td>{{ $row['nip_nik'] }}</td>
-        <td class="center">{{ ucfirst($row['jenis_pegawai']) }}</td>
-        <td class="center">{{ $row['hadir'] }}</td>
-        <td class="center">{{ $row['tepat_waktu'] }}</td>
-        <td class="center">{{ $row['terlambat'] }}</td>
-        <td class="center">{{ $row['wfh'] }}</td>
-        <td class="center">{{ $row['dinas'] }}</td>
+        @foreach($rekap['kolom'] as $k)
+        <td class="{{ in_array($k, ['nama', 'nip_nik']) ? '' : 'center' }}">{{ $k === 'jenis_pegawai' ? ucfirst($row[$k]) : $row[$k] }}</td>
+        @endforeach
       </tr>
       @endforeach
     </tbody>

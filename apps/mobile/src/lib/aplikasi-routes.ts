@@ -7,4 +7,5 @@ export const APLIKASI_ROUTES: Record<AplikasiSlug, string> = {
   izin_keluar_masuk: "/izin-keluar-masuk",
   pengajuan_bmn: "/pengajuan-bmn",
   barang_bukti: "/barang-bukti",
+  manajemen_bahan_lab: "/dashboard-simba",
 };

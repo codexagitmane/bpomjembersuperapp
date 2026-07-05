@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Boxes, Plus, Search, ShieldOff, X } from "lucide-react";
+import { Boxes, Plus, Search, ShieldOff, X, FileText, Camera } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Field";
-import { api } from "@/lib/api";
+import { api, downloadFile } from "@/lib/api";
 import { extractApiErrorMessage } from "@bpom/shared";
 import { formatTanggalIndonesia } from "@/lib/utils";
 
@@ -39,6 +39,8 @@ export default function BarangBuktiPage() {
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<number | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     nomor_bb: "",
@@ -91,6 +93,33 @@ export default function BarangBuktiPage() {
       setError(extractApiErrorMessage(err));
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function unduhBeritaAcara(item: BarangBukti) {
+    setBusyId(item.id);
+    setMsg(null);
+    try {
+      await downloadFile(`/barang-bukti/${item.id}/berita-acara`, `berita-acara-${item.nomor_bb}.pdf`);
+    } catch {
+      setMsg("Gagal mengunduh berita acara.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function unggahFoto(item: BarangBukti, file: File) {
+    setBusyId(item.id);
+    setMsg(null);
+    try {
+      const fd = new FormData();
+      fd.append("foto", file);
+      await api.post(`/barang-bukti/${item.id}/foto`, fd, { headers: { "Content-Type": "multipart/form-data" } });
+      setMsg(`Foto lampiran ${item.nomor_bb} berhasil diunggah.`);
+    } catch (err) {
+      setMsg(extractApiErrorMessage(err));
+    } finally {
+      setBusyId(null);
     }
   }
 
@@ -154,6 +183,8 @@ export default function BarangBuktiPage() {
           <Button variant="outline" onClick={loadItems}>Cari</Button>
         </div>
 
+        {msg && <div className="mt-4 rounded-xl bg-navy-50 px-4 py-3 text-sm font-medium text-navy-700">{msg}</div>}
+
         <div className="mt-4 flex flex-col gap-3">
           {loading && [...Array(4)].map((_, i) => <div key={i} className="h-20 animate-pulse rounded-2xl bg-navy-100/60" />)}
           {!loading && items.length === 0 && (
@@ -174,6 +205,24 @@ export default function BarangBuktiPage() {
                   </p>
                 </div>
                 <Badge tone={STATUS_TONE[item.status] ?? "neutral"}>{item.status.replace(/_/g, " ")}</Badge>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 border-t border-navy-900/5 pt-3">
+                <Button size="sm" variant="outline" loading={busyId === item.id} onClick={() => unduhBeritaAcara(item)}>
+                  <FileText className="size-4" /> Berita Acara PDF
+                </Button>
+                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-navy-900/10 px-3 py-1.5 text-xs font-semibold text-navy-600 transition-colors hover:bg-navy-50">
+                  <Camera className="size-4" /> Lampirkan Foto
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) unggahFoto(item, f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
               </div>
             </Card>
           ))}

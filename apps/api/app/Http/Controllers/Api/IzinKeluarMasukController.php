@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\IzinKeluarMasuk;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -29,7 +30,7 @@ class IzinKeluarMasukController extends Controller
         return response()->json($query->paginate(20));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, NotifikasiService $notif)
     {
         $validated = $request->validate([
             'tanggal' => ['required', 'date'],
@@ -47,10 +48,15 @@ class IzinKeluarMasukController extends Controller
 
         AuditLog::catat($request->user()->id, 'izin_diajukan', 'tata_usaha', "Izin #{$izin->id} diajukan.");
 
+        $notif->kirimKeRole(['kepala_subag_tu', 'superadmin'],
+            'Izin Keluar Masuk Baru',
+            "{$request->user()->name} mengajukan izin {$validated['jenis']} ({$validated['tanggal']} {$validated['jam_mulai']}).",
+            '/persetujuan');
+
         return response()->json(['izin' => $izin], 201);
     }
 
-    public function approve(Request $request, IzinKeluarMasuk $izin)
+    public function approve(Request $request, IzinKeluarMasuk $izin, NotifikasiService $notif)
     {
         $validated = $request->validate([
             'status' => ['required', Rule::in(['disetujui', 'ditolak'])],
@@ -64,6 +70,11 @@ class IzinKeluarMasukController extends Controller
         ]);
 
         AuditLog::catat($request->user()->id, 'izin_diputuskan', 'tata_usaha', "Izin #{$izin->id} -> {$validated['status']}.");
+
+        $notif->kirim([$izin->user_id],
+            'Izin Keluar Masuk '.ucfirst($validated['status']),
+            "Pengajuan izin Anda tanggal {$izin->tanggal->format('Y-m-d')} {$validated['status']}.",
+            '/izin-keluar-masuk');
 
         return response()->json(['izin' => $izin]);
     }

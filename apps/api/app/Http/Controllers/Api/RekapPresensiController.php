@@ -7,8 +7,12 @@ use App\Models\AuditLog;
 use App\Services\RekapExportService;
 use App\Services\RekapPresensiService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
-/** Rekap presensi bulanan + ekspor Excel/PDF — Kasubag TU, Kepala Balai, Superadmin. */
+/**
+ * Rekap presensi harian / bulanan / tahunan + ekspor Excel/PDF —
+ * Kasubag TU, Kepala Balai, Superadmin.
+ */
 class RekapPresensiController extends Controller
 {
     public function __construct(
@@ -17,34 +21,45 @@ class RekapPresensiController extends Controller
     ) {
     }
 
-    private function validasi(Request $request): array
+    /** Validasi parameter sesuai mode, lalu bangun data rekap. */
+    private function bangunRekap(Request $request): array
     {
-        return $request->validate([
-            'tahun' => ['required', 'integer', 'min:2020', 'max:2100'],
-            'bulan' => ['required', 'integer', 'min:1', 'max:12'],
+        $v = $request->validate([
+            'mode' => ['nullable', Rule::in(['harian', 'bulanan', 'tahunan'])],
+            'tanggal' => ['required_if:mode,harian', 'nullable', 'date'],
+            'tahun' => ['required_unless:mode,harian', 'nullable', 'integer', 'min:2020', 'max:2100'],
+            'bulan' => ['nullable', 'integer', 'min:1', 'max:12'],
         ]);
+
+        $mode = $v['mode'] ?? 'bulanan';
+
+        return match ($mode) {
+            'harian' => $this->rekap->rekapHarian($v['tanggal']),
+            'tahunan' => $this->rekap->rekapTahunan((int) $v['tahun']),
+            default => $this->rekap->rekapBulanan((int) $v['tahun'], (int) ($v['bulan'] ?? now()->month)),
+        };
     }
 
     public function index(Request $request)
     {
-        $v = $this->validasi($request);
-
-        return response()->json($this->rekap->rekapBulanan($v['tahun'], $v['bulan']));
+        return response()->json($this->bangunRekap($request));
     }
 
     public function excel(Request $request)
     {
-        $v = $this->validasi($request);
-        AuditLog::catat($request->user()->id, 'rekap_export_excel', 'tata_usaha', "Export Excel rekap {$v['bulan']}/{$v['tahun']}.");
+        $rekap = $this->bangunRekap($request);
+        AuditLog::catat($request->user()->id, 'rekap_export_excel', 'tata_usaha',
+            "Export Excel rekap {$rekap['mode']} ({$rekap['periode']}).");
 
-        return $this->export->excel($this->rekap->rekapBulanan($v['tahun'], $v['bulan']));
+        return $this->export->excel($rekap);
     }
 
     public function pdf(Request $request)
     {
-        $v = $this->validasi($request);
-        AuditLog::catat($request->user()->id, 'rekap_export_pdf', 'tata_usaha', "Export PDF rekap {$v['bulan']}/{$v['tahun']}.");
+        $rekap = $this->bangunRekap($request);
+        AuditLog::catat($request->user()->id, 'rekap_export_pdf', 'tata_usaha',
+            "Export PDF rekap {$rekap['mode']} ({$rekap['periode']}).");
 
-        return $this->export->pdf($this->rekap->rekapBulanan($v['tahun'], $v['bulan']));
+        return $this->export->pdf($rekap);
     }
 }

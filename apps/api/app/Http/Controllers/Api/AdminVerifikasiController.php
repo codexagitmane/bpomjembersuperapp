@@ -7,6 +7,7 @@ use App\Mail\AkunDiaktifkanMail;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Models\WfhLocation;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -63,7 +64,7 @@ class AdminVerifikasiController extends Controller
         return response()->json(['lokasi' => $lokasi]);
     }
 
-    public function verifikasiWfh(Request $request, WfhLocation $wfhLocation)
+    public function verifikasiWfh(Request $request, WfhLocation $wfhLocation, NotifikasiService $notif)
     {
         $validated = $request->validate([
             'aksi' => ['required', Rule::in(['setujui', 'tolak'])],
@@ -79,6 +80,13 @@ class AdminVerifikasiController extends Controller
 
         AuditLog::catat($request->user()->id, 'wfh_diverifikasi', 'admin',
             "Lokasi WFH #{$wfhLocation->id} ({$wfhLocation->user->name}): {$validated['aksi']}.");
+
+        $statusLabel = $validated['aksi'] === 'setujui' ? 'diverifikasi' : 'ditolak';
+        $notif->kirim([$wfhLocation->user_id],
+            'Lokasi WFH '.ucfirst($statusLabel),
+            "Lokasi WFH \"{$wfhLocation->label}\" Anda {$statusLabel}."
+                .(($validated['catatan'] ?? null) ? " Catatan: {$validated['catatan']}" : ''),
+            '/presensi');
 
         return response()->json(['lokasi' => $wfhLocation->fresh()]);
     }

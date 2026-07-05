@@ -16,8 +16,10 @@ import {
   Building2,
   CalendarRange,
   FlaskConical,
+  CalendarOff,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { NotifikasiBell } from "@/components/NotifikasiBell";
 import { ROLE_LABELS, type RoleSlug } from "@bpom/shared";
 import { cn } from "@/lib/utils";
 
@@ -50,8 +52,13 @@ const ROLE_NAV: Record<string, { href: string; label: string; icon: typeof Newsp
     { href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck },
     { href: "/rekap-presensi", label: "Rekap Presensi", icon: CalendarRange },
     { href: "/roster-keamanan", label: "Roster Keamanan", icon: ShieldCheck },
+    { href: "/cuti", label: "Cuti & Izin", icon: CalendarOff },
   ],
-  pegawai_asn_pppk: [{ href: "/dashboard-simba", label: "Dashboard SIMBA", icon: FlaskConical }],
+  pegawai_asn_pppk: [
+    { href: "/dashboard-simba", label: "Dashboard SIMBA", icon: FlaskConical },
+    { href: "/cuti", label: "Cuti & Izin", icon: CalendarOff },
+  ],
+  pegawai_outsourcing_magang: [{ href: "/cuti", label: "Cuti & Izin", icon: CalendarOff }],
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -131,6 +138,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="hidden md:block" />
 
+          <div className="flex items-center gap-3">
+            <NotifikasiBell />
           <Link href="/beranda/profil" className="flex items-center gap-2.5">
             <div className="text-right">
               <p className="text-sm font-semibold text-navy-900">{user.name}</p>
@@ -140,6 +149,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               {user.name.slice(0, 1).toUpperCase()}
             </div>
           </Link>
+          </div>
         </header>
 
         <main className="flex-1 px-5 pb-24 pt-5 md:px-8 md:pb-8 md:pt-6">{children}</main>

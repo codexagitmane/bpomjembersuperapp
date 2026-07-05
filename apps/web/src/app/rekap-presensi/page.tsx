@@ -6,23 +6,22 @@ import { AppShell } from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Field";
+import { Input } from "@/components/ui/Input";
 import { api, downloadFile } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
-interface RekapRow {
-  nama: string;
-  nip_nik: string;
-  jenis_pegawai: string;
-  hadir: number;
-  tepat_waktu: number;
-  terlambat: number;
-  wfh: number;
-  dinas: number;
-}
+type Mode = "harian" | "bulanan" | "tahunan";
+
+type RekapRow = Record<string, string | number>;
+
 interface Rekap {
+  mode: Mode;
   periode: string;
-  hari_kerja: number;
+  hari_kerja?: number;
+  headers: string[];
+  kolom: string[];
   rows: RekapRow[];
-  ringkasan: { total_pegawai: number; total_hadir: number; total_terlambat: number };
+  ringkasan: { total_pegawai: number; total_hadir: number; total_terlambat?: number; total_tidak_hadir?: number };
 }
 
 const BULAN = [
@@ -30,8 +29,12 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
+const MODE_LABEL: Record<Mode, string> = { harian: "Harian", bulanan: "Bulanan", tahunan: "Tahunan" };
+
 export default function RekapPresensiPage() {
   const now = new Date();
+  const [mode, setMode] = useState<Mode>("bulanan");
+  const [tanggal, setTanggal] = useState(now.toISOString().slice(0, 10));
   const [tahun, setTahun] = useState(now.getFullYear());
   const [bulan, setBulan] = useState(now.getMonth() + 1);
   const [rekap, setRekap] = useState<Rekap | null>(null);
@@ -39,17 +42,23 @@ export default function RekapPresensiPage() {
   const [forbidden, setForbidden] = useState(false);
   const [exporting, setExporting] = useState<false | "excel" | "pdf">(false);
 
+  const params = useCallback((): Record<string, string | number> => {
+    if (mode === "harian") return { mode, tanggal };
+    if (mode === "tahunan") return { mode, tahun };
+    return { mode, tahun, bulan };
+  }, [mode, tanggal, tahun, bulan]);
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("/rekap-presensi", { params: { tahun, bulan } });
+      const { data } = await api.get("/rekap-presensi", { params: params() });
       setRekap(data);
     } catch (err: unknown) {
       if ((err as { response?: { status?: number } })?.response?.status === 403) setForbidden(true);
     } finally {
       setLoading(false);
     }
-  }, [tahun, bulan]);
+  }, [params]);
 
   useEffect(() => {
     load();
@@ -59,10 +68,8 @@ export default function RekapPresensiPage() {
     setExporting(jenis);
     try {
       const ext = jenis === "excel" ? "xlsx" : "pdf";
-      await downloadFile(`/rekap-presensi/${jenis}`, `rekap-presensi-${tahun}-${String(bulan).padStart(2, "0")}.${ext}`, {
-        tahun,
-        bulan,
-      });
+      const suffix = mode === "harian" ? tanggal : mode === "tahunan" ? tahun : `${tahun}-${String(bulan).padStart(2, "0")}`;
+      await downloadFile(`/rekap-presensi/${jenis}`, `rekap-presensi-${mode}-${suffix}.${ext}`, params());
     } finally {
       setExporting(false);
     }
@@ -79,35 +86,61 @@ export default function RekapPresensiPage() {
     );
   }
 
+  const jumlahKolom = (rekap?.headers.length ?? 8) + 0;
+
   return (
     <AppShell>
       <div className="mx-auto max-w-5xl">
         <h1 className="flex items-center gap-2 text-2xl font-extrabold text-navy-900">
-          <CalendarRange className="size-6 text-bpom-600" /> Rekap Presensi Bulanan
+          <CalendarRange className="size-6 text-bpom-600" /> Rekap Presensi
         </h1>
         <p className="mt-1 text-sm text-navy-500">
-          Rekapitulasi kehadiran pegawai per bulan — dapat diekspor ke Excel & PDF untuk lampiran TPP.
+          Rekapitulasi kehadiran harian, bulanan, dan tahunan — dapat diekspor ke Excel & PDF untuk lampiran TPP.
         </p>
 
         <div className="mt-5 flex flex-wrap items-end gap-3">
-          <div className="w-40">
-            <Select label="Bulan" value={bulan} onChange={(e) => setBulan(Number(e.target.value))}>
-              {BULAN.map((b, i) => (
-                <option key={i} value={i + 1}>
-                  {b}
-                </option>
-              ))}
-            </Select>
+          <div className="flex rounded-xl bg-navy-50 p-1">
+            {(Object.keys(MODE_LABEL) as Mode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={cn(
+                  "rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-colors",
+                  mode === m ? "bg-navy-900 text-white shadow-sm" : "text-navy-500 hover:text-navy-800"
+                )}
+              >
+                {MODE_LABEL[m]}
+              </button>
+            ))}
           </div>
-          <div className="w-28">
-            <Select label="Tahun" value={tahun} onChange={(e) => setTahun(Number(e.target.value))}>
-              {[now.getFullYear(), now.getFullYear() - 1, now.getFullYear() - 2].map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </Select>
-          </div>
+
+          {mode === "harian" && (
+            <div className="w-44">
+              <Input label="Tanggal" type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} />
+            </div>
+          )}
+          {mode === "bulanan" && (
+            <div className="w-40">
+              <Select label="Bulan" value={bulan} onChange={(e) => setBulan(Number(e.target.value))}>
+                {BULAN.map((b, i) => (
+                  <option key={i} value={i + 1}>
+                    {b}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          )}
+          {mode !== "harian" && (
+            <div className="w-28">
+              <Select label="Tahun" value={tahun} onChange={(e) => setTahun(Number(e.target.value))}>
+                {[now.getFullYear(), now.getFullYear() - 1, now.getFullYear() - 2].map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          )}
           <div className="ml-auto flex gap-2">
             <Button variant="outline" loading={exporting === "excel"} onClick={() => handleExport("excel")}>
               <FileSpreadsheet className="size-4" /> Excel
@@ -121,9 +154,16 @@ export default function RekapPresensiPage() {
         {rekap && (
           <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
             <MiniStat label="Periode" value={rekap.periode} />
-            <MiniStat label="Hari Kerja" value={`${rekap.hari_kerja} hari`} />
+            {rekap.hari_kerja !== undefined ? (
+              <MiniStat label="Hari Kerja" value={`${rekap.hari_kerja} hari`} />
+            ) : (
+              <MiniStat label="Hadir Hari Ini" value={String(rekap.ringkasan.total_hadir)} />
+            )}
             <MiniStat label="Total Pegawai" value={String(rekap.ringkasan.total_pegawai)} />
-            <MiniStat label="Total Terlambat" value={String(rekap.ringkasan.total_terlambat)} />
+            <MiniStat
+              label={rekap.mode === "harian" ? "Tidak Hadir" : "Total Terlambat"}
+              value={String(rekap.mode === "harian" ? rekap.ringkasan.total_tidak_hadir ?? 0 : rekap.ringkasan.total_terlambat ?? 0)}
+            />
           </div>
         )}
 
@@ -132,28 +172,25 @@ export default function RekapPresensiPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-navy-900/10 text-left text-xs uppercase tracking-wide text-navy-400">
-                  <th className="px-4 py-3">Nama</th>
-                  <th className="px-4 py-3">NIP/NIK</th>
-                  <th className="px-4 py-3">Jenis</th>
-                  <th className="px-4 py-3 text-center">Hadir</th>
-                  <th className="px-4 py-3 text-center">Tepat</th>
-                  <th className="px-4 py-3 text-center">Telat</th>
-                  <th className="px-4 py-3 text-center">WFH</th>
-                  <th className="px-4 py-3 text-center">Dinas</th>
+                  {(rekap?.headers ?? []).map((h) => (
+                    <th key={h} className={cn("px-4 py-3", !["No", "Nama", "NIP/NIK"].includes(h) && "text-center")}>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {loading &&
                   [...Array(5)].map((_, i) => (
                     <tr key={i} className="border-b border-navy-900/5">
-                      <td colSpan={8} className="px-4 py-3">
+                      <td colSpan={jumlahKolom} className="px-4 py-3">
                         <div className="h-4 animate-pulse rounded bg-navy-100/60" />
                       </td>
                     </tr>
                   ))}
                 {!loading && rekap?.rows.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-navy-400">
+                    <td colSpan={jumlahKolom} className="px-4 py-10 text-center text-navy-400">
                       <Users className="mx-auto mb-2 size-8 text-navy-200" />
                       Tidak ada data pegawai.
                     </td>
@@ -162,16 +199,20 @@ export default function RekapPresensiPage() {
                 {!loading &&
                   rekap?.rows.map((r, i) => (
                     <tr key={i} className="border-b border-navy-900/5 hover:bg-navy-50/50">
-                      <td className="px-4 py-3 font-semibold text-navy-900">{r.nama}</td>
-                      <td className="px-4 py-3 text-navy-500">{r.nip_nik}</td>
-                      <td className="px-4 py-3">
-                        <Badge tone="neutral">{r.jenis_pegawai}</Badge>
-                      </td>
-                      <td className="px-4 py-3 text-center font-bold tabular-nums text-navy-900">{r.hadir}</td>
-                      <td className="px-4 py-3 text-center tabular-nums text-bpom-600">{r.tepat_waktu}</td>
-                      <td className="px-4 py-3 text-center tabular-nums text-amber-600">{r.terlambat}</td>
-                      <td className="px-4 py-3 text-center tabular-nums text-navy-500">{r.wfh}</td>
-                      <td className="px-4 py-3 text-center tabular-nums text-navy-500">{r.dinas}</td>
+                      <td className="px-4 py-3 text-navy-400">{i + 1}</td>
+                      {rekap.kolom.map((k) => (
+                        <td
+                          key={k}
+                          className={cn(
+                            "px-4 py-3",
+                            k === "nama" && "font-semibold text-navy-900",
+                            k === "nip_nik" && "text-navy-500",
+                            !["nama", "nip_nik", "jenis_pegawai"].includes(k) && "text-center tabular-nums text-navy-600"
+                          )}
+                        >
+                          {k === "jenis_pegawai" ? <Badge tone="neutral">{r[k]}</Badge> : r[k]}
+                        </td>
+                      ))}
                     </tr>
                   ))}
               </tbody>

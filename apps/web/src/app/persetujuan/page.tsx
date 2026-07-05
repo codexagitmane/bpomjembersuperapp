@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ClipboardCheck, DoorOpen, Wrench, Check, X, ShieldOff } from "lucide-react";
+import { ClipboardCheck, DoorOpen, Wrench, Check, X, ShieldOff, CalendarOff } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -36,10 +36,28 @@ const JENIS_IZIN: Record<string, string> = {
   izin_pribadi: "Izin Pribadi",
 };
 
+interface CutiItem {
+  id: number;
+  jenis: "cuti" | "izin" | "sakit";
+  tanggal_mulai: string;
+  tanggal_selesai: string;
+  jumlah_hari: number;
+  alasan: string;
+  status: string;
+  user: { id: number; name: string; jenis_pegawai: string };
+}
+
+const JENIS_CUTI_TONE: Record<string, "info" | "warning" | "danger"> = {
+  cuti: "info",
+  izin: "warning",
+  sakit: "danger",
+};
+
 export default function PersetujuanPage() {
-  const [tab, setTab] = useState<"izin" | "bmn">("izin");
+  const [tab, setTab] = useState<"cuti" | "izin" | "bmn">("cuti");
   const [izin, setIzin] = useState<IzinItem[]>([]);
   const [bmn, setBmn] = useState<BmnItem[]>([]);
+  const [cuti, setCuti] = useState<CutiItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
   const [actingId, setActingId] = useState<number | null>(null);
@@ -47,12 +65,14 @@ export default function PersetujuanPage() {
 
   const load = useCallback(async () => {
     try {
-      const [izinRes, bmnRes] = await Promise.all([
+      const [izinRes, bmnRes, cutiRes] = await Promise.all([
         api.get("/izin-keluar-masuk-semua", { params: { status: "diajukan" } }),
         api.get("/pengajuan-bmn-semua", { params: { status: "diajukan" } }),
+        api.get("/cuti-izin-semua", { params: { status: "diajukan" } }),
       ]);
       setIzin(izinRes.data.data ?? []);
       setBmn(bmnRes.data.data ?? []);
+      setCuti(cutiRes.data.data ?? []);
     } catch (err: unknown) {
       if ((err as { response?: { status?: number } })?.response?.status === 403) {
         setForbidden(true);
@@ -65,6 +85,20 @@ export default function PersetujuanPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function putuskanCuti(id: number, aksi: "setujui" | "tolak") {
+    setActingId(id);
+    setMsg(null);
+    try {
+      await api.patch(`/cuti-izin/${id}/approve`, { aksi });
+      setMsg(`Pengajuan cuti/izin #${id} ${aksi === "setujui" ? "disetujui" : "ditolak"}.`);
+      await load();
+    } catch (err) {
+      setMsg(extractApiErrorMessage(err));
+    } finally {
+      setActingId(null);
+    }
+  }
 
   async function putuskanIzin(id: number, status: "disetujui" | "ditolak") {
     setActingId(id);
@@ -115,7 +149,10 @@ export default function PersetujuanPage() {
           Antrean pengajuan izin keluar-masuk kantor dan pemeliharaan/perbaikan BMN.
         </p>
 
-        <div className="mt-5 flex gap-2">
+        <div className="mt-5 flex flex-wrap gap-2">
+          <TabButton active={tab === "cuti"} onClick={() => setTab("cuti")} icon={<CalendarOff className="size-4" />}>
+            Cuti / Izin / Sakit ({cuti.length})
+          </TabButton>
           <TabButton active={tab === "izin"} onClick={() => setTab("izin")} icon={<DoorOpen className="size-4" />}>
             Izin Keluar Masuk ({izin.length})
           </TabButton>
@@ -132,12 +169,52 @@ export default function PersetujuanPage() {
           {loading &&
             [...Array(3)].map((_, i) => <div key={i} className="h-24 animate-pulse rounded-2xl bg-navy-100/60" />)}
 
+          {!loading && tab === "cuti" && cuti.length === 0 && (
+            <Card className="py-12 text-center text-sm text-navy-400">Tidak ada pengajuan cuti/izin/sakit menunggu persetujuan. 🎉</Card>
+          )}
           {!loading && tab === "izin" && izin.length === 0 && (
             <Card className="py-12 text-center text-sm text-navy-400">Tidak ada pengajuan izin menunggu persetujuan. 🎉</Card>
           )}
           {!loading && tab === "bmn" && bmn.length === 0 && (
             <Card className="py-12 text-center text-sm text-navy-400">Tidak ada pengajuan BMN menunggu tindakan. 🎉</Card>
           )}
+
+          {tab === "cuti" &&
+            cuti.map((item) => (
+              <Card key={item.id} className="!p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-navy-900">{item.user.name}</p>
+                      <Badge tone={JENIS_CUTI_TONE[item.jenis]}>{item.jenis}</Badge>
+                      <Badge tone="neutral">{item.jumlah_hari} hari kerja</Badge>
+                    </div>
+                    <p className="mt-1 text-xs text-navy-400">
+                      {formatTanggalIndonesia(item.tanggal_mulai)} — {formatTanggalIndonesia(item.tanggal_selesai)}
+                    </p>
+                    <p className="mt-1.5 text-sm text-navy-600">{item.alasan}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      loading={actingId === item.id}
+                      onClick={() => putuskanCuti(item.id, "setujui")}
+                    >
+                      <Check className="size-4" /> Setujui
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      disabled={actingId === item.id}
+                      onClick={() => putuskanCuti(item.id, "tolak")}
+                    >
+                      <X className="size-4" /> Tolak
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
 
           {tab === "izin" &&
             izin.map((item) => (

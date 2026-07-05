@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\PengajuanBmn;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -29,7 +30,7 @@ class PengajuanBmnController extends Controller
         return response()->json($query->paginate(20));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, NotifikasiService $notif)
     {
         $validated = $request->validate([
             'bmn_item_id' => ['nullable', 'exists:bmn_items,id'],
@@ -47,10 +48,15 @@ class PengajuanBmnController extends Controller
 
         AuditLog::catat($request->user()->id, 'bmn_diajukan', 'tata_usaha', "Pengajuan BMN #{$pengajuan->id} dibuat.");
 
+        $notif->kirimKeRole(['kepala_subag_tu', 'superadmin'],
+            'Tiket BMN Baru',
+            "{$request->user()->name} mengajukan {$validated['jenis_pengajuan']} (prioritas {$validated['prioritas']}).",
+            '/persetujuan');
+
         return response()->json(['pengajuan' => $pengajuan], 201);
     }
 
-    public function updateStatus(Request $request, PengajuanBmn $pengajuan)
+    public function updateStatus(Request $request, PengajuanBmn $pengajuan, NotifikasiService $notif)
     {
         $validated = $request->validate([
             'status' => ['required', Rule::in(['diproses', 'selesai', 'ditolak'])],
@@ -64,6 +70,11 @@ class PengajuanBmnController extends Controller
         ]);
 
         AuditLog::catat($request->user()->id, 'bmn_status_diubah', 'tata_usaha', "Pengajuan BMN #{$pengajuan->id} -> {$validated['status']}.");
+
+        $notif->kirim([$pengajuan->user_id],
+            'Tiket BMN '.ucfirst($validated['status']),
+            "Pengajuan BMN #{$pengajuan->id} Anda kini berstatus {$validated['status']}.",
+            '/pengajuan-bmn');
 
         return response()->json(['pengajuan' => $pengajuan]);
     }

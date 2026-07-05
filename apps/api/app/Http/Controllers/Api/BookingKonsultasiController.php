@@ -8,6 +8,7 @@ use App\Models\AuditLog;
 use App\Models\BookingKonsultasi;
 use App\Models\Pengaturan;
 use App\Services\BookingSlotService;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -107,7 +108,7 @@ class BookingKonsultasiController extends Controller
         return response()->json(['booking' => $booking], 201);
     }
 
-    public function updateStatus(Request $request, BookingKonsultasi $booking)
+    public function updateStatus(Request $request, BookingKonsultasi $booking, NotifikasiService $notif)
     {
         $validated = $request->validate([
             'status' => ['required', Rule::in(['dikonfirmasi', 'selesai', 'dibatalkan'])],
@@ -126,6 +127,11 @@ class BookingKonsultasiController extends Controller
         }
 
         AuditLog::catat($request->user()->id, 'booking_status_diubah', 'infokom', "Booking #{$booking->id} -> {$validated['status']}.");
+
+        $notif->kirim([$booking->user_id],
+            'Booking '.ucfirst($validated['status']),
+            "Booking konsultasi Anda tanggal {$booking->tanggal->format('Y-m-d')} kini berstatus {$validated['status']}.",
+            '/booking-konsultasi');
 
         return response()->json(['booking' => $booking]);
     }

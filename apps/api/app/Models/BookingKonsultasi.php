@@ -10,12 +10,12 @@ class BookingKonsultasi extends Model
 
     protected $fillable = [
         'user_id', 'jenis_layanan', 'tanggal', 'jam_slot', 'subjek', 'deskripsi',
-        'lampiran_path', 'status', 'ditangani_oleh', 'catatan_petugas',
+        'lampiran_path', 'status', 'ditangani_oleh', 'catatan_petugas', 'reminder_sent_at',
     ];
 
     protected function casts(): array
     {
-        return ['tanggal' => 'date:Y-m-d'];
+        return ['tanggal' => 'date:Y-m-d', 'reminder_sent_at' => 'datetime'];
     }
 
     public function user()

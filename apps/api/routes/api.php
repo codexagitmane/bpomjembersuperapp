@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\DashboardKasubagController;
 use App\Http\Controllers\Api\DashboardSimbaController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\BookingKonsultasiController;
+use App\Http\Controllers\Api\CutiIzinController;
+use App\Http\Controllers\Api\NotifikasiController;
 use App\Http\Controllers\Api\IzinKeluarMasukController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\PengajuanBmnController;
@@ -30,6 +32,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('throttle:10,1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/register', [AuthController::class, 'registerEksternal']);
+});
+
+// Landing publik (tanpa login) — hanya berita terbit, rate-limited.
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/publik/berita', [BeritaController::class, 'index']);
+    Route::get('/publik/berita/{slug}', [BeritaController::class, 'show']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -55,6 +63,23 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('/presensi', [PresensiController::class, 'semuaPresensi'])
         ->middleware('role:superadmin|kepala_balai|kepala_subag_tu');
+
+    // --- Cuti / Izin / Sakit (Fungsi Tata Usaha) ---
+    Route::prefix('cuti-izin')->middleware('role:superadmin|kepala_balai|kepala_subag_tu|pegawai_asn_pppk|pegawai_outsourcing_magang')->group(function () {
+        Route::get('/', [CutiIzinController::class, 'index']);
+        Route::post('/', [CutiIzinController::class, 'store']);
+    });
+    Route::get('/cuti-izin-semua', [CutiIzinController::class, 'semua'])
+        ->middleware('role:superadmin|kepala_balai|kepala_subag_tu');
+    Route::patch('/cuti-izin/{cutiIzin}/approve', [CutiIzinController::class, 'approve'])
+        ->middleware('role:superadmin|kepala_balai|kepala_subag_tu');
+
+    // --- Notifikasi in-app (semua user login) ---
+    Route::prefix('notifikasi')->group(function () {
+        Route::get('/', [NotifikasiController::class, 'index']);
+        Route::patch('/baca-semua', [NotifikasiController::class, 'bacaSemua']);
+        Route::patch('/{notifikasi}/baca', [NotifikasiController::class, 'baca']);
+    });
 
     // Rekap presensi bulanan + ekspor Excel/PDF (Kasubag TU, Kepala Balai, Superadmin).
     Route::middleware('role:superadmin|kepala_balai|kepala_subag_tu')->group(function () {
@@ -98,6 +123,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{barangBukti}', [BarangBuktiController::class, 'show']);
         Route::post('/', [BarangBuktiController::class, 'store']);
         Route::post('/{barangBukti}/log', [BarangBuktiController::class, 'tambahLog']);
+        Route::post('/{barangBukti}/foto', [BarangBuktiController::class, 'uploadFoto'])->middleware('throttle:20,1');
+        Route::get('/{barangBukti}/berita-acara', [BarangBuktiController::class, 'beritaAcara']);
     });
 
     // --- SIG Monitoring & Pemetaan Distribusi Apotek (Fungsi Pemeriksaan) ---

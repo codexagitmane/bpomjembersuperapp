@@ -150,6 +150,25 @@ docker compose exec api php artisan migrate --seed
   WFH di peta Leaflet animasi: marker rumah berdenyut, radius geofence kedua
   kantor, garis animasi ke kantor terdekat + jarak, dan flyTo saat memilih
   pengajuan.
+- **Cuti, Izin & Sakit** — pengajuan dengan hitungan hari kerja otomatis,
+  jatah cuti tahunan per pegawai (default 12 hari) dengan validasi sisa jatah
+  di server, approval Kasubag TU, dan integrasi ke rekap presensi (hari cuti
+  tampil sebagai keterangan kehadiran).
+- **Notifikasi in-app (lonceng)** — pengajuan baru memberi tahu approver,
+  keputusan memberi tahu pemohon; mencakup cuti/izin, izin keluar-masuk,
+  tiket BMN, verifikasi WFH, dan status booking.
+- **Rekap presensi 3 mode** — harian (detail jam masuk/keluar per pegawai),
+  bulanan, dan tahunan; semuanya bisa diekspor Excel & PDF.
+- **Berita Acara Barang Bukti otomatis (PDF)** — kop resmi, identitas barang,
+  kronologi chain-of-custody, lampiran foto (EXIF dihapus saat unggah), dan
+  kolom tanda tangan.
+- **Reminder email H-1 booking** — scheduler harian 07:00 WIB mengirim
+  pengingat ke masyarakat untuk booking terkonfirmasi esok hari (idempoten).
+- **Landing publik mobile** — halaman sambutan masyarakat/stakeholder sebelum
+  login: info layanan + berita terbit (endpoint publik ber-rate-limit).
+
+Panduan deploy produksi (VPS Contabo + domain + HTTPS + APK mobile) ada di
+[`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ## Keamanan yang Sudah Diimplementasikan
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\WfhLocation;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
 
 class WfhLocationController extends Controller
@@ -18,7 +19,7 @@ class WfhLocationController extends Controller
     }
 
     /** Daftarkan / ajukan ulang lokasi WFH (menunggu verifikasi admin). */
-    public function store(Request $request)
+    public function store(Request $request, NotifikasiService $notif)
     {
         $validated = $request->validate([
             'label' => ['nullable', 'string', 'max:100'],
@@ -38,6 +39,11 @@ class WfhLocationController extends Controller
         ]);
 
         AuditLog::catat($request->user()->id, 'wfh_diajukan', 'presensi', "Lokasi WFH #{$lokasi->id} diajukan.");
+
+        $notif->kirimKeRole(['superadmin'],
+            'Pengajuan Lokasi WFH Baru',
+            "{$request->user()->name} mengajukan lokasi WFH baru untuk diverifikasi.",
+            '/admin/verifikasi');
 
         return response()->json([
             'lokasi' => $lokasi,

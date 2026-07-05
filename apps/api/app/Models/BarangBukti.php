@@ -33,4 +33,9 @@ class BarangBukti extends Model
     {
         return $this->hasMany(BarangBuktiLog::class)->latest();
     }
+
+    public function fotos()
+    {
+        return $this->hasMany(BarangBuktiFoto::class)->latest();
+    }
 }

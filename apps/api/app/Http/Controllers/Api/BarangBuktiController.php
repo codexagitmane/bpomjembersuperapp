@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\BarangBukti;
+use App\Models\BarangBuktiFoto;
 use App\Models\BarangBuktiLog;
+use App\Services\SelfiePhotoService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class BarangBuktiController extends Controller
@@ -30,9 +34,54 @@ class BarangBuktiController extends Controller
 
     public function show(BarangBukti $barangBukti)
     {
-        $barangBukti->load(['penanggungJawab:id,name', 'logs.oleh:id,name']);
+        $barangBukti->load(['penanggungJawab:id,name', 'logs.oleh:id,name', 'fotos.pengunggah:id,name']);
 
         return response()->json(['barang_bukti' => $barangBukti]);
+    }
+
+    /** Unggah lampiran foto barang bukti (di-re-encode, EXIF/GPS dihapus). */
+    public function uploadFoto(Request $request, BarangBukti $barangBukti, SelfiePhotoService $fotoService)
+    {
+        $request->validate([
+            'foto' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:8192'],
+            'keterangan' => ['nullable', 'string', 'max:300'],
+        ]);
+
+        $path = $fotoService->simpan($request->file('foto'), 'barang-bukti');
+
+        $foto = BarangBuktiFoto::create([
+            'barang_bukti_id' => $barangBukti->id,
+            'path' => $path,
+            'keterangan' => $request->input('keterangan'),
+            'uploaded_by' => $request->user()->id,
+        ]);
+
+        AuditLog::catat($request->user()->id, 'barang_bukti_foto', 'penindakan',
+            "Foto ditambahkan ke barang bukti {$barangBukti->nomor_bb}.");
+
+        return response()->json(['foto' => $foto, 'url' => Storage::disk('public')->url($path)], 201);
+    }
+
+    /** Berita Acara barang bukti — PDF otomatis berisi identitas, kronologi, dan lampiran foto. */
+    public function beritaAcara(Request $request, BarangBukti $barangBukti)
+    {
+        $barangBukti->load(['penanggungJawab:id,name,nip_nik', 'pembuat:id,name,nip_nik', 'logs.oleh:id,name', 'fotos']);
+
+        // Path absolut foto agar bisa di-embed dompdf.
+        $fotoPaths = $barangBukti->fotos
+            ->map(fn ($f) => Storage::disk('public')->path($f->path))
+            ->filter(fn ($p) => is_file($p))
+            ->values()
+            ->all();
+
+        AuditLog::catat($request->user()->id, 'barang_bukti_ba_pdf', 'penindakan',
+            "Berita acara {$barangBukti->nomor_bb} dicetak.");
+
+        return Pdf::loadView('pdf.berita-acara-bb', [
+            'bb' => $barangBukti,
+            'fotoPaths' => $fotoPaths,
+            'dicetakOleh' => $request->user(),
+        ])->setPaper('a4')->download("berita-acara-{$barangBukti->nomor_bb}.pdf");
     }
 
     public function store(Request $request)
