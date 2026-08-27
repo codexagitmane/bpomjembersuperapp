@@ -33,6 +33,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'pengajuan_bmn',
             'barang_bukti',
             'manajemen_bahan_lab',
+            'si_pandu_ai',
         ];
 
         foreach ($aplikasiSlugs as $slug) {
@@ -42,10 +43,10 @@ class RolesAndPermissionsSeeder extends Seeder
         $matrix = [
             'superadmin' => $aplikasiSlugs, // akses penuh
             'kepala_balai' => $aplikasiSlugs, // akses penuh (monitoring lintas fungsi)
-            'kepala_subag_tu' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn'],
-            'pegawai_asn_pppk' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'sig_apotek', 'barang_bukti', 'booking_konsultasi', 'manajemen_bahan_lab'],
+            'kepala_subag_tu' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'si_pandu_ai'],
+            'pegawai_asn_pppk' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'sig_apotek', 'barang_bukti', 'booking_konsultasi', 'manajemen_bahan_lab', 'si_pandu_ai'],
             'pegawai_outsourcing_magang' => ['presensi', 'izin_keluar_masuk'],
-            'masyarakat' => ['booking_konsultasi'],
+            'masyarakat' => ['booking_konsultasi', 'si_pandu_ai'],
         ];
 
         foreach ($matrix as $roleName => $slugs) {

@@ -57,6 +57,7 @@ export const APLIKASI = {
   PENGAJUAN_BMN: "pengajuan_bmn",
   BARANG_BUKTI: "barang_bukti",
   MANAJEMEN_BAHAN_LAB: "manajemen_bahan_lab",
+  SI_PANDU_AI: "si_pandu_ai",
 } as const;
 
 export type AplikasiSlug = (typeof APLIKASI)[keyof typeof APLIKASI];
@@ -129,6 +130,15 @@ export const APLIKASI_LIST: AplikasiDef[] = [
     icon: "TestTube2",
     externalAccess: false,
   },
+  {
+    slug: APLIKASI.SI_PANDU_AI,
+    nama: "SI PANDU AI — Asisten Pintar Pelaku Usaha",
+    deskripsi:
+      "Pendampingan pelaku usaha memahami regulasi, menyiapkan produk, meninjau label, dan menyusun CAPA.",
+    fungsi: FUNGSI.INFOKOM,
+    icon: "Sparkles",
+    externalAccess: true,
+  },
 ];
 
 /** Matriks akses aplikasi per-role. Superadmin selalu punya akses penuh. */
@@ -138,8 +148,7 @@ export const ROLE_APLIKASI_ACCESS: Record<RoleSlug, AplikasiSlug[] | "all"> = {
   [ROLES.KEPALA_SUBAG_TU]: [
     APLIKASI.PRESENSI,
     APLIKASI.IZIN_KELUAR_MASUK,
-    APLIKASI.PENGAJUAN_BMN,
-  ],
+    APLIKASI.PENGAJUAN_BMN, APLIKASI.SI_PANDU_AI],
   [ROLES.PEGAWAI_ASN_PPPK]: [
     APLIKASI.PRESENSI,
     APLIKASI.IZIN_KELUAR_MASUK,
@@ -147,10 +156,9 @@ export const ROLE_APLIKASI_ACCESS: Record<RoleSlug, AplikasiSlug[] | "all"> = {
     APLIKASI.SIG_APOTEK,
     APLIKASI.BARANG_BUKTI,
     APLIKASI.BOOKING_KONSULTASI,
-    APLIKASI.MANAJEMEN_BAHAN_LAB,
-  ],
+    APLIKASI.MANAJEMEN_BAHAN_LAB, APLIKASI.SI_PANDU_AI],
   [ROLES.PEGAWAI_OUTSOURCING_MAGANG]: [APLIKASI.PRESENSI, APLIKASI.IZIN_KELUAR_MASUK],
-  [ROLES.MASYARAKAT]: [APLIKASI.BOOKING_KONSULTASI],
+  [ROLES.MASYARAKAT]: [APLIKASI.BOOKING_KONSULTASI, APLIKASI.SI_PANDU_AI],
 };
 
 /**

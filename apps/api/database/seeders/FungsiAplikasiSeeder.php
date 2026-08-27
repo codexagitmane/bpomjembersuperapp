@@ -70,6 +70,12 @@ class FungsiAplikasiSeeder extends Seeder
                 'deskripsi' => 'Pencatatan stok, pemakaian, dan analitik bahan/reagen laboratorium pengujian.',
                 'icon' => 'TestTube2', 'is_external_access' => false, 'urutan' => 7,
             ],
+            [
+                'fungsi' => 'infokom', 'slug' => 'si_pandu_ai',
+                'nama' => 'SI PANDU AI — Asisten Pintar Pelaku Usaha',
+                'deskripsi' => 'Pendampingan pelaku usaha memahami regulasi, menyiapkan produk, meninjau label, dan menyusun CAPA.',
+                'icon' => 'Sparkles', 'is_external_access' => true, 'urutan' => 9,
+            ],
         ];
 
         foreach ($aplikasiList as $data) {

@@ -8,4 +8,5 @@ export const APLIKASI_ROUTES: Record<AplikasiSlug, string> = {
   pengajuan_bmn: "/pengajuan-bmn",
   barang_bukti: "/barang-bukti",
   manajemen_bahan_lab: "/manajemen-bahan-lab",
+  si_pandu_ai: "/si-pandu-ai",
 };

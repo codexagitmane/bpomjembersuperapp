@@ -71,6 +71,18 @@
   --animate-fade-in-up: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-scale-in: scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 
+  /* SI PANDU AI — gerak halus maskot & indikator memuat. */
+  --animate-bounce-slow: pandu-bounce 2.4s ease-in-out infinite;
+  --animate-pandu-slide: pandu-slide 1.2s ease-in-out infinite;
+
+  @keyframes pandu-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes pandu-slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(220%); }
+  }
   @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }

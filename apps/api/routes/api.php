@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PanduAiController;
 use App\Http\Controllers\Api\AdminVerifikasiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BahanLabController;
@@ -41,6 +42,27 @@ Route::middleware('throttle:30,1')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    // --- SI PANDU AI: Asisten Pintar Pelaku Usaha ---
+    Route::prefix('pandu')->group(function () {
+        Route::get('/bootstrap', [PanduAiController::class, 'bootstrap']);
+        Route::get('/regulasi', [PanduAiController::class, 'regulasi']);
+        Route::get('/faq', [PanduAiController::class, 'faq']);
+        Route::get('/kontak', [PanduAiController::class, 'kontak']);
+        Route::get('/riwayat', [PanduAiController::class, 'riwayat']);
+        Route::delete('/riwayat', [PanduAiController::class, 'hapusRiwayat']);
+        Route::delete('/riwayat/{riwayat}', [PanduAiController::class, 'hapusRiwayat']);
+        Route::get('/profil-usaha', [PanduAiController::class, 'profil']);
+        Route::put('/profil-usaha', [PanduAiController::class, 'simpanProfil']);
+        Route::middleware('throttle:30,1')->group(function () {
+            Route::post('/chat', [PanduAiController::class, 'chat']);
+            Route::post('/cek-produk', [PanduAiController::class, 'cekProduk']);
+            Route::post('/cek-label', [PanduAiController::class, 'cekLabel']);
+            Route::post('/edit-label', [PanduAiController::class, 'editLabel']);
+            Route::post('/capa', [PanduAiController::class, 'capa']);
+        });
+    });
+
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
