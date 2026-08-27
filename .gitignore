@@ -67,3 +67,7 @@ Thumbs.db
 
 # --- Arsip backup bila dibuat di dalam direktori proyek ---
 lentera-backup-*.tar.gz
+lentera-rilis.tar.gz
+
+# --- Cadangan Caddyfile milik VPS (bukan milik repositori) ---
+docker/Caddyfile.vps.bak

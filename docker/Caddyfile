@@ -8,14 +8,19 @@
 #   /api/*, /storage/*, /sanctum/*, /up  → Laravel  (container `api`, port 8000)
 #   sisanya                              → Next.js  (container `web`, port 3000)
 #
-# CATATAN SAAT DEPLOY: bila di VPS sudah ada Caddyfile hasil penyetelan manual,
-# cadangkan lebih dulu sebelum mengekstrak paket rilis:
-#   cp docker/Caddyfile docker/Caddyfile.vps.bak
-
-{
-	# Matikan admin API — tidak dibutuhkan dan mengurangi permukaan serangan.
-	admin off
-}
+# Berkas ini adalah TITIK AWAL untuk pemasangan baru, bukan salinan konfigurasi
+# VPS yang sedang berjalan. Satu Caddy bisa melayani beberapa aplikasi sekaligus;
+# di VPS produksi berkas ini memuat blok situs lain yang tidak ada di repositori
+# ini. Karena itu `scripts/buat-rilis.sh` sengaja TIDAK menyertakannya ke dalam
+# paket rilis — agar mengekstrak rilis tidak pernah menimpa penyetelan manual.
+#
+# Bila menyalin berkas ini ke VPS yang sudah punya Caddyfile sendiri:
+#   cp docker/Caddyfile docker/Caddyfile.vps.bak    # cadangkan dulu
+#   diff docker/Caddyfile.vps.bak docker/Caddyfile  # bandingkan
+# lalu gabungkan — jangan timpa begitu saja.
+#
+# Admin API Caddy sengaja TIDAK dimatikan di sini: pada VPS yang Caddy-nya
+# dipakai bersama aplikasi lain, `caddy reload` membutuhkannya.
 
 {$DOMAIN} {
 	encode zstd gzip

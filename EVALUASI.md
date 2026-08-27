@@ -180,17 +180,18 @@ yang tanpa itu basis data cadangan pun tak sepenuhnya terbaca.
 - `docker/Caddyfile` kini **ada di dalam repositori**. Sebelumnya berkas ini
   hanya ada di VPS, padahal `docker-compose.prod.yml` me-*mount*-nya — artinya
   membangun ulang sistem dari repositori saja pasti gagal.
+- Versi repositori itu adalah **titik awal untuk pemasangan baru, bukan salinan
+  konfigurasi VPS**. Di VPS produksi, satu Caddy melayani beberapa aplikasi
+  sekaligus, sehingga berkasnya memuat blok situs lain yang tidak ada di
+  repositori ini. Karena itu `scripts/buat-rilis.sh` **mengecualikan**
+  `docker/Caddyfile` (dan `.env`) dari paket rilis, lalu memeriksa hasil paket
+  dan menolak membuatnya bila salah satu tetap ikut — mengekstrak rilis tidak
+  akan pernah menimpa penyetelan manual di VPS.
 
 **Perintah gerak cepat.**
 
 ```bash
 cd /opt/lentera
-
-# CADANGKAN Caddyfile VPS lebih dulu, lalu bandingkan dengan versi repositori
-cp docker/Caddyfile docker/Caddyfile.vps.bak 2>/dev/null
-# (setelah mengekstrak paket rilis)
-diff docker/Caddyfile.vps.bak docker/Caddyfile
-
 bash scripts/backup.sh                  # uji sekali
 bash scripts/pasang-cron-backup.sh      # nyalakan harian
 ls -lh /opt/lentera-backup/
@@ -256,12 +257,10 @@ pengujian penuh. Sampai saat itu, jalur yang terpapar sudah tertutup.
 
 ```bash
 cd /opt/lentera
-cp docker/Caddyfile docker/Caddyfile.vps.bak          # 1. amankan Caddyfile lama
-tar xzf /root/lentera-rilis.tar.gz                     # 2. ekstrak DARI DALAM /opt/lentera
-diff docker/Caddyfile.vps.bak docker/Caddyfile         # 3. pastikan rute tetap benar
-docker compose -f docker-compose.prod.yml up -d --build # 4. nyalakan (Redis + worker + scheduler)
-docker compose -f docker-compose.prod.yml ps           # 5. pastikan 7 service Up
-bash scripts/backup.sh                                 # 6. backup pertama
-bash scripts/pasang-cron-backup.sh                     # 7. backup harian otomatis
-bash scripts/siapkan-repo.sh && git push -u origin main # 8. dorong ke GitHub Anda
+tar xzf /root/lentera-rilis.tar.gz                     # 1. ekstrak DARI DALAM /opt/lentera
+docker compose -f docker-compose.prod.yml up -d --build # 2. nyalakan (Redis + worker + scheduler)
+docker compose -f docker-compose.prod.yml ps           # 3. pastikan 7 service Up
+bash scripts/backup.sh                                 # 4. backup pertama
+bash scripts/pasang-cron-backup.sh                     # 5. backup harian otomatis
+bash scripts/siapkan-repo.sh && git push -u origin main # 6. dorong ke GitHub Anda
 ```
