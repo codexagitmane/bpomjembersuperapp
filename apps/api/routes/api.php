@@ -244,12 +244,36 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // --- SIG Monitoring & Pemetaan Distribusi Apotek (Fungsi Pemeriksaan) ---
+    // --- SIG Monitoring Distribusi Apotek (Fungsi Pemeriksaan) ---
     Route::prefix('sig-apotek')->middleware('role:superadmin|kepala_balai|kepala_subag_tu|pegawai_asn_pppk')->group(function () {
+        // Data awal & analitik
+        Route::get('/bootstrap', [SigApotekController::class, 'bootstrap']);
+        Route::get('/geojson', [SigApotekController::class, 'geojson']);
+        Route::get('/ringkasan', [SigApotekController::class, 'ringkasan']);
+        Route::get('/analisis', [SigApotekController::class, 'analisis']);
+        Route::get('/prioritas', [SigApotekController::class, 'prioritas']);
+        Route::get('/kualitas-data', [SigApotekController::class, 'kualitasData']);
+
+        // Temuan & distribusi lintas sarana
+        Route::get('/temuan', [SigApotekController::class, 'temuan']);
+        Route::patch('/temuan/{temuan}/status', [SigApotekController::class, 'ubahStatusTemuan']);
+        Route::post('/temuan/{temuan}/tindak-lanjut', [SigApotekController::class, 'simpanTindakLanjut']);
+        Route::get('/distribusi', [SigApotekController::class, 'distribusi']);
+        Route::post('/distribusi', [SigApotekController::class, 'simpanDistribusi']);
+
+        // Impor & ekspor
+        Route::get('/template', [SigApotekController::class, 'template']);
+        Route::get('/ekspor', [SigApotekController::class, 'ekspor']);
+        Route::post('/impor/pratinjau', [SigApotekController::class, 'pratinjauImpor'])->middleware('throttle:10,10');
+        Route::post('/impor/simpan', [SigApotekController::class, 'simpanImpor'])->middleware('throttle:10,10');
+
+        // Sarana
         Route::get('/', [SigApotekController::class, 'index']);
         Route::post('/', [SigApotekController::class, 'store']);
-        Route::post('/import-excel', [SigApotekController::class, 'importSpreadsheet'])->middleware('throttle:10,10');
-        Route::post('/import-shp', [SigApotekController::class, 'importShapefile'])->middleware('throttle:10,10');
+        Route::get('/{sigApotek}', [SigApotekController::class, 'show']);
         Route::patch('/{sigApotek}', [SigApotekController::class, 'update']);
+        Route::delete('/{sigApotek}', [SigApotekController::class, 'destroy']);
+        Route::post('/{sigApotek}/pemeriksaan', [SigApotekController::class, 'simpanPemeriksaan']);
     });
 
     // --- Manajemen Bahan Laboratorium & Dashboard SIMBA (Fungsi Pengujian) ---
