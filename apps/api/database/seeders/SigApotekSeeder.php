@@ -18,8 +18,10 @@ use Illuminate\Support\Carbon;
  * berkas ini adalah REKAAN dan ditandai `is_demo = true`. Tidak ada data
  * pribadi maupun identitas sarana nyata yang digunakan.
  *
- * Koordinat disebar di sekitar titik tengah tiap kabupaten agar masuk akal
- * secara geografis, namun jelas merupakan simulasi — bukan lokasi sebenarnya.
+ * Koordinat ditempatkan di dalam poligon kecamatan yang bersangkutan (dibaca
+ * dari resources/sig/geojson/kecamatan.geojson) agar sebaran titik masuk akal
+ * secara geografis dan tidak jatuh ke laut, namun tetap merupakan simulasi —
+ * bukan lokasi sarana yang sebenarnya.
  */
 class SigApotekSeeder extends Seeder
 {
@@ -38,8 +40,17 @@ class SigApotekSeeder extends Seeder
         'Mandiri', 'Bersama', 'Rahayu', 'Makmur', 'Jaya', 'Sumber', 'Tirta', 'Argo', 'Wijaya',
     ];
 
+    /**
+     * Cincin luar poligon tiap kecamatan, dikunci "Kabupaten|Kecamatan".
+     *
+     * @var array<string,array<int,array{titik:array<int,array{0:float,1:float}>,bbox:array{0:float,1:float,2:float,3:float}}>>
+     */
+    private array $poligon = [];
+
     public function run(): void
     {
+        $this->muatPoligonKecamatan();
+
         // Idempoten: data demo lama dibersihkan agar tidak menumpuk.
         SigApotek::where('is_demo', true)->delete();
 
@@ -66,14 +77,19 @@ class SigApotekSeeder extends Seeder
                 $tanpaKoordinat = $i % 9 === 4;
                 $tanpaNib = $i % 7 === 3;
 
+                // Titik diambil dari dalam poligon kecamatan bila batas wilayah
+                // tersedia; bila tidak, jatuh kembali ke sebaran sekitar pusat.
+                $titik = $tanpaKoordinat ? null : ($this->titikDalamKecamatan($kabupaten, $kecamatan)
+                    ?? [round($lat + $this->acak(0.13), 6), round($lng + $this->acak(0.13), 6)]);
+
                 $apotek = SigApotek::create([
                     'nama_apotek' => $nama,
                     'alamat' => 'Jl. Contoh Demo No. '.(10 + $i).', '.$kecamatan,
                     'kabupaten' => $kabupaten,
                     'kecamatan' => $kecamatan,
                     'desa' => 'Desa Demo '.(($i % 3) + 1),
-                    'latitude' => $tanpaKoordinat ? null : round($lat + $this->acak(0.13), 6),
-                    'longitude' => $tanpaKoordinat ? null : round($lng + $this->acak(0.13), 6),
+                    'latitude' => $titik[0] ?? null,
+                    'longitude' => $titik[1] ?? null,
                     'nib' => $tanpaNib ? null : 'DEMO-NIB-'.str_pad((string) $nomor, 5, '0', STR_PAD_LEFT),
                     'nomor_identitas' => 'DEMO-SIA-'.str_pad((string) $nomor, 4, '0', STR_PAD_LEFT),
                     'pemilik' => 'Pemilik Demo '.$nomor,
@@ -207,5 +223,103 @@ class SigApotekSeeder extends Seeder
     private function acak(float $rentang): float
     {
         return (mt_rand(0, 20000) / 10000 - 1) * $rentang;
+    }
+
+    /**
+     * Baca batas kecamatan sekali saja lalu simpan cincin luar tiap bagian
+     * beserta kotak pembatasnya, agar penempatan titik demo cukup cepat.
+     */
+    private function muatPoligonKecamatan(): void
+    {
+        $path = resource_path('sig/geojson/kecamatan.geojson');
+        if (! is_file($path)) {
+            return;
+        }
+
+        $isi = json_decode((string) file_get_contents($path), true);
+        if (! is_array($isi) || ! isset($isi['features']) || ! is_array($isi['features'])) {
+            return;
+        }
+
+        foreach ($isi['features'] as $fitur) {
+            $prop = $fitur['properties'] ?? [];
+            $geom = $fitur['geometry'] ?? [];
+            $kunci = ($prop['kabupaten'] ?? '').'|'.($prop['nama'] ?? '');
+            if ($kunci === '|' || ! isset($geom['type'], $geom['coordinates'])) {
+                continue;
+            }
+
+            // Polygon → satu bagian; MultiPolygon → banyak bagian. Cincin
+            // pertama tiap bagian adalah batas luarnya.
+            $bagian = $geom['type'] === 'MultiPolygon' ? $geom['coordinates'] : [$geom['coordinates']];
+            foreach ($bagian as $poligon) {
+                $cincin = $poligon[0] ?? null;
+                if (! is_array($cincin) || count($cincin) < 4) {
+                    continue;
+                }
+
+                $lng = array_column($cincin, 0);
+                $lat = array_column($cincin, 1);
+                $this->poligon[$kunci][] = [
+                    'titik' => $cincin,
+                    'bbox' => [min($lng), min($lat), max($lng), max($lat)],
+                ];
+            }
+        }
+    }
+
+    /**
+     * Titik acak di dalam poligon kecamatan.
+     *
+     * Memakai penolakan (rejection sampling): ambil titik acak di dalam kotak
+     * pembatas, ulangi sampai titik benar-benar berada di dalam poligon.
+     *
+     * @return array{0:float,1:float}|null [lat, lng]
+     */
+    private function titikDalamKecamatan(string $kabupaten, string $kecamatan): ?array
+    {
+        $bagian = $this->poligon[$kabupaten.'|'.$kecamatan] ?? null;
+        if (! $bagian) {
+            return null;
+        }
+
+        // Bagian terluas dipakai agar titik tidak menumpuk di pulau kecil.
+        usort($bagian, fn ($a, $b) => ($b['bbox'][2] - $b['bbox'][0]) * ($b['bbox'][3] - $b['bbox'][1])
+            <=> ($a['bbox'][2] - $a['bbox'][0]) * ($a['bbox'][3] - $a['bbox'][1]));
+        [$minLng, $minLat, $maksLng, $maksLat] = $bagian[0]['bbox'];
+
+        for ($coba = 0; $coba < 200; $coba++) {
+            $lng = $minLng + (mt_rand(0, 1000000) / 1000000) * ($maksLng - $minLng);
+            $lat = $minLat + (mt_rand(0, 1000000) / 1000000) * ($maksLat - $minLat);
+            if ($this->didalam($lng, $lat, $bagian[0]['titik'])) {
+                return [round($lat, 6), round($lng, 6)];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Uji titik di dalam poligon dengan algoritme lemparan sinar (ray casting).
+     *
+     * @param  array<int,array{0:float,1:float}>  $cincin
+     */
+    private function didalam(float $x, float $y, array $cincin): bool
+    {
+        $didalam = false;
+        $n = count($cincin);
+
+        for ($i = 0, $j = $n - 1; $i < $n; $j = $i++) {
+            [$xi, $yi] = $cincin[$i];
+            [$xj, $yj] = $cincin[$j];
+
+            // Sinar horizontal ke kanan memotong ruas [j,i]?
+            if (($yi > $y) !== ($yj > $y)
+                && $x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi) {
+                $didalam = ! $didalam;
+            }
+        }
+
+        return $didalam;
     }
 }

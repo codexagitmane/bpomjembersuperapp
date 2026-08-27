@@ -334,6 +334,11 @@ export function PetaApotek({
           <GeoJSON
             data={batasWilayah as never}
             style={{ color: "#2c5596", weight: 1.2, fillColor: "#2c5596", fillOpacity: 0.05 }}
+            onEachFeature={(fitur, lapisan) => {
+              const p = (fitur as { properties?: Record<string, unknown> }).properties;
+              const nama = typeof p?.nama === "string" ? p.nama : null;
+              if (nama) lapisan.bindTooltip(nama, { sticky: true });
+            }}
           />
         )}
 

@@ -61,3 +61,9 @@ Thumbs.db
 
 # --- Claude Code local state ---
 .claude/
+
+# --- Cache unduhan skrip (scripts/bangun-geojson.py) ---
+.cache-geojson/
+
+# --- Arsip backup bila dibuat di dalam direktori proyek ---
+lentera-backup-*.tar.gz

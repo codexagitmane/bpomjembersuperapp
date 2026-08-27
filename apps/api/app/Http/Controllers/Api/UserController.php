@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\EmailAman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -138,7 +139,7 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'email', 'max:150', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:150', new EmailAman, 'unique:users,email'],
             'nip_nik' => ['nullable', 'string', 'max:32', 'unique:users,nip_nik'],
             'phone' => ['nullable', 'string', 'max:20'],
             'role' => ['required', 'string', Rule::exists('roles', 'name')],
@@ -179,7 +180,7 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => ['sometimes', 'string', 'max:150'],
-            'email' => ['sometimes', 'email', 'max:150', Rule::unique('users', 'email')->ignore($user->id)],
+            'email' => ['sometimes', 'email', 'max:150', new EmailAman, Rule::unique('users', 'email')->ignore($user->id)],
             'nip_nik' => ['nullable', 'string', 'max:32', Rule::unique('users', 'nip_nik')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'max:20'],
             'role' => ['sometimes', 'string', Rule::exists('roles', 'name')],

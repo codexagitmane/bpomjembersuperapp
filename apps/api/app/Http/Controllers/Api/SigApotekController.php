@@ -10,6 +10,7 @@ use App\Models\ApotekTemuan;
 use App\Models\ApotekTindakLanjut;
 use App\Models\AuditLog;
 use App\Models\SigApotek;
+use App\Rules\EmailAman;
 use App\Services\Sig\AnalitikApotekService;
 use App\Services\Sig\ApotekBerkasService;
 use App\Services\Sig\PrioritasMonitoringService;
@@ -552,7 +553,7 @@ class SigApotekController extends Controller
             'pemilik' => ['nullable', 'string', 'max:150'],
             'penanggung_jawab' => ['nullable', 'string', 'max:150'],
             'telepon' => ['nullable', 'string', 'max:30'],
-            'email' => ['nullable', 'email', 'max:120'],
+            'email' => ['nullable', 'email', 'max:120', new EmailAman],
             'jenis_sarana' => ['nullable', 'string', 'max:40'],
             'status_sarana' => ['nullable', Rule::in(SigApotek::STATUS_SARANA)],
             'keterangan' => ['nullable', 'string', 'max:2000'],

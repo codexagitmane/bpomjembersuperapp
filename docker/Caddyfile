@@ -1,0 +1,43 @@
+# Caddy — gerbang tunggal LENTERA BPOM Jember.
+#
+# Hanya service ini yang membuka port 80/443. Sertifikat TLS diurus otomatis
+# oleh Caddy (Let's Encrypt / ZeroSSL) selama {$DOMAIN} benar-benar mengarah
+# ke IP VPS ini.
+#
+# Pembagian rute:
+#   /api/*, /storage/*, /sanctum/*, /up  → Laravel  (container `api`, port 8000)
+#   sisanya                              → Next.js  (container `web`, port 3000)
+#
+# CATATAN SAAT DEPLOY: bila di VPS sudah ada Caddyfile hasil penyetelan manual,
+# cadangkan lebih dulu sebelum mengekstrak paket rilis:
+#   cp docker/Caddyfile docker/Caddyfile.vps.bak
+
+{
+	# Matikan admin API — tidak dibutuhkan dan mengurangi permukaan serangan.
+	admin off
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Unggahan berkas (BAST, lampiran arsip, impor Excel) bisa beberapa MB.
+	request_body {
+		max_size 25MB
+	}
+
+	# Backend Laravel: REST API, berkas publik storage, dan endpoint kesehatan.
+	@backend path /api/* /storage/* /sanctum/* /up
+	handle @backend {
+		reverse_proxy api:8000
+	}
+
+	# Selebihnya adalah aplikasi web Next.js.
+	handle {
+		reverse_proxy web:3000
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}
