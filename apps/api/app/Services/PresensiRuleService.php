@@ -69,16 +69,9 @@ class PresensiRuleService
         $hari = (int) $tanggal->dayOfWeekIso; // 1=Senin ... 7=Minggu
 
         if ($jenis === 'keamanan') {
-            // Petugas keamanan hanya boleh absen di hari yang dijadwalkan dalam
-            // roster. Jika belum ada roster untuk hari ini, presensi ditolak
-            // (mencegah absen di hari libur shift-nya).
-            $adaRoster = \App\Models\RosterKeamanan::where('user_id', $user->id)
-                ->whereDate('tanggal', $tanggal->toDateString())
-                ->exists();
-            if (! $adaRoster) {
-                return [false, 'Anda tidak terjadwal bertugas hari ini menurut roster keamanan.', null, null, false];
-            }
-
+            // Petugas keamanan bertugas setiap hari (termasuk akhir pekan &
+            // libur) tanpa terikat roster shift — boleh absen kapan pun.
+            // Shift lintas hari tetap diizinkan (checkout keesokan pagi).
             return [true, null, '07:30', '07:30', true];
         }
 

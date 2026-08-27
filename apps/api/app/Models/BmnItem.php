@@ -8,7 +8,7 @@ class BmnItem extends Model
 {
     protected $table = 'bmn_items';
 
-    protected $fillable = ['kode_barang', 'nama_barang', 'lokasi', 'kondisi', 'tahun_perolehan'];
+    protected $fillable = ['kode_barang', 'nup', 'nama_barang', 'jenis_bmn', 'lokasi', 'kondisi', 'tahun_perolehan', 'foto_path', 'bast_path'];
 
     public function pengajuan()
     {

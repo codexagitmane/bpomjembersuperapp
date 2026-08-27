@@ -168,7 +168,46 @@ export default function RekapPresensiPage() {
         )}
 
         <Card className="mt-4 !p-0">
-          <div className="overflow-x-auto">
+          {/* Mobile: kartu per pegawai (label : nilai) */}
+          <div className="divide-y divide-navy-900/5 md:hidden">
+            {loading &&
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="p-4">
+                  <div className="h-4 w-2/3 animate-pulse rounded bg-navy-100/60" />
+                </div>
+              ))}
+            {!loading && rekap?.rows.length === 0 && (
+              <div className="px-4 py-10 text-center text-navy-400">
+                <Users className="mx-auto mb-2 size-8 text-navy-200" />
+                Tidak ada data pegawai.
+              </div>
+            )}
+            {!loading &&
+              rekap?.rows.map((r, i) => (
+                <div key={i} className="p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-navy-900">{String(r["nama"] ?? "—")}</p>
+                      {"nip_nik" in r && <p className="font-mono text-xs text-navy-500">{String(r["nip_nik"] ?? "—")}</p>}
+                    </div>
+                    <span className="shrink-0 text-xs text-navy-400">#{i + 1}</span>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {rekap.kolom.map((k, ki) =>
+                      ["nama", "nip_nik"].includes(k) ? null : (
+                        <div key={k} className="rounded-lg bg-navy-50 px-2.5 py-1.5">
+                          <p className="text-[10px] uppercase tracking-wide text-navy-400">{rekap.headers[ki + 1] ?? k}</p>
+                          <p className="text-sm font-semibold text-navy-800">{String(r[k] ?? "—")}</p>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          {/* Desktop: tabel */}
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-navy-900/10 text-left text-xs uppercase tracking-wide text-navy-400">

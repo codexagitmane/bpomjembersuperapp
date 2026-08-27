@@ -10,10 +10,29 @@ export interface User {
   phone?: string | null;
   account_type: AccountType;
   role: RoleSlug;
+  jenis_pegawai?: string | null;
+  is_pengelola_gudang?: boolean;
+  is_pengelola_bmn?: boolean;
+  is_ketua_tim?: boolean;
+  fungsi_ketua_tim?: string | null;
+  is_pengelola_arsip?: boolean;
+  is_arsiparis?: boolean;
+  status_kepegawaian?: "asn" | "pppk" | "outsourcing" | "magang" | null;
+  jabatan?: string | null;
+  kelompok_substansi?: string | null;
   avatar_url?: string | null;
+  two_factor_enabled?: boolean;
   is_active: boolean;
   created_at: string;
 }
+
+/** Label ramah untuk status kepegawaian pegawai internal. */
+export const STATUS_KEPEGAWAIAN_LABEL: Record<string, string> = {
+  asn: "ASN",
+  pppk: "P3K",
+  outsourcing: "Outsourcing",
+  magang: "Magang",
+};
 
 export interface AuthSession {
   user: User;

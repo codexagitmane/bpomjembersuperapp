@@ -18,6 +18,7 @@ class CutiIzinController extends Controller
         $user = $request->user();
         $tahun = (int) $request->input('tahun', now()->year);
 
+        $berhakJatah = $user->berhakJatahCutiTahunan();
         $terpakai = CutiIzin::totalCutiDisetujui($user->id, $tahun);
 
         return response()->json([
@@ -28,9 +29,13 @@ class CutiIzinController extends Controller
                 ->get(),
             'jatah' => [
                 'tahun' => $tahun,
-                'jatah_cuti_tahunan' => $user->jatah_cuti_tahunan,
+                'berlaku' => $berhakJatah,
+                'jatah_cuti_tahunan' => $berhakJatah ? $user->jatah_cuti_tahunan : 0,
                 'cuti_terpakai' => $terpakai,
-                'sisa_cuti' => max(0, $user->jatah_cuti_tahunan - $terpakai),
+                'sisa_cuti' => $berhakJatah ? max(0, $user->jatah_cuti_tahunan - $terpakai) : 0,
+                'keterangan' => $berhakJatah
+                    ? null
+                    : 'Sebagai pegawai outsourcing/magang, cuti diajukan tanpa jatah tahunan dan disetujui berjenjang oleh Kasubag TU lalu Kepala Balai.',
             ],
         ]);
     }
@@ -67,8 +72,9 @@ class CutiIzinController extends Controller
             ], 422);
         }
 
-        // Khusus cuti: validasi sisa jatah tahun berjalan.
-        if ($validated['jenis'] === 'cuti') {
+        // Khusus cuti ASN/PPPK: validasi sisa jatah tahun berjalan.
+        // Outsourcing/magang tidak berjatah — cuti disetujui berjenjang.
+        if ($validated['jenis'] === 'cuti' && $user->berhakJatahCutiTahunan()) {
             $terpakai = CutiIzin::totalCutiDisetujui($user->id, $mulai->year);
             $sisa = $user->jatah_cuti_tahunan - $terpakai;
             if ($jumlahHari > $sisa) {
@@ -99,7 +105,7 @@ class CutiIzinController extends Controller
     /** Daftar semua pengajuan (untuk halaman persetujuan manajerial). */
     public function semua(Request $request)
     {
-        $query = CutiIzin::with(['user:id,name,jenis_pegawai', 'approver:id,name'])
+        $query = CutiIzin::with(['user:id,name,jenis_pegawai', 'approver:id,name', 'kasubagApprover:id,name'])
             ->orderByDesc('created_at');
 
         if ($request->filled('status')) {
@@ -120,8 +126,30 @@ class CutiIzinController extends Controller
             return response()->json(['message' => 'Pengajuan ini sudah diproses.'], 422);
         }
 
-        // Re-validasi jatah saat approval (jatah bisa berubah sejak diajukan).
-        if ($validated['aksi'] === 'setujui' && $cutiIzin->jenis === 'cuti') {
+        $approver = $request->user();
+        $isSuperadmin = $approver->hasRole('superadmin');
+        $isKasubag = $approver->hasRole('kepala_subag_tu') || $isSuperadmin;
+        $isKabalai = $approver->hasRole('kepala_balai') || $isSuperadmin;
+        $catatan = $validated['catatan'] ?? null;
+
+        // Penolakan di tahap manapun bersifat final.
+        if ($validated['aksi'] === 'tolak') {
+            $cutiIzin->update([
+                'status' => 'ditolak',
+                'approved_by' => $approver->id,
+                'approved_at' => now(),
+                'catatan_approval' => $catatan,
+            ]);
+            AuditLog::catat($approver->id, 'cuti_izin_ditolak', 'presensi',
+                "Pengajuan {$cutiIzin->jenis} #{$cutiIzin->id} milik {$cutiIzin->user->name} ditolak.");
+            $this->beriTahuPemohon($notif, $cutiIzin, 'ditolak', $catatan);
+
+            return response()->json(['cuti_izin' => $this->muat($cutiIzin)]);
+        }
+
+        // === Persetujuan ===
+        // Re-validasi jatah untuk cuti ASN/PPPK (jatah bisa berubah sejak diajukan).
+        if ($cutiIzin->jenis === 'cuti' && $cutiIzin->user->berhakJatahCutiTahunan()) {
             $tahun = Carbon::parse($cutiIzin->tanggal_mulai)->year;
             $terpakai = CutiIzin::totalCutiDisetujui($cutiIzin->user_id, $tahun);
             $sisa = $cutiIzin->user->jatah_cuti_tahunan - $terpakai;
@@ -132,23 +160,79 @@ class CutiIzinController extends Controller
             }
         }
 
-        $status = $validated['aksi'] === 'setujui' ? 'disetujui' : 'ditolak';
+        // Alur berjenjang khusus pegawai outsourcing/magang.
+        if ($cutiIzin->user->isOutsourcing()) {
+            // Tahap 1 — Kasubag TU.
+            if (! $cutiIzin->approval_kasubag_at) {
+                if (! $isKasubag) {
+                    return response()->json(['message' => 'Tahap pertama harus disetujui Kepala Subag TU.'], 422);
+                }
+                $cutiIzin->update([
+                    'approval_kasubag_by' => $approver->id,
+                    'approval_kasubag_at' => now(),
+                    'catatan_approval' => $catatan,
+                ]);
+                AuditLog::catat($approver->id, 'cuti_izin_approve_kasubag', 'presensi',
+                    "Cuti #{$cutiIzin->id} ({$cutiIzin->user->name}) disetujui Kasubag, menunggu Kepala Balai.");
+
+                $notif->kirimKeRole(['kepala_balai'],
+                    'Persetujuan Cuti Menunggu Anda',
+                    "Cuti {$cutiIzin->user->name} sudah disetujui Kasubag TU dan menunggu persetujuan Kepala Balai.",
+                    '/persetujuan');
+                $this->beriTahuPemohon($notif, $cutiIzin, 'disetujui Kasubag TU (menunggu Kepala Balai)', $catatan);
+
+                return response()->json(['cuti_izin' => $this->muat($cutiIzin)]);
+            }
+
+            // Tahap 2 — Kepala Balai (final).
+            if (! $isKabalai) {
+                return response()->json(['message' => 'Tahap akhir harus disetujui Kepala Balai.'], 422);
+            }
+            $cutiIzin->update([
+                'approval_kabalai_by' => $approver->id,
+                'approval_kabalai_at' => now(),
+                'status' => 'disetujui',
+                'approved_by' => $approver->id,
+                'approved_at' => now(),
+                'catatan_approval' => $catatan ?? $cutiIzin->catatan_approval,
+            ]);
+            AuditLog::catat($approver->id, 'cuti_izin_disetujui', 'presensi',
+                "Cuti #{$cutiIzin->id} ({$cutiIzin->user->name}) disetujui final oleh Kepala Balai.");
+            $this->beriTahuPemohon($notif, $cutiIzin, 'disetujui', $catatan);
+
+            return response()->json(['cuti_izin' => $this->muat($cutiIzin)]);
+        }
+
+        // ASN/PPPK: cukup satu tahap (Kasubag TU / Superadmin).
+        if (! $isKasubag) {
+            return response()->json(['message' => 'Pengajuan ini disetujui oleh Kepala Subag TU.'], 422);
+        }
         $cutiIzin->update([
-            'status' => $status,
-            'approved_by' => $request->user()->id,
+            'status' => 'disetujui',
+            'approved_by' => $approver->id,
             'approved_at' => now(),
-            'catatan_approval' => $validated['catatan'] ?? null,
+            'approval_kasubag_by' => $approver->id,
+            'approval_kasubag_at' => now(),
+            'catatan_approval' => $catatan,
         ]);
+        AuditLog::catat($approver->id, 'cuti_izin_disetujui', 'presensi',
+            "Pengajuan {$cutiIzin->jenis} #{$cutiIzin->id} milik {$cutiIzin->user->name} disetujui.");
+        $this->beriTahuPemohon($notif, $cutiIzin, 'disetujui', $catatan);
 
-        AuditLog::catat($request->user()->id, 'cuti_izin_'.$status, 'presensi',
-            "Pengajuan {$cutiIzin->jenis} #{$cutiIzin->id} milik {$cutiIzin->user->name} {$status}.");
+        return response()->json(['cuti_izin' => $this->muat($cutiIzin)]);
+    }
 
+    private function muat(CutiIzin $cutiIzin): CutiIzin
+    {
+        return $cutiIzin->fresh(['user:id,name', 'approver:id,name', 'kasubagApprover:id,name']);
+    }
+
+    private function beriTahuPemohon(NotifikasiService $notif, CutiIzin $cutiIzin, string $statusText, ?string $catatan): void
+    {
         $notif->kirim([$cutiIzin->user_id],
-            'Pengajuan '.ucfirst($cutiIzin->jenis).' '.ucfirst($status),
-            "Pengajuan {$cutiIzin->jenis} Anda ({$cutiIzin->tanggal_mulai->format('Y-m-d')} s/d {$cutiIzin->tanggal_selesai->format('Y-m-d')}) {$status}."
-                .($validated['catatan'] ? " Catatan: {$validated['catatan']}" : ''),
+            'Pengajuan '.ucfirst($cutiIzin->jenis).': '.ucfirst($statusText),
+            "Pengajuan {$cutiIzin->jenis} Anda ({$cutiIzin->tanggal_mulai->format('Y-m-d')} s/d {$cutiIzin->tanggal_selesai->format('Y-m-d')}) {$statusText}."
+                .($catatan ? " Catatan: {$catatan}" : ''),
             '/cuti');
-
-        return response()->json(['cuti_izin' => $cutiIzin->fresh(['user:id,name', 'approver:id,name'])]);
     }
 }

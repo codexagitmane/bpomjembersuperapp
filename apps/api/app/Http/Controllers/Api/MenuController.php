@@ -15,7 +15,8 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $isSuperOrKepala = $user->hasAnyRole(['superadmin', 'kepala_balai']);
+        // Superadmin, Kepala Balai, & Kepala Subag TU melihat seluruh fungsi (lintas fungsi).
+        $isSuperOrKepala = $user->hasAnyRole(['superadmin', 'kepala_balai', 'kepala_subag_tu']);
 
         $fungsi = Fungsi::with(['aplikasi' => function ($q) {
             $q->where('is_active', true)->orderBy('urutan');

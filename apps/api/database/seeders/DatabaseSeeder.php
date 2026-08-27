@@ -13,10 +13,12 @@ class DatabaseSeeder extends Seeder
             FungsiAplikasiSeeder::class,
             PengaturanSeeder::class,
             DemoUsersSeeder::class,
+            PegawaiSeeder::class,
             BeritaSeeder::class,
             SigApotekSeeder::class,
             RosterKeamananSeeder::class,
             BahanLabSeeder::class,
+            DemoOperasionalSeeder::class,
         ]);
     }
 }

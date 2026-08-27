@@ -7,7 +7,11 @@ import { api, getStoredToken, setStoredToken } from "./api";
 interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    opts?: { remember?: boolean; twoFactorCode?: string }
+  ) => Promise<{ twoFactorRequired?: boolean }>;
   registerEksternal: (data: {
     name: string;
     email: string;
@@ -47,15 +51,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refresh();
   }, [refresh]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const { data } = await api.post<{ user: User; token: string }>("/auth/login", {
-      email,
-      password,
-      device_name: "web",
-    });
-    setStoredToken(data.token);
-    setUser(data.user);
-  }, []);
+  const login = useCallback(
+    async (email: string, password: string, opts?: { remember?: boolean; twoFactorCode?: string }) => {
+      const { data } = await api.post<{ user?: User; token?: string; two_factor_required?: boolean }>("/auth/login", {
+        email,
+        password,
+        device_name: "web",
+        remember: opts?.remember ?? false,
+        two_factor_code: opts?.twoFactorCode,
+      });
+      if (data.two_factor_required) return { twoFactorRequired: true };
+      if (data.token && data.user) {
+        setStoredToken(data.token);
+        setUser(data.user);
+        // Re-arm pengingat 2FA agar tampil setiap kali user login (bukan sekali per sesi).
+        if (typeof window !== "undefined") sessionStorage.removeItem("lentera_2fa_nudged");
+      }
+      return {};
+    },
+    []
+  );
 
   const registerEksternal = useCallback(
     async (payload: {

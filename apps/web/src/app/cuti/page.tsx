@@ -25,9 +25,11 @@ interface CutiItem {
 
 interface Jatah {
   tahun: number;
+  berlaku: boolean;
   jatah_cuti_tahunan: number;
   cuti_terpakai: number;
   sisa_cuti: number;
+  keterangan: string | null;
 }
 
 const STATUS_TONE: Record<string, "info" | "success" | "danger"> = {
@@ -115,7 +117,7 @@ export default function CutiPage() {
           </Button>
         </div>
 
-        {jatah && (
+        {jatah && jatah.berlaku && (
           <Card className="mt-4 flex items-center gap-4 !py-4">
             <div className="flex size-11 items-center justify-center rounded-xl bg-bpom-50 text-bpom-700">
               <Sun className="size-5" />
@@ -130,6 +132,11 @@ export default function CutiPage() {
               {jatah.sisa_cuti}
               <span className="ml-1 text-xs font-semibold text-navy-400">hari tersisa</span>
             </p>
+          </Card>
+        )}
+        {jatah && !jatah.berlaku && jatah.keterangan && (
+          <Card className="mt-4 !py-4">
+            <p className="text-xs leading-relaxed text-navy-500">{jatah.keterangan}</p>
           </Card>
         )}
 

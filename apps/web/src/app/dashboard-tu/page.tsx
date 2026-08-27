@@ -52,7 +52,8 @@ export default function DashboardTUPage() {
 
   useEffect(() => {
     api
-      .get("/dashboard/kasubag")
+      // Kartu ini menampilkan tren 7 hari — minta rentang yang sesuai judulnya.
+      .get("/dashboard/kasubag", { params: { periode: "minggu" } })
       .then(({ data }) => setData(data))
       .catch((err) => {
         if (err?.response?.status === 403) setForbidden(true);
@@ -73,7 +74,7 @@ export default function DashboardTUPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto w-full max-w-5xl">
         <h1 className="flex items-center gap-2 text-2xl font-extrabold text-navy-900">
           <Building2 className="size-6 text-bpom-600" /> Dashboard Tata Usaha
         </h1>
@@ -99,8 +100,8 @@ export default function DashboardTUPage() {
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-5">
-              {/* Tren 7 hari */}
-              <Card className="lg:col-span-3">
+              {/* Tren 7 hari — min-w-0 mencegah isi grafik melebar keluar kartu. */}
+              <Card className="min-w-0 lg:col-span-3">
                 <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-navy-400">
                   Tren Kehadiran 7 Hari
                 </h2>
@@ -121,7 +122,7 @@ export default function DashboardTUPage() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <ShortcutCard href="/persetujuan" icon={<ClipboardCheck className="size-5" />} title="Persetujuan" desc="Approve izin & pengajuan BMN" />
               <ShortcutCard href="/rekap-presensi" icon={<CalendarRange className="size-5" />} title="Rekap Presensi" desc="Rekap bulanan + ekspor Excel/PDF" />
-              <ShortcutCard href="/roster-keamanan" icon={<ShieldCheck className="size-5" />} title="Roster Keamanan" desc="Atur jadwal shift petugas keamanan" />
+              <ShortcutCard href="/persediaan-bmn" icon={<ShieldCheck className="size-5" />} title="Persediaan BMN" desc="Permintaan & persetujuan persediaan" />
             </div>
           </>
         )}
@@ -151,7 +152,7 @@ function StatTile({
   accent: keyof typeof ACCENT;
 }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="min-w-0">
       <Card className="!p-4">
         <div className={cn("mb-3 inline-flex size-9 items-center justify-center rounded-xl", ACCENT[accent])}>{icon}</div>
         <p className="text-2xl font-extrabold tabular-nums text-navy-900">{value}</p>

@@ -51,10 +51,15 @@ export const FUNGSI_LABELS: Record<FungsiSlug, string> = {
 
 export const APLIKASI = {
   BOOKING_KONSULTASI: "booking_konsultasi",
+  LAYANAN_KONSUMEN: "layanan_konsumen",
+  SI_PANDU_AJA: "si_pandu_aja",
   SIG_APOTEK: "sig_apotek",
   PRESENSI: "presensi",
   IZIN_KELUAR_MASUK: "izin_keluar_masuk",
   PENGAJUAN_BMN: "pengajuan_bmn",
+  PERSEDIAAN_BMN: "persediaan_bmn",
+  PERJALANAN_DINAS: "perjalanan_dinas",
+  PEMINJAMAN_ARSIP: "peminjaman_arsip",
   BARANG_BUKTI: "barang_bukti",
   MANAJEMEN_BAHAN_LAB: "manajemen_bahan_lab",
   SI_PANDU_AI: "si_pandu_ai",

@@ -10,7 +10,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -46,11 +46,15 @@ services:
       DB_DATABASE: ${DB_DATABASE:-bpom_jember}
       DB_USERNAME: ${DB_USERNAME:-bpom}
       DB_PASSWORD: ${DB_PASSWORD:-secret}
-      REDIS_HOST: redis
-      CACHE_STORE: redis
-      SESSION_DRIVER: redis
-      QUEUE_CONNECTION: redis
-      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      CORS_ALLOWED_ORIGINS: "http://${SERVER_IP:-147.93.159.225}:3000,http://localhost:3000"
+    # `php artisan serve` tidak meneruskan env var Docker ke konteks HTTP, sehingga
+    # env('DB_CONNECTION') kosong di request → Laravel fallback ke sqlite kosong.
+    # `config:cache` me-resolve nilai env di CLI lalu menuliskannya ke file yang
+    # dibaca semua konteks (termasuk HTTP), agar API selalu memakai MySQL yang benar.
+    command: sh -c "php artisan config:clear; until php artisan migrate --force; do echo 'Menunggu MySQL siap...'; sleep 3; done; php artisan db:seed --force; php artisan storage:link || true; php artisan config:cache; php artisan serve --host=0.0.0.0 --port=8000"
     ports:
       - "8000:8000"
     volumes:
@@ -60,11 +64,13 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+      args:
+        # NEXT_PUBLIC_* di-inline saat BUILD (bukan runtime). Harus alamat yang
+        # bisa dijangkau BROWSER pengguna — yaitu IP publik VPS, bukan localhost.
+        NEXT_PUBLIC_API_URL: "http://${SERVER_IP:-147.93.159.225}:8000/api"
     restart: unless-stopped
     depends_on:
       - api
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api
     ports:
       - "3000:3000"
 

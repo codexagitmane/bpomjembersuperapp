@@ -27,10 +27,15 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $aplikasiSlugs = [
             'booking_konsultasi',
+            'layanan_konsumen',
+            'si_pandu_aja',
             'sig_apotek',
             'presensi',
             'izin_keluar_masuk',
             'pengajuan_bmn',
+            'persediaan_bmn',
+            'perjalanan_dinas',
+            'peminjaman_arsip',
             'barang_bukti',
             'manajemen_bahan_lab',
             'si_pandu_ai',
@@ -43,8 +48,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $matrix = [
             'superadmin' => $aplikasiSlugs, // akses penuh
             'kepala_balai' => $aplikasiSlugs, // akses penuh (monitoring lintas fungsi)
-            'kepala_subag_tu' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'si_pandu_ai'],
-            'pegawai_asn_pppk' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'sig_apotek', 'barang_bukti', 'booking_konsultasi', 'manajemen_bahan_lab', 'si_pandu_ai'],
+            'kepala_subag_tu' => $aplikasiSlugs, // Kasubag TU memantau lintas fungsi
+            'pegawai_asn_pppk' => ['presensi', 'izin_keluar_masuk', 'pengajuan_bmn', 'persediaan_bmn', 'perjalanan_dinas', 'peminjaman_arsip', 'sig_apotek', 'barang_bukti', 'booking_konsultasi', 'layanan_konsumen', 'si_pandu_aja', 'manajemen_bahan_lab', 'si_pandu_ai'],
             'pegawai_outsourcing_magang' => ['presensi', 'izin_keluar_masuk'],
             'masyarakat' => ['booking_konsultasi', 'si_pandu_ai'],
         ];

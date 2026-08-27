@@ -103,9 +103,9 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-5xl">
-        <h1 className="flex items-center gap-2 text-2xl font-extrabold text-navy-900">
-          <LayoutDashboard className="size-6 text-bpom-600" /> Dashboard Kepala Balai
+      <div className="mx-auto w-full max-w-5xl">
+        <h1 className="flex items-center gap-2 text-xl font-extrabold text-navy-900 sm:text-2xl">
+          <LayoutDashboard className="size-6 shrink-0 text-bpom-600" /> Dashboard Kepala Balai
         </h1>
         <p className="mt-1 text-sm text-navy-500">
           Ringkasan aktivitas seluruh aplikasi — {data ? formatTanggalIndonesia(data.tanggal) : "..."}
@@ -372,6 +372,7 @@ function StatTile({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.06, duration: 0.35 }}
+      className="min-w-0"
     >
       <Card className="!p-4">
         <div className={cn("mb-3 inline-flex size-9 items-center justify-center rounded-xl", ACCENT_STYLES[accent])}>

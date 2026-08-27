@@ -35,6 +35,18 @@ class FungsiAplikasiSeeder extends Seeder
                 'icon' => 'CalendarCheck', 'is_external_access' => true, 'urutan' => 1,
             ],
             [
+                'fungsi' => 'infokom', 'slug' => 'layanan_konsumen',
+                'nama' => 'Layanan Informasi Konsumen',
+                'deskripsi' => 'Pencatatan record layanan informasi, konsultasi & pengaduan konsumen — form bertahap, ekspor Word/PDF.',
+                'icon' => 'ClipboardList', 'is_external_access' => false, 'urutan' => 2,
+            ],
+            [
+                'fungsi' => 'infokom', 'slug' => 'si_pandu_aja',
+                'nama' => 'Si Pandu Aja',
+                'deskripsi' => 'Formulir layanan pengaduan konsumen daring (Office Forms) — membuka di jendela baru.',
+                'icon' => 'MessageSquareText', 'is_external_access' => true, 'urutan' => 3,
+            ],
+            [
                 'fungsi' => 'pemeriksaan', 'slug' => 'sig_apotek',
                 'nama' => 'SIG Monitoring & Pemetaan Distribusi Apotek',
                 'deskripsi' => 'Pemetaan geografis sebaran dan status pengawasan apotek se-Kabupaten Jember.',
@@ -42,9 +54,9 @@ class FungsiAplikasiSeeder extends Seeder
             ],
             [
                 'fungsi' => 'tata_usaha', 'slug' => 'presensi',
-                'nama' => 'Presensi Berbasis Lokasi & Selfie',
-                'deskripsi' => 'Absensi pegawai dengan validasi titik lokasi (geofence) dan foto selfie.',
-                'icon' => 'ScanFace', 'is_external_access' => false, 'urutan' => 3,
+                'nama' => 'ONTIME — Presensi & Kehadiran',
+                'deskripsi' => 'Absensi berbasis lokasi (geofence) & selfie, rekap kehadiran, dan manajemen jadwal.',
+                'icon' => 'Fingerprint', 'is_external_access' => false, 'urutan' => 3,
             ],
             [
                 'fungsi' => 'tata_usaha', 'slug' => 'izin_keluar_masuk',
@@ -57,6 +69,24 @@ class FungsiAplikasiSeeder extends Seeder
                 'nama' => 'Pengajuan Pemeliharaan & Perbaikan BMN',
                 'deskripsi' => 'Pengajuan tiket pemeliharaan dan perbaikan Barang Milik Negara.',
                 'icon' => 'Wrench', 'is_external_access' => false, 'urutan' => 5,
+            ],
+            [
+                'fungsi' => 'tata_usaha', 'slug' => 'persediaan_bmn',
+                'nama' => 'Persediaan Barang Milik Negara',
+                'deskripsi' => 'Permintaan persediaan pegawai, monitoring stok & kedaluwarsa reagen/test kit, persetujuan berjenjang.',
+                'icon' => 'PackageOpen', 'is_external_access' => false, 'urutan' => 6,
+            ],
+            [
+                'fungsi' => 'tata_usaha', 'slug' => 'perjalanan_dinas',
+                'nama' => 'Perjalanan Dinas',
+                'deskripsi' => 'Pembuatan dokumen Surat Tugas & SPPD perjalanan dinas secara cepat, output PDF siap tanda tangan.',
+                'icon' => 'Plane', 'is_external_access' => false, 'urutan' => 7,
+            ],
+            [
+                'fungsi' => 'tata_usaha', 'slug' => 'peminjaman_arsip',
+                'nama' => 'Peminjaman & Pengembalian Arsip',
+                'deskripsi' => 'Peminjaman arsip aktif & inaktif full aplikasi: formulir, persetujuan petugas arsip, dua TTD QR, dan bukti peminjaman/pengembalian PDF.',
+                'icon' => 'Archive', 'is_external_access' => false, 'urutan' => 8,
             ],
             [
                 'fungsi' => 'penindakan', 'slug' => 'barang_bukti',

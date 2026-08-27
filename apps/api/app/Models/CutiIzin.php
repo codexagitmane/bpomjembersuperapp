@@ -12,7 +12,10 @@ class CutiIzin extends Model
     protected $fillable = [
         'user_id', 'jenis', 'tanggal_mulai', 'tanggal_selesai', 'jumlah_hari',
         'alasan', 'status', 'approved_by', 'approved_at', 'catatan_approval',
+        'approval_kasubag_by', 'approval_kasubag_at', 'approval_kabalai_by', 'approval_kabalai_at',
     ];
+
+    protected $appends = ['tahap'];
 
     protected function casts(): array
     {
@@ -20,7 +23,34 @@ class CutiIzin extends Model
             'tanggal_mulai' => 'date:Y-m-d',
             'tanggal_selesai' => 'date:Y-m-d',
             'approved_at' => 'datetime',
+            'approval_kasubag_at' => 'datetime',
+            'approval_kabalai_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Tahap persetujuan saat ini untuk konsumsi frontend:
+     * - menunggu_kasubag: baru diajukan
+     * - menunggu_kabalai: sudah disetujui Kasubag, tunggu Kepala Balai (khusus outsourcing)
+     * - selesai: sudah final (disetujui/ditolak)
+     */
+    public function getTahapAttribute(): string
+    {
+        if ($this->status !== 'diajukan') {
+            return 'selesai';
+        }
+
+        return $this->approval_kasubag_at ? 'menunggu_kabalai' : 'menunggu_kasubag';
+    }
+
+    public function kasubagApprover()
+    {
+        return $this->belongsTo(User::class, 'approval_kasubag_by');
+    }
+
+    public function kabalaiApprover()
+    {
+        return $this->belongsTo(User::class, 'approval_kabalai_by');
     }
 
     public function user()

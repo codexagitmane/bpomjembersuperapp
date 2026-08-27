@@ -14,12 +14,16 @@ use Illuminate\Support\Carbon;
  */
 class TrenKehadiranService
 {
-    private const PERIODE_VALID = ['bulan', 'triwulan', 'semester', 'tahun'];
+    private const PERIODE_VALID = ['minggu', 'bulan', 'triwulan', 'semester', 'tahun'];
 
     public function tren(string $periode = 'bulan'): array
     {
         if (! in_array($periode, self::PERIODE_VALID, true)) {
             $periode = 'bulan';
+        }
+
+        if ($periode === 'minggu') {
+            return $this->trenHarian(7);
         }
 
         if ($periode === 'bulan') {

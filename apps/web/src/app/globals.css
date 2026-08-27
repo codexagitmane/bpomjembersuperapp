@@ -2,6 +2,7 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
+  color-scheme: light;
   --background: #f4f7fb;
   --foreground: #0b1f3a;
 
@@ -97,13 +98,6 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a1626;
-    --foreground: #eef3fb;
-  }
-}
-
 * {
   border-color: color-mix(in oklab, var(--color-navy-900) 8%, transparent);
 }
@@ -112,6 +106,55 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* ── Mode gelap ─────────────────────────────────────────────────
+   Retrofit tema gelap tanpa mengubah tiap komponen: override utilitas
+   permukaan/teks yang paling umum saat <html class="dark">. */
+html.dark {
+  color-scheme: dark;
+  --background: #0a1526;
+  --foreground: #e7eef8;
+}
+html.dark body {
+  background: var(--background);
+  color: var(--foreground);
+}
+html.dark .bg-background {
+  background-color: #0a1526 !important;
+}
+html.dark .bg-white {
+  background-color: #10203a !important;
+}
+html.dark .bg-white\/80,
+html.dark .bg-white\/90,
+html.dark .bg-white\/95 {
+  background-color: rgba(16, 32, 58, 0.9) !important;
+}
+html.dark .bg-navy-50 {
+  background-color: rgba(23, 41, 68, 0.6) !important;
+}
+html.dark .bg-navy-100 {
+  background-color: #1c3350 !important;
+}
+html.dark .text-navy-900,
+html.dark .text-navy-800 {
+  color: #e7eef8 !important;
+}
+html.dark .text-navy-700,
+html.dark .text-navy-600 {
+  color: #c3d0e6 !important;
+}
+html.dark .text-navy-500,
+html.dark .text-navy-400 {
+  color: #92a3c1 !important;
+}
+html.dark .border-navy-900\/5,
+html.dark .border-navy-900\/10 {
+  border-color: rgba(255, 255, 255, 0.09) !important;
+}
+html.dark .divide-navy-900\/5 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .card-elevated {

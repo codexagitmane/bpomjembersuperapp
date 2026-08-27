@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterEksternalRequest;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Support\Totp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -62,6 +63,20 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['email' => $pesan]);
         }
 
+        // --- Autentikasi dua faktor (jika aktif) ---
+        if ($user->twoFactorEnabled()) {
+            $code = (string) $request->input('two_factor_code', '');
+            if ($code === '') {
+                // Kata sandi benar, tapi butuh kode 2FA — belum menerbitkan token.
+                return response()->json(['two_factor_required' => true]);
+            }
+            if (! $this->verifyTwoFactor($user, $code)) {
+                RateLimiter::hit($throttleKey, 60);
+                AuditLog::catat($user->id, 'login_2fa_gagal', 'auth', 'Kode 2FA salah.');
+                throw ValidationException::withMessages(['two_factor_code' => 'Kode verifikasi tidak valid.']);
+            }
+        }
+
         RateLimiter::clear($throttleKey);
         $user->forceFill([
             'failed_login_attempts' => 0,
@@ -73,10 +88,14 @@ class AuthController extends Controller
         // Batasi jumlah token aktif per user untuk mengurangi permukaan serangan token bocor.
         $user->tokens()->where('name', $request->input('device_name', 'default'))->delete();
 
+        // "Ingat saya" memperpanjang masa berlaku token menjadi 30 hari.
+        $expMinutes = $request->boolean('remember')
+            ? 60 * 24 * 30
+            : (int) config('sanctum.expiration');
         $token = $user->createToken(
             $request->input('device_name', 'default'),
             ['*'],
-            now()->addMinutes((int) config('sanctum.expiration'))
+            now()->addMinutes($expMinutes)
         )->plainTextToken;
 
         AuditLog::catat($user->id, 'login_sukses', 'auth', 'Login berhasil.');
@@ -127,6 +146,26 @@ class AuthController extends Controller
         return response()->json(['message' => 'Berhasil keluar.']);
     }
 
+    /** Verifikasi kode TOTP atau salah satu kode pemulihan (sekali pakai). */
+    private function verifyTwoFactor(User $user, string $code): bool
+    {
+        if ($user->two_factor_secret && Totp::verify($user->two_factor_secret, $code)) {
+            return true;
+        }
+        $codes = $user->two_factor_recovery_codes ?? [];
+        $norm = strtoupper(trim($code));
+        foreach ($codes as $i => $rc) {
+            if (hash_equals(strtoupper($rc), $norm)) {
+                unset($codes[$i]);
+                $user->forceFill(['two_factor_recovery_codes' => array_values($codes)])->save();
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function catatPercobaanGagal(User $user): void
     {
         $maxAttempts = (int) config('app.auth_max_failed_attempts', env('AUTH_MAX_FAILED_ATTEMPTS', 5));
@@ -153,8 +192,18 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'account_type' => $user->account_type,
             'jenis_pegawai' => $user->jenis_pegawai,
+            'is_pengelola_gudang' => (bool) $user->is_pengelola_gudang,
+            'is_pengelola_bmn' => (bool) $user->is_pengelola_bmn,
+            'is_ketua_tim' => (bool) $user->is_ketua_tim,
+            'fungsi_ketua_tim' => $user->fungsi_ketua_tim,
+            'is_pengelola_arsip' => (bool) $user->is_pengelola_arsip,
+            'is_arsiparis' => (bool) $user->is_arsiparis,
+            'status_kepegawaian' => $user->status_kepegawaian,
+            'jabatan' => $user->jabatan,
+            'kelompok_substansi' => $user->kelompok_substansi,
             'role' => $user->getRoleNames()->first(),
             'avatar_url' => $user->avatar_path ? asset('storage/'.$user->avatar_path) : null,
+            'two_factor_enabled' => $user->twoFactorEnabled(),
             'is_active' => $user->is_active,
             'created_at' => $user->created_at?->toIso8601String(),
         ];
