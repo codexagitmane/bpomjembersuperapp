@@ -64,6 +64,7 @@ const STATUS_ACCENT: Record<string, string> = {
   pppk: "from-bpom-400 to-bpom-600",
   outsourcing: "from-amber-400 to-amber-500",
   magang: "from-navy-300 to-navy-400",
+  masyarakat: "from-sky-400 to-sky-600",
 };
 
 const emptyForm = {
@@ -85,6 +86,7 @@ export default function PegawaiPage() {
 
   const [items, setItems] = useState<Pegawai[]>([]);
   const [ringkasan, setRingkasan] = useState<Ringkasan[]>([]);
+  const [totalPengguna, setTotalPengguna] = useState(0);
   const [opsi, setOpsi] = useState<Opsi | null>(null);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
@@ -104,6 +106,7 @@ export default function PegawaiPage() {
       const { data } = await api.get("/pegawai", { params: q ? { q } : {} });
       setItems(data.data ?? []);
       setRingkasan(data.ringkasan ?? []);
+      setTotalPengguna(data.total_pengguna ?? 0);
     } finally {
       setLoading(false);
     }
@@ -200,7 +203,7 @@ export default function PegawaiPage() {
         <div>
           <h1 className="text-2xl font-extrabold text-navy-900">Data Pegawai</h1>
           <p className="mt-1 text-sm text-navy-500">
-            Direktori pegawai Balai POM di Jember — ASN, P3K, Outsourcing &amp; Magang.
+            Direktori pengguna LENTERA — PNS, PPPK, Outsourcing, Magang &amp; Masyarakat.
           </p>
         </div>
         {isAdmin && (
@@ -210,34 +213,56 @@ export default function PegawaiPage() {
         )}
       </div>
 
-      {/* Stat cards */}
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {ringkasan.map((r, i) => (
-          <motion.button
-            key={r.status}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            onClick={() => setFilter(filter === r.status ? "" : r.status)}
-            className={cn(
-              "group relative overflow-hidden rounded-2xl border bg-white p-4 text-left transition-all",
-              filter === r.status
-                ? "border-navy-900 shadow-md"
-                : "border-navy-900/5 hover:border-navy-200 hover:shadow-sm"
-            )}
-          >
-            <div
+      {/* Statistik: satu kartu besar total pengguna + kartu kategori di sampingnya */}
+      <div className="mb-6 grid gap-3 lg:grid-cols-3">
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={() => setFilter("")}
+          className={cn(
+            "relative flex flex-col justify-between overflow-hidden rounded-2xl border p-5 text-left transition-all",
+            "bg-gradient-to-br from-navy-900 to-navy-700 text-white",
+            filter === "" ? "border-navy-900 shadow-md" : "border-transparent hover:shadow-md"
+          )}
+        >
+          <div className="flex size-11 items-center justify-center rounded-2xl bg-white/15">
+            <Users className="size-5" />
+          </div>
+          <div className="mt-4">
+            <p className="text-4xl font-extrabold tabular-nums">{totalPengguna}</p>
+            <p className="mt-0.5 text-sm font-semibold text-white/80">Total Pengguna LENTERA</p>
+            <p className="mt-1 text-[11px] text-white/60">Pegawai internal &amp; masyarakat terdaftar</p>
+          </div>
+        </motion.button>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-2 lg:grid-cols-3">
+          {ringkasan.map((r, i) => (
+            <motion.button
+              key={r.status}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: (i + 1) * 0.05 }}
+              onClick={() => setFilter(filter === r.status ? "" : r.status)}
               className={cn(
-                "mb-3 flex size-9 items-center justify-center rounded-xl bg-gradient-to-br text-white",
-                STATUS_ACCENT[r.status]
+                "group relative flex flex-col overflow-hidden rounded-2xl border bg-white p-4 text-left transition-all",
+                filter === r.status
+                  ? "border-navy-900 shadow-md"
+                  : "border-navy-900/5 hover:border-navy-200 hover:shadow-sm"
               )}
             >
-              <Users className="size-4.5" />
-            </div>
-            <p className="text-2xl font-extrabold text-navy-900">{r.jumlah}</p>
-            <p className="text-xs font-semibold text-navy-500">{r.label}</p>
-          </motion.button>
-        ))}
+              <div
+                className={cn(
+                  "mb-2.5 flex size-8 items-center justify-center rounded-xl bg-gradient-to-br text-white",
+                  STATUS_ACCENT[r.status] ?? "from-navy-300 to-navy-400"
+                )}
+              >
+                <Users className="size-4" />
+              </div>
+              <p className="text-2xl font-extrabold tabular-nums text-navy-900">{r.jumlah}</p>
+              <p className="text-xs font-semibold text-navy-500">{r.label}</p>
+            </motion.button>
+          ))}
+        </div>
       </div>
 
       {/* Toolbar */}

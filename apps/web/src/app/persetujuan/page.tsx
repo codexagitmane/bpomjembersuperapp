@@ -17,7 +17,7 @@ interface IzinItem {
   jenis: string;
   keperluan: string;
   status: string;
-  user: { id: number; name: string; email: string };
+  user: { id: number; name: string; email: string } | null;
 }
 
 const JENIS_IZIN: Record<string, string> = {
@@ -35,7 +35,7 @@ interface CutiItem {
   alasan: string;
   status: string;
   tahap: "menunggu_kasubag" | "menunggu_kabalai" | "selesai";
-  user: { id: number; name: string; jenis_pegawai: string };
+  user: { id: number; name: string; jenis_pegawai: string } | null;
 }
 
 const TAHAP_LABEL: Record<string, string> = {
@@ -206,7 +206,7 @@ export default function PersetujuanPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-bold text-navy-900">{item.user.name}</p>
+                      <p className="text-sm font-bold text-navy-900">{item.user?.name ?? "Pengguna tidak ditemukan"}</p>
                       <Badge tone={JENIS_CUTI_TONE[item.jenis]}>{item.jenis}</Badge>
                       <Badge tone="neutral">{item.jumlah_hari} hari kerja</Badge>
                       {menunggu && item.tahap === "menunggu_kabalai" && (
@@ -239,7 +239,7 @@ export default function PersetujuanPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-bold text-navy-900">{item.user.name}</p>
+                      <p className="text-sm font-bold text-navy-900">{item.user?.name ?? "Pengguna tidak ditemukan"}</p>
                       <Badge tone="info">{JENIS_IZIN[item.jenis] ?? item.jenis}</Badge>
                       {!menunggu && <Badge tone={STATUS_TONE[item.status] ?? "neutral"}>{STATUS_LABEL[item.status] ?? item.status}</Badge>}
                     </div>

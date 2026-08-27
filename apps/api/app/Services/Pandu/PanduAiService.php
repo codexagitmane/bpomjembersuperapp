@@ -27,6 +27,9 @@ class PanduAiService
 
     public const TIDAK_CUKUP = 'Saya belum menemukan informasi yang cukup untuk menjawab pertanyaan tersebut.';
 
+    /** Skor minimum agar sebuah kecocokan dianggap meyakinkan (kata kunci cocok). */
+    private const AMBANG_YAKIN = 6.0;
+
     public const DISCLAIMER = 'Si Pandu AI memberikan informasi dan edukasi awal, bukan keputusan atau persetujuan resmi BPOM. Untuk keputusan resmi, verifikasi melalui kanal resmi BPOM.';
 
     public function __construct(private readonly KnowledgeService $knowledge) {}
@@ -46,6 +49,8 @@ class PanduAiService
                 'sumber' => [],
                 'di_luar_lingkup' => true,
                 'perlu_verifikasi' => false,
+                'butuh_petugas' => false,
+                'petugas' => null,
                 'saran' => $this->saranPertanyaan(),
             ];
         }
@@ -53,10 +58,14 @@ class PanduAiService
         $temuan = $this->knowledge->cari($pertanyaan, 3);
         if ($temuan === []) {
             return [
-                'jawaban' => self::TIDAK_CUKUP.' '.self::PERLU_VERIFIKASI,
+                'jawaban' => self::TIDAK_CUKUP.' Agar Anda memperoleh jawaban yang tepat, '
+                    .'pertanyaan ini sebaiknya disampaikan langsung kepada petugas Balai POM di Jember.',
                 'sumber' => [],
                 'di_luar_lingkup' => false,
                 'perlu_verifikasi' => true,
+                // Menandai UI untuk menawarkan penghubung ke petugas.
+                'butuh_petugas' => true,
+                'petugas' => $this->kontakPetugas($pertanyaan),
                 'saran' => $this->saranPertanyaan(),
             ];
         }
@@ -73,8 +82,27 @@ class PanduAiService
             $judul = $kepanjangan ? "{$nama} ({$kepanjangan})" : $nama;
             $jawaban = "**{$judul}**\n\n".(string) ($entri['ringkasan'] ?? '');
         }
+
+        // Poin, langkah, dan catatan tambahan disusun sebagai daftar agar
+        // jawaban tetap rinci namun mudah dibaca.
+        $jawaban .= $this->daftar($entri['poin'] ?? [], 'Hal penting yang perlu diperhatikan:');
+        $jawaban .= $this->daftar($entri['langkah'] ?? [], 'Gambaran langkahnya:', true);
+        $jawaban .= $this->daftar($entri['dokumen'] ?? [], 'Dokumen yang umumnya disiapkan:');
+        if (! empty($entri['catatan'])) {
+            $jawaban .= "\n\n".(string) $entri['catatan'];
+        }
         if (! empty($entri['perlu_verifikasi'])) {
             $perluVerifikasi = true;
+        }
+        // Petugas dilibatkan bila entri memang menuntut kepastian resmi, atau
+        // bila kecocokan pertanyaan tergolong lemah (tidak ada kata kunci yang
+        // benar-benar cocok, hanya kemiripan kata biasa).
+        $kecocokanLemah = ((float) ($utama['skor'] ?? 0)) < self::AMBANG_YAKIN;
+        $arahkanPetugas = ! empty($entri['arahkan_petugas']) || $kecocokanLemah;
+
+        if ($kecocokanLemah) {
+            $jawaban .= "\n\nBila yang Anda maksud berbeda dari penjelasan di atas, "
+                .'pertanyaan tersebut sebaiknya disampaikan langsung kepada petugas Balai POM di Jember.';
         }
 
         // Entri pendukung ditampilkan sebagai referensi tambahan, bukan karangan.
@@ -99,6 +127,11 @@ class PanduAiService
             'sumber' => $sumber,
             'di_luar_lingkup' => false,
             'perlu_verifikasi' => $perluVerifikasi,
+            // Penghubung petugas hanya ditawarkan bila jawabannya memang
+            // tidak dapat dipastikan dari knowledge — misalnya pertanyaan
+            // tentang biaya, lama proses, atau kondisi khusus milik pengguna.
+            'butuh_petugas' => $arahkanPetugas,
+            'petugas' => $arahkanPetugas ? $this->kontakPetugas($pertanyaan) : null,
             'saran' => $this->saranLanjutan($temuan),
         ];
     }
@@ -266,6 +299,52 @@ class PanduAiService
             ],
             'catatan' => 'Draft ini disusun dari informasi yang Anda isikan dan masih perlu disesuaikan dengan kondisi nyata di sarana Anda. Draft CAPA bukan jaminan diterimanya tindak lanjut oleh petugas.',
         ];
+    }
+
+    /**
+     * Data penghubung ke petugas Balai POM di Jember.
+     *
+     * Pertanyaan pengguna disertakan pada tautan WhatsApp agar petugas langsung
+     * memperoleh konteks tanpa pengguna perlu mengetik ulang.
+     */
+    private function kontakPetugas(string $pertanyaan): array
+    {
+        $k = $this->knowledge->kontak();
+        $nomor = preg_replace('/\D/', '', (string) ($k['whatsapp'] ?? ''));
+        // Nomor lokal diawali 0 diubah ke format internasional untuk wa.me.
+        if (str_starts_with($nomor, '0')) {
+            $nomor = '62'.substr($nomor, 1);
+        }
+
+        $pesan = "Halo, saya pelaku usaha yang menggunakan Si Pandu AI.\n\n"
+            ."Saya ingin menanyakan:\n\"".trim($pertanyaan)."\"\n\n"
+            .'Mohon bantuan penjelasannya. Terima kasih.';
+
+        return [
+            'nama' => $k['nama'] ?? 'Balai POM di Jember',
+            'whatsapp' => $k['whatsapp'] ?? null,
+            'whatsapp_link' => $nomor !== '' ? 'https://wa.me/'.$nomor.'?text='.rawurlencode($pesan) : ($k['whatsapp_link'] ?? null),
+            'telepon' => $k['telepon'] ?? null,
+            'telepon_link' => $k['telepon_link'] ?? null,
+            'email' => $k['email'] ?? null,
+            'ajakan' => 'Hubungi petugas Balai POM di Jember untuk jawaban resmi.',
+        ];
+    }
+
+    /** Susun daftar berpoin/bernomor untuk memperkaya jawaban. */
+    private function daftar(mixed $isi, string $judul, bool $bernomor = false): string
+    {
+        $isi = array_values(array_filter((array) $isi));
+        if ($isi === []) {
+            return '';
+        }
+
+        $baris = '';
+        foreach ($isi as $i => $b) {
+            $baris .= "\n".($bernomor ? ($i + 1).'. ' : '• ').$b;
+        }
+
+        return "\n\n**{$judul}**".$baris;
     }
 
     /** Contoh pertanyaan pembuka. */

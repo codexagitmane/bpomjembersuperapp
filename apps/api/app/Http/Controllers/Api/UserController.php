@@ -17,8 +17,9 @@ use Spatie\Permission\Models\Role;
 class UserController extends Controller
 {
     private const STATUS_LABEL = [
-        'asn' => 'ASN',
-        'pppk' => 'P3K',
+        // ASN mencakup PNS dan PPPK; keduanya ditampilkan sebagai kategori terpisah.
+        'asn' => 'PNS',
+        'pppk' => 'PPPK',
         'outsourcing' => 'Outsourcing',
         'magang' => 'Magang',
         // Akun masyarakat (eksternal) yang sudah disetujui admin.
@@ -111,6 +112,9 @@ class UserController extends Controller
             'data' => $users,
             'ringkasan' => $ringkasan,
             'total' => $users->count(),
+            // Total seluruh pengguna LENTERA (pegawai internal + masyarakat disetujui),
+            // tidak terpengaruh pencarian/saringan yang sedang aktif.
+            'total_pengguna' => $ringkasan->sum('jumlah'),
         ]);
     }
 

@@ -263,8 +263,8 @@ export default function DashboardPage() {
               />
             </div>
 
-            <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-              <Card>
+            <div className="mt-3 grid grid-cols-1 items-stretch gap-3 md:grid-cols-2">
+              <Card className="min-w-0">
                 <h3 className="mb-4 text-sm font-bold text-navy-700">Status Izin Apotek (SIG)</h3>
                 {data.apotek.total > 0 ? (
                   <DonutChart
@@ -279,7 +279,7 @@ export default function DashboardPage() {
                   <p className="py-8 text-center text-sm text-navy-400">Belum ada data apotek.</p>
                 )}
               </Card>
-              <Card>
+              <Card className="min-w-0">
                 <h3 className="mb-4 text-sm font-bold text-navy-700">Status Barang Bukti</h3>
                 {sum(data.barang_bukti) > 0 ? (
                   <DonutChart
@@ -372,9 +372,9 @@ function StatTile({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.06, duration: 0.35 }}
-      className="min-w-0"
+      className="min-w-0 h-full"
     >
-      <Card className="!p-4">
+      <Card className="h-full !p-4">
         <div className={cn("mb-3 inline-flex size-9 items-center justify-center rounded-xl", ACCENT_STYLES[accent])}>
           {icon}
         </div>

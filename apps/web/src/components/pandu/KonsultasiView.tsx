@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send, MessageCircle, BookMarked, AlertTriangle } from "lucide-react";
+import { Send, MessageCircle, BookMarked, AlertTriangle, Phone, Mail } from "lucide-react";
 import { Card, Badge } from "@/components/ui/Card";
 import { Maskot, PanduLoading } from "@/components/pandu/Maskot";
 import { Disclaimer } from "@/components/pandu/InfoViews";
-import { panduService, type Bootstrap, type SumberJawaban } from "@/lib/pandu-service";
+import { panduService, type Bootstrap, type SumberJawaban, type KontakPetugas } from "@/lib/pandu-service";
 import { extractApiErrorMessage } from "@bpom/shared";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,7 @@ interface Pesan {
   sumber?: SumberJawaban[];
   perluVerifikasi?: boolean;
   diLuarLingkup?: boolean;
+  petugas?: KontakPetugas | null;
 }
 
 const SAPAAN =
@@ -54,6 +55,7 @@ export function KonsultasiView({ boot }: { boot: Bootstrap | null }) {
         sumber: jawab.sumber,
         perluVerifikasi: jawab.perlu_verifikasi,
         diLuarLingkup: jawab.di_luar_lingkup,
+        petugas: jawab.butuh_petugas ? jawab.petugas ?? null : null,
       }]);
       setSaran(jawab.saran?.length ? jawab.saran : PROMPT_CEPAT);
     } catch (e) {
@@ -161,6 +163,9 @@ function Gelembung({ pesan }: { pesan: Pesan }) {
           <TeksTerformat teks={pesan.teks} />
         </div>
 
+        {/* Penghubung ke petugas saat jawaban belum memadai */}
+        {dariPandu && pesan.petugas && <KartuPetugas petugas={pesan.petugas} />}
+
         {/* Referensi knowledge */}
         {dariPandu && pesan.sumber && pesan.sumber.length > 0 && (
           <div className="mt-1.5 rounded-xl border border-navy-900/5 bg-white/70 px-3 py-2">
@@ -176,6 +181,46 @@ function Gelembung({ pesan }: { pesan: Pesan }) {
               ))}
             </div>
           </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Ajakan menghubungi petugas ketika asisten belum dapat menjawab pasti. */
+function KartuPetugas({ petugas }: { petugas: KontakPetugas }) {
+  return (
+    <div className="mt-2 rounded-2xl border border-bpom-200 bg-bpom-50/70 p-3.5">
+      <p className="text-xs font-bold text-bpom-800">{petugas.ajakan}</p>
+      <p className="mt-0.5 text-[11px] leading-relaxed text-navy-600">
+        Petugas {petugas.nama} dapat memberikan penjelasan resmi sesuai kondisi usaha Anda.
+      </p>
+      <div className="mt-2.5 flex flex-wrap gap-1.5">
+        {petugas.whatsapp_link && (
+          <a
+            href={petugas.whatsapp_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-bpom-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-bpom-700"
+          >
+            <MessageCircle className="size-3.5" /> WhatsApp {petugas.whatsapp}
+          </a>
+        )}
+        {petugas.telepon_link && (
+          <a
+            href={petugas.telepon_link}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-navy-200 bg-white px-3 py-2 text-xs font-bold text-navy-700 transition-colors hover:bg-navy-50"
+          >
+            <Phone className="size-3.5" /> {petugas.telepon}
+          </a>
+        )}
+        {petugas.email && (
+          <a
+            href={`mailto:${petugas.email}`}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-navy-200 bg-white px-3 py-2 text-xs font-bold text-navy-700 transition-colors hover:bg-navy-50"
+          >
+            <Mail className="size-3.5" /> Email
+          </a>
         )}
       </div>
     </div>

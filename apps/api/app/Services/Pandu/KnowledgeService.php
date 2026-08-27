@@ -134,7 +134,9 @@ class KnowledgeService
                     $nilai += 1;
                 }
             }
-            if ($nilai > 0) {
+            // Ambang minimum: kecocokan satu kata umum saja terlalu lemah untuk
+            // dianggap sebagai jawaban, dan lebih baik dialihkan ke petugas.
+            if ($nilai >= 2) {
                 $skor[$i] = $nilai;
             }
         }
@@ -142,7 +144,9 @@ class KnowledgeService
 
         $hasil = [];
         foreach (array_slice(array_keys($skor), 0, $limit) as $i) {
-            $hasil[] = $kandidat[$i];
+            // Skor disertakan agar pemanggil dapat menilai seberapa yakin
+            // kecocokannya; kecocokan lemah sebaiknya dialihkan ke petugas.
+            $hasil[] = $kandidat[$i] + ['skor' => $skor[$i]];
         }
 
         return $hasil;

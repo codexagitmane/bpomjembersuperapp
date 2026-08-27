@@ -152,8 +152,8 @@ function StatTile({
   accent: keyof typeof ACCENT;
 }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="min-w-0">
-      <Card className="!p-4">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="h-full min-w-0">
+      <Card className="h-full !p-4">
         <div className={cn("mb-3 inline-flex size-9 items-center justify-center rounded-xl", ACCENT[accent])}>{icon}</div>
         <p className="text-2xl font-extrabold tabular-nums text-navy-900">{value}</p>
         <p className="mt-0.5 text-xs font-semibold text-navy-600">{label}</p>
@@ -165,8 +165,8 @@ function StatTile({
 
 function QueueLink({ href, icon, label, count }: { href: string; icon: React.ReactNode; label: string; count: number }) {
   return (
-    <Link href={href}>
-      <Card className="flex items-center gap-3 !p-4">
+    <Link href={href} className="block h-full">
+      <Card className="flex h-full items-center gap-3 !p-4">
         <div className={cn("flex size-9 items-center justify-center rounded-xl", count > 0 ? "bg-amber-500/10 text-amber-600" : "bg-navy-50 text-navy-400")}>
           {icon}
         </div>
@@ -182,7 +182,7 @@ function QueueLink({ href, icon, label, count }: { href: string; icon: React.Rea
 
 function ShortcutCard({ href, icon, title, desc }: { href: string; icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <Link href={href}>
+    <Link href={href} className="block h-full">
       <Card className="group flex h-full flex-col gap-2">
         <div className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-bpom-50 to-bpom-100 text-bpom-700 transition-colors group-hover:from-bpom-500 group-hover:to-bpom-600 group-hover:text-white">
           {icon}

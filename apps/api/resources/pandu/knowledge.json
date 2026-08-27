@@ -1,10 +1,11 @@
 {
-  "versi": "0.1-kerangka",
-  "catatan_pengembang": "TODO: Ganti/lengkapi isi berkas ini dengan Knowledge Base resmi Balai POM di Jember. Struktur sudah final — cukup tambah/ubah entri pada 'topik', 'faq', dan 'regulasi'. JANGAN menambahkan nomor peraturan, biaya, atau persyaratan yang belum terverifikasi dari sumber resmi.",
+  "versi": "1.0",
+  "catatan_pengembang": "Knowledge SI PANDU AI. Isi disusun sebagai penjelasan umum yang berlaku luas dan disengaja TIDAK memuat nomor peraturan, tahun peraturan, besaran biaya, batas teknis, maupun lama proses — hal-hal itu berubah dan harus diverifikasi ke kanal resmi. Untuk menambah entri, ikuti bentuk yang sudah ada: 'ringkasan' sebagai paragraf utama, lalu 'poin'/'langkah'/'dokumen' sebagai daftar, dan 'kata_kunci' untuk pencocokan pertanyaan.",
   "sumber_resmi": {
     "jdih": "https://jdih.pom.go.id/",
     "bpom": "https://www.pom.go.id/",
-    "balai_jember": "https://jember.pom.go.id/"
+    "balai_jember": "https://jember.pom.go.id/",
+    "cek_produk": "https://cekbpom.pom.go.id/"
   },
   "kontak": {
     "nama": "Balai POM di Jember",
@@ -16,29 +17,244 @@
     "website": "https://jember.pom.go.id/",
     "catatan": "Untuk keputusan resmi, status permohonan, pengaduan, atau konsultasi yang membutuhkan petugas, silakan menghubungi kanal resmi."
   },
-  "wilayah_kerja": ["Jember", "Banyuwangi", "Bondowoso", "Situbondo", "Lumajang"],
+  "wilayah_kerja": [
+    "Jember",
+    "Banyuwangi",
+    "Bondowoso",
+    "Situbondo",
+    "Lumajang"
+  ],
   "elemen_label": [
-    { "id": "nama_produk", "nama": "Nama produk", "kategori": "umum" },
-    { "id": "komposisi", "nama": "Komposisi", "kategori": "umum" },
-    { "id": "netto", "nama": "Berat bersih / isi bersih (netto)", "kategori": "umum" },
-    { "id": "produsen", "nama": "Identitas produsen", "kategori": "umum" },
-    { "id": "alamat", "nama": "Alamat produsen", "kategori": "umum" },
-    { "id": "kode_produksi", "nama": "Kode produksi", "kategori": "umum" },
-    { "id": "kedaluwarsa", "nama": "Tanggal kedaluwarsa", "kategori": "umum" },
-    { "id": "nilai_gizi", "nama": "Informasi nilai gizi", "kategori": "pangan" },
-    { "id": "klaim", "nama": "Klaim pada label", "kategori": "umum" },
-    { "id": "peringatan", "nama": "Peringatan", "kategori": "umum" },
-    { "id": "penyimpanan", "nama": "Petunjuk penyimpanan", "kategori": "umum" },
-    { "id": "nomor_izin", "nama": "Nomor izin edar", "kategori": "umum" }
+    {
+      "id": "nama_produk",
+      "nama": "Nama produk",
+      "kategori": "umum"
+    },
+    {
+      "id": "komposisi",
+      "nama": "Komposisi / daftar bahan",
+      "kategori": "umum"
+    },
+    {
+      "id": "netto",
+      "nama": "Berat bersih / isi bersih (netto)",
+      "kategori": "umum"
+    },
+    {
+      "id": "produsen",
+      "nama": "Nama produsen atau importir",
+      "kategori": "umum"
+    },
+    {
+      "id": "alamat",
+      "nama": "Alamat produsen atau importir",
+      "kategori": "umum"
+    },
+    {
+      "id": "kode_produksi",
+      "nama": "Kode produksi / nomor bets",
+      "kategori": "umum"
+    },
+    {
+      "id": "kedaluwarsa",
+      "nama": "Tanggal kedaluwarsa",
+      "kategori": "umum"
+    },
+    {
+      "id": "nilai_gizi",
+      "nama": "Informasi nilai gizi",
+      "kategori": "pangan"
+    },
+    {
+      "id": "klaim",
+      "nama": "Klaim pada label",
+      "kategori": "umum"
+    },
+    {
+      "id": "peringatan",
+      "nama": "Peringatan / perhatian",
+      "kategori": "umum"
+    },
+    {
+      "id": "penyimpanan",
+      "nama": "Petunjuk penyimpanan",
+      "kategori": "umum"
+    },
+    {
+      "id": "cara_pakai",
+      "nama": "Petunjuk penggunaan / cara pakai",
+      "kategori": "umum"
+    },
+    {
+      "id": "nomor_izin",
+      "nama": "Nomor izin edar / nomor notifikasi",
+      "kategori": "umum"
+    },
+    {
+      "id": "alergen",
+      "nama": "Keterangan alergen",
+      "kategori": "pangan"
+    }
   ],
   "topik": [
+    {
+      "id": "tentang_bpom",
+      "nama": "Badan POM",
+      "kepanjangan": "Badan Pengawas Obat dan Makanan",
+      "kategori": "Umum",
+      "ringkasan": "Badan POM adalah lembaga pemerintah yang menyelenggarakan pengawasan Obat dan Makanan di Indonesia. Ruang lingkup pengawasannya mencakup obat, bahan obat, obat tradisional, suplemen kesehatan, kosmetika, pangan olahan, serta produk tembakau tertentu. Pengawasan dilakukan menyeluruh sejak sebelum produk beredar hingga setelah produk berada di pasaran.",
+      "poin": [
+        "Standardisasi — menyusun pedoman dan persyaratan mutu, keamanan, serta penandaan produk.",
+        "Penilaian sebelum beredar (pre-market) — menilai keamanan, mutu, manfaat, dan penandaan produk sebelum memperoleh izin edar atau notifikasi.",
+        "Pengawasan setelah beredar (post-market) — pemeriksaan sarana, sampling, pengujian laboratorium, dan pengawasan iklan serta penandaan.",
+        "Penindakan — menangani pelanggaran di bidang Obat dan Makanan.",
+        "Komunikasi, informasi, dan edukasi — melayani konsultasi pelaku usaha serta pengaduan dan informasi bagi masyarakat."
+      ],
+      "catatan": "Di daerah, tugas pengawasan dijalankan oleh Unit Pelaksana Teknis, antara lain Balai POM di Jember untuk wilayah Jember, Banyuwangi, Bondowoso, Situbondo, dan Lumajang.",
+      "kata_kunci": [
+        "bpom",
+        "badan pom",
+        "balai pom",
+        "tugas bpom",
+        "fungsi bpom",
+        "apa itu bpom",
+        "pengawasan obat dan makanan"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "balai_jember",
+      "nama": "Balai POM di Jember",
+      "kepanjangan": null,
+      "kategori": "Layanan",
+      "ringkasan": "Balai POM di Jember adalah unit pelaksana teknis Badan POM yang melayani wilayah Jember, Banyuwangi, Bondowoso, Situbondo, dan Lumajang. Balai melayani pelaku usaha maupun masyarakat, mulai dari konsultasi persiapan produk hingga pengaduan konsumen.",
+      "poin": [
+        "Konsultasi pelaku usaha: persiapan sarana, kesiapan dokumen, penandaan/label, dan jalur perizinan yang sesuai.",
+        "Pemeriksaan sarana produksi dan sarana distribusi di wilayah kerja.",
+        "Sampling dan pengujian produk yang beredar.",
+        "Layanan informasi dan pengaduan masyarakat terkait Obat dan Makanan.",
+        "Komunikasi, informasi, dan edukasi kepada masyarakat serta pelaku usaha."
+      ],
+      "catatan": "WhatsApp 08777-1500-533 • Telepon (0331) 5105533 • Email bpom_jember@pom.go.id • Web https://jember.pom.go.id/. Bila lokasi usaha Anda di luar lima kabupaten tersebut, hubungi UPT BPOM yang sesuai wilayah Anda.",
+      "kata_kunci": [
+        "balai pom jember",
+        "jember",
+        "banyuwangi",
+        "bondowoso",
+        "situbondo",
+        "lumajang",
+        "alamat",
+        "kontak",
+        "hubungi",
+        "konsultasi",
+        "wilayah kerja"
+      ],
+      "perlu_verifikasi": false
+    },
+    {
+      "id": "izin_edar",
+      "nama": "Izin Edar",
+      "kepanjangan": null,
+      "kategori": "Perizinan",
+      "ringkasan": "Izin edar adalah persetujuan yang diberikan agar suatu produk boleh diedarkan di wilayah Indonesia. Jenis persetujuan berbeda menurut kategori produk: obat, obat tradisional, suplemen kesehatan, dan pangan olahan umumnya melalui registrasi/pendaftaran, sedangkan kosmetika melalui notifikasi. Penerbitan izin edar mempertimbangkan keamanan, mutu, manfaat, dan penandaan produk.",
+      "poin": [
+        "Pangan olahan produksi dalam negeri yang wajib izin edar BPOM umumnya memperoleh nomor berawalan BPOM RI MD.",
+        "Pangan olahan impor umumnya memperoleh nomor berawalan BPOM RI ML.",
+        "Pangan olahan tertentu berskala industri rumah tangga memperoleh SPP-IRT dari Dinas Kesehatan kabupaten/kota, bukan dari BPOM.",
+        "Kosmetika tidak diregistrasi melainkan dinotifikasi, dan memperoleh nomor notifikasi.",
+        "Obat, obat tradisional, dan suplemen kesehatan memiliki jalur registrasi tersendiri sesuai tingkat risikonya."
+      ],
+      "catatan": "Penentuan jalur yang tepat bergantung pada jenis produk, cara produksi, kemasan, dan skala usaha. Konfirmasikan jalur produk Anda ke Balai POM di Jember sebelum mengajukan permohonan.",
+      "kata_kunci": [
+        "izin edar",
+        "nomor izin",
+        "md",
+        "ml",
+        "wajib bpom",
+        "wajib izin",
+        "daftar produk",
+        "registrasi",
+        "nomor bpom",
+        "pirt"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "registrasi",
+      "nama": "Registrasi Produk",
+      "kepanjangan": null,
+      "kategori": "Perizinan",
+      "ringkasan": "Registrasi produk adalah proses pengajuan agar produk memperoleh izin edar. Prosesnya kini dilakukan secara daring melalui sistem resmi Badan POM. Sebelum mendaftarkan produk, pelaku usaha umumnya perlu terlebih dahulu mendaftarkan perusahaan dan sarana produksinya.",
+      "langkah": [
+        "Siapkan legalitas usaha, antara lain NIB yang diterbitkan melalui sistem OSS.",
+        "Pastikan sarana produksi telah memenuhi persyaratan cara produksi yang baik sesuai jenis produk.",
+        "Daftarkan perusahaan/pabrik pada sistem registrasi resmi Badan POM untuk memperoleh akun.",
+        "Siapkan berkas produk: komposisi lengkap, spesifikasi dan asal bahan baku, proses produksi, hasil uji sesuai kebutuhan, serta rancangan label.",
+        "Ajukan permohonan registrasi produk melalui sistem, lalu tindak lanjuti bila ada permintaan tambahan data."
+      ],
+      "catatan": "Jenis dokumen, tahapan, dan lama proses berbeda menurut kategori dan tingkat risiko produk. Rincian resmi yang berlaku saat ini perlu dikonfirmasi ke kanal resmi BPOM.",
+      "kata_kunci": [
+        "registrasi",
+        "pendaftaran produk",
+        "e-registration",
+        "daftar produk",
+        "cara mendaftar",
+        "mengurus izin edar",
+        "akun perusahaan"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "pirt",
+      "nama": "SPP-IRT",
+      "kepanjangan": "Sertifikat Produksi Pangan Industri Rumah Tangga",
+      "kategori": "Pangan",
+      "ringkasan": "SPP-IRT adalah sertifikat bagi pangan olahan tertentu yang diproduksi oleh industri rumah tangga. Sertifikat ini diterbitkan oleh Dinas Kesehatan kabupaten/kota, bukan oleh Badan POM. Tidak semua jenis pangan dapat memakai jalur ini — pangan dengan risiko lebih tinggi atau yang memerlukan proses tertentu wajib menempuh izin edar BPOM.",
+      "poin": [
+        "Diterbitkan Dinas Kesehatan kabupaten/kota setempat.",
+        "Umumnya didahului penyuluhan keamanan pangan bagi pemilik atau penanggung jawab.",
+        "Jenis pangan yang boleh memakai jalur ini dibatasi; beberapa kategori dikecualikan.",
+        "Produk yang tidak memenuhi kriteria industri rumah tangga harus menempuh izin edar BPOM (nomor MD)."
+      ],
+      "catatan": "Bila ragu apakah produk Anda masuk jalur SPP-IRT atau izin edar BPOM, konsultasikan lebih dahulu ke Balai POM di Jember atau Dinas Kesehatan setempat agar tidak salah jalur.",
+      "kata_kunci": [
+        "pirt",
+        "p-irt",
+        "spp-irt",
+        "industri rumah tangga",
+        "umkm",
+        "rumahan",
+        "dinas kesehatan",
+        "sertifikat produksi"
+      ],
+      "perlu_verifikasi": true
+    },
     {
       "id": "cppob",
       "nama": "CPPOB",
       "kepanjangan": "Cara Produksi Pangan Olahan yang Baik",
       "kategori": "Pangan",
-      "ringkasan": "Pedoman cara produksi pangan olahan yang baik: mencakup aspek bangunan dan fasilitas, peralatan, sanitasi dan higiene, pengendalian proses, serta dokumentasi dan pencatatan. Diterapkan oleh sarana produksi pangan olahan untuk menjaga keamanan dan mutu produk.",
-      "kata_kunci": ["cppob", "produksi pangan", "sarana pangan", "higiene", "sanitasi", "pangan olahan"],
+      "ringkasan": "CPPOB adalah pedoman cara memproduksi pangan olahan agar aman, bermutu, dan layak dikonsumsi. Penerapannya menyentuh hampir seluruh aspek sarana, mulai dari bangunan hingga catatan produksi, dan menjadi dasar penilaian saat pemeriksaan sarana pangan.",
+      "poin": [
+        "Lokasi dan bangunan: tata letak mencegah pencemaran silang, permukaan mudah dibersihkan, ada pemisahan area kotor dan bersih.",
+        "Peralatan produksi: terbuat dari bahan yang sesuai untuk pangan, mudah dibersihkan, dan terpelihara.",
+        "Sanitasi dan higiene: program pembersihan terjadwal, penyediaan air bersih, fasilitas cuci tangan, dan pengendalian hama.",
+        "Higiene karyawan: pakaian kerja, kebiasaan kerja yang benar, serta pemeriksaan kesehatan bila diperlukan.",
+        "Pengendalian proses: pengaturan bahan baku, proses, dan produk akhir termasuk pemantauan titik kritis.",
+        "Penyimpanan dan distribusi: penyimpanan bahan dan produk jadi yang benar serta pengaturan suhu bila diperlukan.",
+        "Dokumentasi dan pencatatan: prosedur tertulis serta catatan yang konsisten sebagai bukti penerapan."
+      ],
+      "catatan": "Catatan yang rapi sering menjadi pembeda utama saat pemeriksaan. Banyak sarana sudah melakukan praktik yang benar namun tidak mencatatnya, sehingga sulit dibuktikan kepada petugas.",
+      "kata_kunci": [
+        "cppob",
+        "produksi pangan",
+        "sarana pangan",
+        "higiene",
+        "sanitasi",
+        "pangan olahan",
+        "cara produksi yang baik",
+        "gmp"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -46,8 +262,24 @@
       "nama": "IP CPPOB",
       "kepanjangan": "Izin Penerapan CPPOB",
       "kategori": "Pangan",
-      "ringkasan": "Bentuk pengakuan atas penerapan CPPOB pada sarana produksi pangan olahan. Umumnya diawali kesiapan sarana, pemenuhan aspek CPPOB, pengajuan permohonan, hingga pemeriksaan sarana. Rincian persyaratan, alur, dan biaya harus diverifikasi melalui kanal resmi.",
-      "kata_kunci": ["ip cppob", "izin penerapan", "sertifikat cppob", "pemeriksaan sarana pangan"],
+      "ringkasan": "IP CPPOB adalah pengakuan bahwa sarana produksi pangan olahan telah menerapkan CPPOB. Bagi banyak pelaku usaha, izin ini menjadi salah satu prasyarat sebelum produk dapat didaftarkan untuk memperoleh izin edar.",
+      "langkah": [
+        "Benahi sarana agar memenuhi aspek CPPOB: bangunan, peralatan, sanitasi, higiene, pengendalian proses, dan dokumentasi.",
+        "Susun prosedur tertulis dan mulai menjalankan pencatatan harian secara konsisten.",
+        "Lengkapi legalitas usaha, antara lain NIB melalui OSS.",
+        "Lakukan penilaian mandiri (self-assessment) terhadap kesiapan sarana; menu Cek Produk pada aplikasi ini dapat membantu tahap awal.",
+        "Ajukan permohonan melalui jalur resmi, kemudian ikuti pemeriksaan sarana oleh petugas.",
+        "Tindak lanjuti temuan pemeriksaan dengan menyusun CAPA beserta bukti perbaikannya."
+      ],
+      "catatan": "Persyaratan dokumen, alur, dan biaya resmi harus dikonfirmasi ke Balai POM di Jember karena dapat berbeda menurut jenis dan skala sarana.",
+      "kata_kunci": [
+        "ip cppob",
+        "izin penerapan",
+        "sertifikat cppob",
+        "pemeriksaan sarana pangan",
+        "cara mengurus ip cppob",
+        "syarat ip cppob"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -55,8 +287,53 @@
       "nama": "CPKB",
       "kepanjangan": "Cara Pembuatan Kosmetika yang Baik",
       "kategori": "Kosmetika",
-      "ringkasan": "Pedoman pembuatan kosmetika yang menekankan konsistensi mutu produk: sistem mutu, personalia, bangunan dan fasilitas, peralatan, sanitasi dan higiene, produksi, pengawasan mutu, serta dokumentasi.",
-      "kata_kunci": ["cpkb", "kosmetika", "kosmetik", "pembuatan kosmetika"],
+      "ringkasan": "CPKB adalah pedoman pembuatan kosmetika agar mutu produk terjaga secara konsisten dari satu bets ke bets berikutnya. Penerapan CPKB menjadi dasar penilaian sarana pembuatan kosmetika dan berkaitan erat dengan kelayakan produk untuk dinotifikasi.",
+      "poin": [
+        "Sistem mutu dan personalia: penanggung jawab yang kompeten serta pembagian tugas yang jelas.",
+        "Bangunan dan fasilitas: alur produksi yang mencegah campur baur dan pencemaran silang.",
+        "Peralatan: sesuai peruntukan, mudah dibersihkan, dan terpelihara.",
+        "Sanitasi dan higiene pada personel, bangunan, peralatan, serta bahan.",
+        "Produksi: penimbangan, pencampuran, pengisian, dan pengemasan yang terkendali dan tercatat.",
+        "Pengawasan mutu: pemeriksaan bahan baku, produk antara, dan produk jadi.",
+        "Dokumentasi: catatan bets yang dapat ditelusuri, termasuk penanganan keluhan dan penarikan produk."
+      ],
+      "catatan": "Bila produksi dilakukan melalui maklon, status pemenuhan CPKB berada pada sarana yang benar-benar membuat produk, sehingga pemilik merek perlu memastikan kesiapan mitra produksinya.",
+      "kata_kunci": [
+        "cpkb",
+        "kosmetika",
+        "kosmetik",
+        "pembuatan kosmetika",
+        "skincare",
+        "sabun",
+        "krim",
+        "maklon kosmetik"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "notifikasi_kosmetika",
+      "nama": "Notifikasi Kosmetika",
+      "kepanjangan": null,
+      "kategori": "Kosmetika",
+      "ringkasan": "Kosmetika tidak melalui registrasi melainkan notifikasi, yaitu pemberitahuan kepada Badan POM sebelum produk diedarkan. Notifikasi diajukan secara daring dan berlaku untuk jangka waktu tertentu sehingga perlu diperbarui.",
+      "poin": [
+        "Pemohon umumnya adalah industri kosmetika, importir, atau pemilik merek yang memenuhi persyaratan.",
+        "Formula dan bahan yang digunakan harus termasuk yang diizinkan; sebagian bahan dilarang atau dibatasi kadarnya.",
+        "Sarana pembuat harus memenuhi CPKB, termasuk bila produksi dilakukan secara maklon.",
+        "Penandaan/label serta klaim produk harus sesuai ketentuan dan tidak menyesatkan.",
+        "Notifikasi memiliki masa berlaku dan perlu diperbarui sebelum berakhir."
+      ],
+      "catatan": "Daftar bahan yang diizinkan, dibatasi, atau dilarang diperbarui dari waktu ke waktu. Pastikan formula Anda dicek terhadap ketentuan terbaru melalui kanal resmi BPOM.",
+      "kata_kunci": [
+        "notifikasi kosmetika",
+        "notifikasi",
+        "kosmetik daftar",
+        "izin kosmetik",
+        "nomor notifikasi",
+        "bahan kosmetik dilarang",
+        "merkuri",
+        "hidrokinon"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -64,8 +341,71 @@
       "nama": "CPOTB",
       "kepanjangan": "Cara Pembuatan Obat Tradisional yang Baik",
       "kategori": "Obat Tradisional",
-      "ringkasan": "Pedoman pembuatan obat tradisional agar mutu, keamanan, dan manfaat produk terjaga secara konsisten, meliputi manajemen mutu, personalia, bangunan, peralatan, produksi, pengawasan mutu, dan dokumentasi.",
-      "kata_kunci": ["cpotb", "obat tradisional", "jamu", "herbal"],
+      "ringkasan": "CPOTB adalah pedoman pembuatan obat tradisional agar mutu, keamanan, dan manfaatnya terjaga. Karena bahan bakunya berasal dari alam dan mutunya dapat beragam, pengendalian bahan baku menjadi perhatian utama dalam penerapan CPOTB.",
+      "poin": [
+        "Manajemen mutu dan personel yang memahami proses pembuatan obat tradisional.",
+        "Bangunan, fasilitas, dan peralatan yang mencegah pencemaran serta campur baur bahan.",
+        "Pengendalian bahan baku simplisia: identitas, kebersihan, kadar air, serta penyimpanan yang benar.",
+        "Proses produksi yang tercatat lengkap pada tiap tahapan.",
+        "Pengawasan mutu terhadap bahan baku, produk antara, dan produk jadi.",
+        "Dokumentasi bets yang dapat ditelusuri."
+      ],
+      "catatan": "Obat tradisional dilarang mengandung bahan kimia obat. Penambahan bahan kimia obat merupakan pelanggaran serius dan berisiko membahayakan konsumen.",
+      "kata_kunci": [
+        "cpotb",
+        "obat tradisional",
+        "jamu",
+        "herbal",
+        "simplisia",
+        "bahan kimia obat",
+        "bko"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "golongan_ot",
+      "nama": "Golongan Obat Tradisional",
+      "kepanjangan": null,
+      "kategori": "Obat Tradisional",
+      "ringkasan": "Obat tradisional di Indonesia dikelompokkan menurut tingkat pembuktian ilmiah atas khasiat dan keamanannya. Semakin tinggi golongannya, semakin kuat bukti ilmiah yang dipersyaratkan, dan semakin luas pula klaim yang dapat dicantumkan.",
+      "poin": [
+        "Jamu — didasarkan pada bukti empiris atau penggunaan turun-temurun.",
+        "Obat Herbal Terstandar (OHT) — telah melalui uji praklinik dan bahan bakunya terstandar.",
+        "Fitofarmaka — telah melalui uji klinik pada manusia sehingga bukti ilmiahnya paling kuat."
+      ],
+      "catatan": "Klaim yang boleh dicantumkan pada label harus sesuai golongan produk. Mencantumkan klaim melebihi bukti yang dimiliki merupakan pelanggaran penandaan.",
+      "kata_kunci": [
+        "jamu",
+        "oht",
+        "obat herbal terstandar",
+        "fitofarmaka",
+        "golongan obat tradisional",
+        "logo jamu"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "suplemen",
+      "nama": "Suplemen Kesehatan",
+      "kepanjangan": null,
+      "kategori": "Suplemen",
+      "ringkasan": "Suplemen kesehatan adalah produk yang dimaksudkan untuk melengkapi kebutuhan gizi, memelihara, meningkatkan, atau memperbaiki fungsi kesehatan. Suplemen bukan obat dan tidak boleh diklaim menyembuhkan penyakit.",
+      "poin": [
+        "Memerlukan izin edar sebelum diedarkan.",
+        "Bahan dan kadarnya harus termasuk yang diizinkan untuk suplemen.",
+        "Klaim terbatas pada pemeliharaan kesehatan sesuai bukti yang dimiliki, bukan klaim pengobatan.",
+        "Sarana pembuat harus memenuhi cara pembuatan yang baik sesuai bentuk sediaannya.",
+        "Label wajib memuat keterangan yang jelas, termasuk anjuran penggunaan dan peringatan bila diperlukan."
+      ],
+      "catatan": "Suplemen yang menjanjikan kesembuhan penyakit tertentu patut dicurigai. Penambahan bahan kimia obat pada suplemen merupakan pelanggaran berat.",
+      "kata_kunci": [
+        "suplemen",
+        "suplemen kesehatan",
+        "vitamin",
+        "multivitamin",
+        "food supplement",
+        "klaim suplemen"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -73,8 +413,23 @@
       "nama": "CPOB",
       "kepanjangan": "Cara Pembuatan Obat yang Baik",
       "kategori": "Obat",
-      "ringkasan": "Pedoman pembuatan obat yang mengatur seluruh aspek produksi dan pengendalian mutu agar obat yang dihasilkan memenuhi persyaratan mutu, keamanan, dan khasiat sesuai tujuan penggunaannya.",
-      "kata_kunci": ["cpob", "obat", "industri farmasi", "pembuatan obat"],
+      "ringkasan": "CPOB adalah pedoman pembuatan obat yang mengatur seluruh aspek produksi dan pengendalian mutu agar obat yang dihasilkan memenuhi persyaratan mutu, keamanan, dan khasiat sesuai tujuan penggunaannya. CPOB merupakan standar dengan tuntutan paling ketat di antara pedoman cara pembuatan yang baik.",
+      "poin": [
+        "Sistem mutu farmasi yang menyeluruh dan terdokumentasi.",
+        "Personalia dengan kualifikasi dan pelatihan yang memadai.",
+        "Bangunan, fasilitas, dan peralatan yang terkualifikasi.",
+        "Validasi proses, pembersihan, dan metode analisis.",
+        "Pengawasan mutu yang independen dari produksi.",
+        "Penanganan keluhan, penarikan produk, dan inspeksi diri."
+      ],
+      "kata_kunci": [
+        "cpob",
+        "obat",
+        "industri farmasi",
+        "pembuatan obat",
+        "validasi",
+        "kualifikasi"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -82,8 +437,26 @@
       "nama": "CDOB",
       "kepanjangan": "Cara Distribusi Obat yang Baik",
       "kategori": "Distribusi",
-      "ringkasan": "Pedoman distribusi obat agar mutu dan keamanan produk tetap terjaga di sepanjang rantai distribusi, mencakup manajemen mutu, personalia, bangunan dan peralatan, operasional, dokumentasi, serta penanganan keluhan dan penarikan produk.",
-      "kata_kunci": ["cdob", "distribusi obat", "pbf", "rantai distribusi", "penyaluran"],
+      "ringkasan": "CDOB adalah pedoman agar mutu dan keamanan obat tetap terjaga di sepanjang rantai distribusi, sejak diterima dari industri hingga sampai ke sarana pelayanan. Fokus utamanya adalah menjaga kondisi penyimpanan dan ketertelusuran produk.",
+      "poin": [
+        "Manajemen mutu dan penanggung jawab yang berwenang.",
+        "Bangunan dan peralatan penyimpanan yang sesuai, termasuk pemantauan suhu.",
+        "Operasional: penerimaan, penyimpanan, pengambilan, pengemasan, dan pengiriman yang terkendali.",
+        "Ketertelusuran melalui dokumentasi penerimaan dan penyaluran.",
+        "Penanganan keluhan, produk kembalian, diduga palsu, dan penarikan kembali.",
+        "Pengendalian terhadap kegiatan yang dialihdayakan."
+      ],
+      "catatan": "Penyaluran hanya boleh dilakukan kepada pihak yang berhak. Dokumen penyaluran harus lengkap agar rantai distribusi dapat ditelusuri bila terjadi penarikan produk.",
+      "kata_kunci": [
+        "cdob",
+        "distribusi obat",
+        "pbf",
+        "rantai distribusi",
+        "penyaluran",
+        "apotek",
+        "rantai dingin",
+        "cold chain"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -91,8 +464,13 @@
       "nama": "CPerPOB",
       "kepanjangan": null,
       "kategori": "Distribusi",
-      "ringkasan": "Pedoman penerapan cara yang baik pada kegiatan peredaran produk Obat dan Makanan. Kepanjangan resmi, ruang lingkup, dan persyaratan penerapannya perlu diverifikasi melalui kanal resmi BPOM.",
-      "kata_kunci": ["cperpob", "peredaran", "sarana distribusi"],
+      "ringkasan": "CPerPOB merupakan pedoman penerapan cara yang baik pada kegiatan peredaran produk Obat dan Makanan. Prinsipnya sejalan dengan pedoman lain, yaitu menjaga mutu dan keamanan produk selama berada di jalur peredaran serta memastikan ketertelusurannya.",
+      "catatan": "Kepanjangan resmi, ruang lingkup, dan ketentuan penerapan CPerPOB perlu diverifikasi melalui kanal resmi BPOM sebelum dijadikan acuan.",
+      "kata_kunci": [
+        "cperpob",
+        "peredaran",
+        "sarana peredaran"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -100,17 +478,14 @@
       "nama": "SMKPO",
       "kepanjangan": null,
       "kategori": "Pangan",
-      "ringkasan": "Kerangka sistem manajemen terkait keamanan pangan olahan yang digunakan dalam pengawasan Obat dan Makanan. Kepanjangan resmi, ruang lingkup, dan ketentuan penerapannya perlu diverifikasi melalui kanal resmi BPOM.",
-      "kata_kunci": ["smkpo", "sistem manajemen", "keamanan pangan"],
-      "perlu_verifikasi": true
-    },
-    {
-      "id": "registrasi",
-      "nama": "Registrasi Produk",
-      "kepanjangan": null,
-      "kategori": "Layanan",
-      "ringkasan": "Proses pendaftaran produk untuk memperoleh izin edar. Jenis jalur, persyaratan dokumen, dan waktu proses berbeda menurut kategori produk dan tingkat risiko. Rincian resmi harus diverifikasi melalui kanal resmi BPOM.",
-      "kata_kunci": ["registrasi", "izin edar", "pendaftaran produk", "nomor izin edar", "wajib bpom"],
+      "ringkasan": "SMKPO adalah kerangka sistem manajemen yang berkaitan dengan keamanan pangan olahan dan digunakan dalam pengawasan Obat dan Makanan. Pendekatannya menekankan pengelolaan risiko keamanan pangan secara sistematis, bukan sekadar pemeriksaan produk akhir.",
+      "catatan": "Kepanjangan resmi, ruang lingkup, dan ketentuan penerapan SMKPO perlu diverifikasi melalui kanal resmi BPOM.",
+      "kata_kunci": [
+        "smkpo",
+        "sistem manajemen",
+        "keamanan pangan",
+        "haccp"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -118,17 +493,29 @@
       "nama": "Label Produk",
       "kepanjangan": null,
       "kategori": "Label",
-      "ringkasan": "Label memuat keterangan produk bagi konsumen, antara lain nama produk, komposisi, berat/isi bersih, identitas dan alamat produsen, kode produksi, serta tanggal kedaluwarsa. Kelengkapan yang wajib berbeda menurut kategori produk.",
-      "kata_kunci": ["label", "kemasan", "keterangan", "netto", "komposisi", "kedaluwarsa"],
-      "perlu_verifikasi": true
-    },
-    {
-      "id": "btp",
-      "nama": "BTP",
-      "kepanjangan": "Bahan Tambahan Pangan",
-      "kategori": "Pangan",
-      "ringkasan": "Bahan yang ditambahkan ke pangan untuk tujuan teknologi tertentu. Jenis BTP yang diizinkan dan batas maksimum penggunaannya diatur menurut kategori pangan, sehingga penggunaannya harus dicek pada ketentuan resmi yang berlaku.",
-      "kata_kunci": ["btp", "bahan tambahan pangan", "pengawet", "pewarna", "pemanis", "batas maksimum"],
+      "ringkasan": "Label adalah keterangan pada kemasan yang menjadi sumber informasi utama bagi konsumen. Label harus benar, jelas terbaca, tidak menyesatkan, dan memuat keterangan yang dipersyaratkan sesuai kategori produk. Kesalahan pada label termasuk temuan yang sering dijumpai pada produk UMKM.",
+      "poin": [
+        "Nama produk yang menggambarkan produk sebenarnya.",
+        "Daftar bahan/komposisi, umumnya diurutkan dari yang terbanyak.",
+        "Berat bersih atau isi bersih (netto).",
+        "Nama dan alamat produsen, atau importir untuk produk impor.",
+        "Nomor izin edar atau nomor notifikasi bila produk telah memilikinya.",
+        "Kode produksi atau nomor bets untuk ketertelusuran.",
+        "Tanggal kedaluwarsa dengan format yang jelas.",
+        "Keterangan tambahan sesuai kategori: informasi nilai gizi, alergen, peringatan, cara penyimpanan, dan cara pakai."
+      ],
+      "catatan": "Gunakan menu Cek Label pada aplikasi ini untuk meninjau kelengkapan desain label Anda sebelum dicetak dalam jumlah besar.",
+      "kata_kunci": [
+        "label",
+        "kemasan",
+        "penandaan",
+        "keterangan",
+        "netto",
+        "komposisi",
+        "kedaluwarsa",
+        "expired",
+        "isi label"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -136,8 +523,103 @@
       "nama": "Klaim pada Label",
       "kepanjangan": null,
       "kategori": "Label",
-      "ringkasan": "Pernyataan pada label mengenai sifat atau keunggulan produk. Klaim harus benar, tidak menyesatkan, dan didukung bukti sesuai ketentuan. Klaim tertentu memiliki persyaratan khusus dan perlu diverifikasi sebelum dicantumkan.",
-      "kata_kunci": ["klaim", "bebas gula", "tinggi serat", "menyehatkan", "klaim gizi", "klaim kesehatan"],
+      "ringkasan": "Klaim adalah pernyataan pada label atau iklan mengenai sifat, kandungan, atau keunggulan produk. Setiap klaim harus benar, tidak menyesatkan, dan didukung bukti yang memadai. Klaim tertentu memiliki persyaratan khusus dan tidak dapat dicantumkan begitu saja.",
+      "poin": [
+        "Klaim kandungan gizi (misalnya 'sumber serat') memiliki persyaratan kadar tertentu.",
+        "Klaim kesehatan memerlukan dukungan bukti ilmiah dan hanya boleh untuk produk yang memenuhi syarat.",
+        "Produk pangan, kosmetika, dan suplemen dilarang mencantumkan klaim mengobati atau menyembuhkan penyakit.",
+        "Klaim seperti 'alami', 'tanpa pengawet', atau 'organik' harus benar-benar sesuai kenyataan produk.",
+        "Penggunaan logo atau tanda sertifikasi hanya diperbolehkan bila sertifikatnya benar-benar dimiliki."
+      ],
+      "catatan": "Klaim halal bukan kewenangan BPOM. Sertifikasi halal diselenggarakan oleh BPJPH, sehingga pencantuman label halal mengikuti ketentuan lembaga tersebut.",
+      "kata_kunci": [
+        "klaim",
+        "bebas gula",
+        "tinggi serat",
+        "menyehatkan",
+        "klaim gizi",
+        "klaim kesehatan",
+        "alami",
+        "organik",
+        "tanpa pengawet",
+        "menyembuhkan"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "btp",
+      "nama": "BTP",
+      "kepanjangan": "Bahan Tambahan Pangan",
+      "kategori": "Pangan",
+      "ringkasan": "BTP adalah bahan yang ditambahkan ke pangan untuk tujuan teknologi tertentu, misalnya mengawetkan, memberi warna, atau memperbaiki tekstur. BTP yang digunakan harus termasuk jenis yang diizinkan dan tidak melebihi batas maksimum yang ditetapkan untuk kategori pangan yang bersangkutan.",
+      "poin": [
+        "Jenis BTP yang diizinkan dan batas maksimumnya berbeda menurut kategori pangan.",
+        "Beberapa bahan dilarang keras digunakan pada pangan, antara lain boraks, formalin, rhodamin B, dan metanil yellow.",
+        "Simpan spesifikasi BTP dari pemasok sebagai bukti bahwa bahan yang dipakai layak pangan.",
+        "Catat penimbangan BTP pada setiap bets produksi agar penggunaannya dapat ditelusuri.",
+        "BTP yang digunakan wajib dicantumkan pada komposisi di label."
+      ],
+      "catatan": "Batas maksimum dan daftar BTP yang berlaku dapat berubah. Cek ketentuan terbaru melalui kanal resmi BPOM sebelum menetapkan formula produk Anda.",
+      "kata_kunci": [
+        "btp",
+        "bahan tambahan pangan",
+        "pengawet",
+        "pewarna",
+        "pemanis",
+        "batas maksimum",
+        "boraks",
+        "formalin",
+        "rhodamin",
+        "aditif"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "kemasan",
+      "nama": "Kemasan Pangan",
+      "kepanjangan": null,
+      "kategori": "Pangan",
+      "ringkasan": "Kemasan bukan sekadar wadah, melainkan bagian dari keamanan produk. Bahan kemasan yang bersentuhan langsung dengan pangan harus aman dan tidak memindahkan zat berbahaya ke dalam produk, terutama pada produk berminyak, asam, atau yang dikemas panas.",
+      "poin": [
+        "Gunakan bahan kemasan yang memang diperuntukkan bagi pangan (food grade).",
+        "Mintakan keterangan atau spesifikasi bahan kemasan dari pemasok dan simpan sebagai dokumen.",
+        "Hindari penggunaan kembali wadah bekas bahan kimia atau bahan non-pangan.",
+        "Perhatikan ketahanan kemasan terhadap suhu, terutama untuk pengisian panas atau produk beku.",
+        "Pastikan kemasan melindungi produk selama masa simpan yang dicantumkan."
+      ],
+      "kata_kunci": [
+        "kemasan",
+        "food grade",
+        "plastik",
+        "wadah",
+        "packaging",
+        "migrasi",
+        "kemasan pangan"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "masa_simpan",
+      "nama": "Masa Simpan & Kedaluwarsa",
+      "kepanjangan": null,
+      "kategori": "Pangan",
+      "ringkasan": "Tanggal kedaluwarsa harus ditetapkan berdasarkan data, bukan perkiraan. Masa simpan dipengaruhi oleh sifat produk, proses produksi, jenis kemasan, dan kondisi penyimpanan. Menetapkan masa simpan terlalu panjang tanpa dasar merupakan risiko keamanan sekaligus temuan pemeriksaan.",
+      "poin": [
+        "Tetapkan masa simpan melalui pengujian, baik uji simpan biasa maupun dipercepat.",
+        "Simpan data pendukung penetapan masa simpan sebagai dokumen sarana.",
+        "Cantumkan tanggal kedaluwarsa dengan format yang jelas dan mudah dibaca.",
+        "Kondisi penyimpanan yang dipersyaratkan harus ikut dicantumkan bila memengaruhi keawetan produk.",
+        "Kode produksi membantu penelusuran bila terjadi keluhan atau penarikan."
+      ],
+      "kata_kunci": [
+        "kedaluwarsa",
+        "expired",
+        "masa simpan",
+        "shelf life",
+        "best before",
+        "tanggal",
+        "kode produksi"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -145,8 +627,26 @@
       "nama": "Pemeriksaan Sarana",
       "kepanjangan": null,
       "kategori": "Pemeriksaan",
-      "ringkasan": "Kegiatan pemeriksaan terhadap sarana produksi atau distribusi untuk menilai pemenuhan ketentuan. Umumnya petugas memeriksa dokumen, kondisi sarana, proses, serta pencatatan. Hasil pemeriksaan dapat memuat temuan yang perlu ditindaklanjuti.",
-      "kata_kunci": ["pemeriksaan", "inspeksi", "sarana", "audit", "petugas", "dokumen pemeriksaan"],
+      "ringkasan": "Pemeriksaan sarana adalah kegiatan petugas menilai pemenuhan ketentuan pada sarana produksi atau distribusi. Petugas memeriksa kondisi fisik sarana, jalannya proses, serta dokumen dan catatan. Hasilnya dituangkan dalam berita acara yang dapat memuat temuan untuk ditindaklanjuti.",
+      "poin": [
+        "Kondisi bangunan, kebersihan, dan alur produksi.",
+        "Kelayakan dan perawatan peralatan.",
+        "Pelaksanaan sanitasi, higiene karyawan, dan pengendalian hama.",
+        "Pengendalian bahan baku, termasuk asal dan penyimpanannya.",
+        "Kelengkapan prosedur tertulis dan catatan pelaksanaannya.",
+        "Kesesuaian label produk dengan ketentuan."
+      ],
+      "catatan": "Temuan pemeriksaan bukan akhir dari proses. Yang dinilai selanjutnya adalah kesungguhan dan bukti perbaikan yang Anda lakukan melalui CAPA.",
+      "kata_kunci": [
+        "pemeriksaan",
+        "inspeksi",
+        "sarana",
+        "audit",
+        "petugas",
+        "dokumen pemeriksaan",
+        "berita acara",
+        "persiapan pemeriksaan"
+      ],
       "perlu_verifikasi": true
     },
     {
@@ -154,86 +654,942 @@
       "nama": "CAPA",
       "kepanjangan": "Corrective Action and Preventive Action",
       "kategori": "CAPA",
-      "ringkasan": "Tindakan perbaikan dan pencegahan atas temuan pemeriksaan. CAPA yang baik memuat temuan, akar masalah, tindakan perbaikan, tindakan pencegahan, bukti objektif, penanggung jawab (PIC), target waktu, dan verifikasi efektivitas.",
-      "kata_kunci": ["capa", "temuan", "tindak lanjut", "akar masalah", "root cause", "corrective", "preventive"],
+      "ringkasan": "CAPA adalah tindakan perbaikan dan pencegahan atas temuan pemeriksaan. Tindakan perbaikan menyelesaikan masalah yang ditemukan, sedangkan tindakan pencegahan memastikan masalah serupa tidak terulang. CAPA yang baik selalu berangkat dari akar masalah yang sebenarnya, bukan sekadar menutup gejala.",
+      "poin": [
+        "Temuan — dituliskan apa adanya sesuai hasil pemeriksaan.",
+        "Akar masalah — ditelusuri bersama pelaksana, misalnya dengan metode 5 Why.",
+        "Tindakan perbaikan — menyelesaikan kondisi yang menjadi temuan.",
+        "Tindakan pencegahan — prosedur, jadwal, dan pelatihan agar tidak berulang.",
+        "Bukti objektif — foto, catatan, dokumen, atau nota yang benar-benar ada.",
+        "PIC dan target waktu — penanggung jawab serta tenggat yang realistis.",
+        "Verifikasi efektivitas — cara dan waktu memastikan tindakan benar-benar berhasil."
+      ],
+      "catatan": "Jangan pernah membuat bukti yang tidak ada. Bila bukti belum tersedia, tuliskan apa adanya beserta rencana pemenuhannya. Gunakan menu Bantuan CAPA pada aplikasi ini untuk menyusun draftnya.",
+      "kata_kunci": [
+        "capa",
+        "temuan",
+        "tindak lanjut",
+        "akar masalah",
+        "root cause",
+        "corrective",
+        "preventive",
+        "perbaikan",
+        "5 why"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "sampling",
+      "nama": "Sampling & Pengujian",
+      "kepanjangan": null,
+      "kategori": "Pemeriksaan",
+      "ringkasan": "Selain memeriksa sarana, Badan POM juga mengambil contoh (sampling) produk yang beredar untuk diuji di laboratorium. Pengujian dilakukan untuk memastikan produk memenuhi persyaratan keamanan dan mutu, misalnya cemaran mikroba, cemaran logam berat, atau kandungan bahan yang dilarang.",
+      "poin": [
+        "Contoh produk dapat diambil dari sarana produksi maupun dari peredaran.",
+        "Pengujian dilakukan di laboratorium yang terakreditasi.",
+        "Hasil uji yang tidak memenuhi syarat dapat berujung pada tindak lanjut pengawasan.",
+        "Pelaku usaha sebaiknya juga melakukan pengujian mandiri secara berkala sebagai kendali mutu."
+      ],
+      "kata_kunci": [
+        "sampling",
+        "uji lab",
+        "pengujian",
+        "sampel",
+        "cemaran",
+        "mikroba",
+        "logam berat",
+        "hasil uji"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "iklan",
+      "nama": "Iklan & Promosi",
+      "kepanjangan": null,
+      "kategori": "Label",
+      "ringkasan": "Iklan Obat dan Makanan juga diawasi. Iklan harus objektif, lengkap, dan tidak menyesatkan, serta isinya tidak boleh melebihi apa yang disetujui pada penandaan produk. Ketentuan ini berlaku pula untuk promosi melalui media sosial, lokapasar, dan endorsement.",
+      "poin": [
+        "Isi iklan tidak boleh melebihi klaim yang disetujui pada label produk.",
+        "Dilarang menjanjikan kesembuhan atau memberi kesan produk sebagai obat bila bukan obat.",
+        "Testimoni yang menyesatkan atau menjanjikan hasil pasti berisiko melanggar ketentuan.",
+        "Hindari mencantumkan pernyataan seolah produk telah disetujui atau direkomendasikan pemerintah bila tidak benar.",
+        "Promosi oleh reseller dan pemengaruh tetap menjadi tanggung jawab pemilik merek."
+      ],
+      "kata_kunci": [
+        "iklan",
+        "promosi",
+        "endorse",
+        "testimoni",
+        "media sosial",
+        "marketplace",
+        "pemasaran"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "cek_produk_bpom",
+      "nama": "Mengecek Produk Terdaftar",
+      "kepanjangan": null,
+      "kategori": "Layanan",
+      "ringkasan": "Masyarakat dan pelaku usaha dapat memeriksa apakah suatu produk benar-benar terdaftar melalui laman resmi cekbpom.pom.go.id. Pengecekan dapat dilakukan berdasarkan nomor izin edar, nama produk, atau nama pendaftar.",
+      "poin": [
+        "Nomor izin edar yang tercantum pada kemasan harus cocok dengan data pada laman resmi.",
+        "Perhatikan kesesuaian nama produk dan nama pendaftar, bukan hanya nomornya.",
+        "Nomor yang tidak ditemukan patut dicurigai sebagai nomor fiktif.",
+        "Laporkan produk mencurigakan kepada Balai POM di Jember."
+      ],
+      "catatan": "Sebelum menjadi reseller atau distributor suatu produk, biasakan mengecek keabsahan izin edarnya terlebih dahulu.",
+      "kata_kunci": [
+        "cek bpom",
+        "cekbpom",
+        "cek produk",
+        "nomor izin palsu",
+        "produk terdaftar",
+        "verifikasi produk",
+        "asli atau palsu"
+      ],
+      "perlu_verifikasi": false
+    },
+    {
+      "id": "pengaduan",
+      "nama": "Pengaduan & Layanan Konsumen",
+      "kepanjangan": null,
+      "kategori": "Layanan",
+      "ringkasan": "Masyarakat dapat menyampaikan pertanyaan, permintaan informasi, maupun pengaduan terkait Obat dan Makanan kepada Balai POM di Jember. Pengaduan yang disertai keterangan lengkap akan lebih mudah ditindaklanjuti.",
+      "poin": [
+        "Sebutkan nama produk, nomor izin edar bila ada, dan kode produksi.",
+        "Sertakan foto kemasan bagian depan dan belakang bila memungkinkan.",
+        "Jelaskan tempat dan waktu pembelian produk.",
+        "Uraikan keluhan atau kejadian yang dialami secara runtut.",
+        "Simpan produk beserta kemasannya sebagai bukti."
+      ],
+      "catatan": "Hubungi WhatsApp 08777-1500-533, telepon (0331) 5105533, atau email bpom_jember@pom.go.id.",
+      "kata_kunci": [
+        "pengaduan",
+        "lapor",
+        "komplain",
+        "keluhan",
+        "layanan konsumen",
+        "produk bermasalah",
+        "keracunan"
+      ],
+      "perlu_verifikasi": false
+    },
+    {
+      "id": "maklon",
+      "nama": "Produksi Maklon",
+      "kepanjangan": null,
+      "kategori": "Perizinan",
+      "ringkasan": "Maklon adalah pola produksi ketika pemilik merek tidak memproduksi sendiri, melainkan menitipkan produksi pada sarana milik pihak lain. Pola ini lazim bagi UMKM, namun tanggung jawab mutu dan kepatuhan tidak hilang begitu saja dari pemilik merek.",
+      "poin": [
+        "Pastikan sarana pembuat telah memenuhi cara pembuatan yang baik sesuai jenis produk.",
+        "Buat perjanjian kerja sama tertulis yang mengatur pembagian tanggung jawab secara jelas.",
+        "Pastikan kejelasan siapa yang mengajukan izin edar atau notifikasi produk.",
+        "Cantumkan keterangan produsen dan pemilik merek pada label sesuai ketentuan.",
+        "Simpan dokumen mutu dari sarana pembuat, termasuk catatan bets produk Anda."
+      ],
+      "catatan": "Meminta bukti kepatuhan dari mitra maklon sejak awal jauh lebih mudah daripada memperbaikinya setelah produk beredar.",
+      "kata_kunci": [
+        "maklon",
+        "makloon",
+        "toll manufacturing",
+        "titip produksi",
+        "pihak ketiga",
+        "oem",
+        "private label"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "nib_oss",
+      "nama": "NIB & Legalitas Usaha",
+      "kepanjangan": "Nomor Induk Berusaha",
+      "kategori": "Perizinan",
+      "ringkasan": "NIB adalah identitas berusaha yang diterbitkan melalui sistem OSS dan menjadi pintu masuk bagi hampir semua perizinan berikutnya, termasuk perizinan di bidang Obat dan Makanan. Tanpa legalitas usaha yang jelas, permohonan ke BPOM umumnya belum dapat diproses.",
+      "poin": [
+        "NIB diperoleh melalui sistem OSS milik pemerintah.",
+        "Pastikan bidang usaha (KBLI) yang dipilih sesuai dengan kegiatan yang benar-benar dijalankan.",
+        "Alamat sarana pada dokumen legalitas sebaiknya sama dengan lokasi produksi sebenarnya.",
+        "Sebagian jenis usaha memerlukan izin tambahan dari instansi lain."
+      ],
+      "catatan": "Ketidaksesuaian antara alamat pada dokumen dan lokasi sarana sebenarnya kerap menjadi hambatan saat pemeriksaan.",
+      "kata_kunci": [
+        "nib",
+        "oss",
+        "legalitas",
+        "kbli",
+        "izin usaha",
+        "badan usaha",
+        "cv",
+        "pt"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "halal",
+      "nama": "Sertifikasi Halal",
+      "kepanjangan": null,
+      "kategori": "Umum",
+      "ringkasan": "Sertifikasi halal bukan kewenangan Badan POM. Penyelenggaraan jaminan produk halal dilakukan oleh BPJPH bersama lembaga pemeriksa halal. Karena itu pertanyaan mengenai proses, biaya, dan masa berlaku sertifikat halal perlu diajukan kepada lembaga tersebut.",
+      "poin": [
+        "Sertifikat halal dan izin edar adalah dua hal berbeda dan diurus terpisah.",
+        "Logo halal hanya boleh dicantumkan bila sertifikatnya benar-benar dimiliki dan masih berlaku.",
+        "Mencantumkan logo halal tanpa sertifikat merupakan pelanggaran penandaan."
+      ],
+      "kata_kunci": [
+        "halal",
+        "sertifikat halal",
+        "bpjph",
+        "logo halal",
+        "mui"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "sarana_distribusi",
+      "nama": "Sarana Distribusi & Ritel",
+      "kepanjangan": null,
+      "kategori": "Distribusi",
+      "ringkasan": "Sarana distribusi seperti apotek, toko obat, distributor, dan ritel juga menjadi objek pengawasan. Fokus pemeriksaannya adalah keabsahan produk yang disalurkan, kondisi penyimpanan, serta kelengkapan dokumen penerimaan dan penyaluran.",
+      "poin": [
+        "Hanya menerima produk dari pemasok resmi dan berhak menyalurkan.",
+        "Simpan faktur atau surat jalan sebagai bukti asal-usul produk.",
+        "Perhatikan kondisi penyimpanan, termasuk suhu untuk produk tertentu.",
+        "Pisahkan produk kedaluwarsa atau rusak dari produk siap jual.",
+        "Jangan menjual produk tanpa izin edar atau yang izinnya telah dicabut."
+      ],
+      "kata_kunci": [
+        "apotek",
+        "toko obat",
+        "distributor",
+        "ritel",
+        "penyalur",
+        "warung",
+        "penyimpanan",
+        "faktur",
+        "grosir"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "sanksi",
+      "nama": "Tindak Lanjut Pelanggaran",
+      "kepanjangan": null,
+      "kategori": "Pemeriksaan",
+      "ringkasan": "Pelanggaran di bidang Obat dan Makanan dapat ditindaklanjuti secara administratif maupun melalui jalur hukum, bergantung pada jenis dan tingkat pelanggarannya. Tindak lanjut administratif umumnya bertujuan memperbaiki kepatuhan, sedangkan pelanggaran serius yang membahayakan kesehatan dapat berlanjut ke proses penindakan.",
+      "poin": [
+        "Bentuk tindak lanjut ditentukan oleh jenis, tingkat, dan dampak pelanggaran.",
+        "Pelanggaran yang membahayakan kesehatan masyarakat ditangani lebih tegas.",
+        "Iktikad baik pelaku usaha dan kesungguhan perbaikan menjadi hal yang diperhatikan.",
+        "Menanggapi temuan dengan CAPA yang sungguh-sungguh adalah langkah terbaik."
+      ],
+      "catatan": "Jenis dan besaran sanksi diatur dalam ketentuan yang berlaku dan tidak dapat disimpulkan sendiri. Konsultasikan kondisi Anda kepada petugas Balai POM di Jember.",
+      "kata_kunci": [
+        "sanksi",
+        "pelanggaran",
+        "denda",
+        "pidana",
+        "penindakan",
+        "produk ditarik",
+        "recall",
+        "izin dicabut"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "umkm_mulai",
+      "nama": "Panduan Awal UMKM",
+      "kepanjangan": null,
+      "kategori": "Umum",
+      "ringkasan": "Bagi pelaku usaha yang baru memulai, urutan langkah yang tepat menghemat banyak waktu dan biaya. Kesalahan yang paling sering terjadi adalah mencetak kemasan dalam jumlah besar atau memasarkan produk terlebih dahulu, baru kemudian mengurus perizinannya.",
+      "langkah": [
+        "Tetapkan jenis produk dan kategori usahanya secara jelas.",
+        "Urus legalitas usaha terlebih dahulu, antara lain NIB melalui OSS.",
+        "Siapkan sarana produksi agar memenuhi cara produksi yang baik sesuai jenis produk.",
+        "Konsultasikan jalur perizinan yang tepat ke Balai POM di Jember atau Dinas Kesehatan setempat.",
+        "Susun rancangan label dan periksa kelengkapannya sebelum dicetak banyak.",
+        "Ajukan perizinan sesuai jalur, lalu ikuti tahapan pemeriksaan bila dipersyaratkan.",
+        "Setelah produk beredar, jaga konsistensi mutu dan pencatatan produksi."
+      ],
+      "catatan": "Gunakan menu Cek Produk untuk penilaian awal dan Cek Label untuk meninjau desain kemasan sebelum dicetak.",
+      "kata_kunci": [
+        "umkm",
+        "mulai usaha",
+        "pemula",
+        "usaha baru",
+        "langkah awal",
+        "cara memulai",
+        "rintisan",
+        "ukm"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "self_assessment",
+      "nama": "Self-Assessment Sarana",
+      "kepanjangan": null,
+      "kategori": "Pemeriksaan",
+      "ringkasan": "Self-assessment adalah penilaian mandiri terhadap kesiapan sarana sebelum diperiksa petugas. Kegiatan ini membantu menemukan kekurangan lebih awal sehingga dapat diperbaiki tanpa menjadi temuan resmi.",
+      "poin": [
+        "Telusuri sarana mengikuti alur produksi, dari penerimaan bahan hingga produk jadi.",
+        "Periksa apakah setiap praktik yang dijalankan memiliki catatannya.",
+        "Uji ketertelusuran: ambil satu produk jadi, lalu telusuri balik ke bahan bakunya.",
+        "Periksa label produk terhadap daftar kelengkapan yang dipersyaratkan.",
+        "Catat kekurangan yang ditemukan beserta rencana dan tenggat perbaikannya."
+      ],
+      "kata_kunci": [
+        "self assessment",
+        "penilaian mandiri",
+        "persiapan pemeriksaan",
+        "audit internal",
+        "checklist",
+        "kesiapan sarana"
+      ],
       "perlu_verifikasi": true
     }
   ],
   "faq": [
     {
       "id": "faq_wajib_izin",
-      "kategori": "Layanan",
+      "kategori": "Perizinan",
       "pertanyaan": "Apakah produk saya wajib memiliki izin edar BPOM?",
-      "jawaban": "Kewajiban izin edar bergantung pada jenis produk, cara produksi, dan peruntukannya. Sebagian pangan olahan tertentu berada pada kewenangan pemerintah daerah, sedangkan yang lain memerlukan izin edar BPOM. Gunakan menu Cek Produk untuk melakukan penilaian awal, lalu verifikasi jalur yang tepat melalui kanal resmi Balai POM di Jember.",
-      "kata_kunci": ["wajib", "izin edar", "perlu bpom", "harus daftar"],
+      "jawaban": "Kewajiban izin edar bergantung pada jenis produk, cara produksinya, kemasan, dan skala usaha Anda. Tidak semua produk pangan wajib memiliki nomor izin edar dari BPOM.\n\nSebagai gambaran umum: pangan olahan yang diproduksi berskala industri rumah tangga dan termasuk jenis yang diizinkan umumnya menempuh SPP-IRT dari Dinas Kesehatan kabupaten/kota. Sementara itu, pangan olahan dengan risiko lebih tinggi, yang menggunakan proses tertentu, atau yang diedarkan lebih luas umumnya wajib memiliki izin edar BPOM dengan nomor MD untuk produksi dalam negeri dan ML untuk produk impor. Kosmetika tidak diregistrasi melainkan dinotifikasi. Obat, obat tradisional, dan suplemen kesehatan memiliki jalur registrasi tersendiri.\n\nLangkah paling aman adalah memastikan kategori produk Anda terlebih dahulu sebelum menyiapkan apa pun. Gunakan menu Cek Produk pada aplikasi ini untuk penilaian awal, lalu konfirmasikan jalur yang tepat kepada petugas Balai POM di Jember. Menentukan jalur sejak awal mencegah pemborosan biaya kemasan dan pengujian yang ternyata tidak sesuai.",
+      "kata_kunci": [
+        "wajib",
+        "izin edar",
+        "perlu bpom",
+        "harus daftar",
+        "apakah wajib",
+        "produk saya"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_beda_pirt_md",
+      "kategori": "Perizinan",
+      "pertanyaan": "Apa bedanya P-IRT dengan izin edar MD dari BPOM?",
+      "jawaban": "Keduanya sama-sama merupakan izin agar pangan olahan boleh diedarkan, namun berbeda penerbit, cakupan, dan jenis produk yang dilayani.\n\nSPP-IRT diterbitkan oleh Dinas Kesehatan kabupaten/kota dan ditujukan bagi pangan olahan tertentu yang diproduksi industri rumah tangga. Jenis pangan yang boleh menempuh jalur ini dibatasi; beberapa kategori dikecualikan karena risikonya lebih tinggi. Prosesnya umumnya didahului penyuluhan keamanan pangan bagi pemilik atau penanggung jawab.\n\nIzin edar MD diterbitkan oleh Badan POM dan ditujukan bagi pangan olahan produksi dalam negeri yang tidak masuk kriteria industri rumah tangga. Persyaratannya lebih menyeluruh: sarana produksi dinilai pemenuhannya terhadap CPPOB, dan berkas produk yang diajukan lebih rinci, mencakup komposisi, proses produksi, hasil pengujian, serta rancangan label.\n\nBila produk Anda berkembang dari skala rumah tangga menjadi lebih besar, atau berubah jenisnya, jalur perizinannya bisa ikut berubah. Konsultasikan hal ini lebih awal agar peralihannya terencana.",
+      "kata_kunci": [
+        "beda pirt md",
+        "perbedaan",
+        "pirt atau md",
+        "naik kelas",
+        "p-irt vs md"
+      ],
       "perlu_verifikasi": true
     },
     {
       "id": "faq_mulai_ip_cppob",
       "kategori": "Pangan",
       "pertanyaan": "Bagaimana memulai pengurusan IP CPPOB?",
-      "jawaban": "Secara umum diawali dengan menyiapkan sarana sesuai aspek CPPOB (bangunan, fasilitas, sanitasi, pengendalian proses, dokumentasi), melengkapi legalitas usaha, lalu mengajukan permohonan dan mengikuti pemeriksaan sarana. Persyaratan dokumen dan alur resmi yang berlaku harus dikonfirmasi ke Balai POM di Jember.",
-      "kata_kunci": ["ip cppob", "mulai", "cara mengurus", "syarat"],
+      "jawaban": "Pengurusan IP CPPOB sebaiknya dimulai dari pembenahan sarana, bukan dari pengurusan berkas. Penilaian utamanya memang berada pada kondisi nyata sarana Anda.\n\nMulailah dengan menyesuaikan sarana terhadap aspek CPPOB: tata letak bangunan yang mencegah pencemaran silang, peralatan yang layak dan terpelihara, program sanitasi serta pengendalian hama yang berjalan, higiene karyawan, pengendalian proses produksi, dan yang kerap terlupakan — dokumentasi. Susun prosedur tertulis untuk kegiatan pokok, lalu jalankan pencatatan hariannya secara konsisten. Catatan yang baru dibuat menjelang pemeriksaan mudah dikenali petugas.\n\nBersamaan dengan itu, lengkapi legalitas usaha Anda, terutama NIB melalui sistem OSS, dan pastikan alamat pada dokumen sesuai dengan lokasi sarana yang sebenarnya.\n\nSetelah sarana dinilai siap, lakukan penilaian mandiri, ajukan permohonan melalui jalur resmi, lalu ikuti pemeriksaan sarana. Bila muncul temuan, tindak lanjuti dengan CAPA beserta bukti perbaikannya. Persyaratan dokumen dan alur resmi yang berlaku saat ini perlu dikonfirmasi ke Balai POM di Jember.",
+      "kata_kunci": [
+        "ip cppob",
+        "mulai",
+        "cara mengurus",
+        "syarat",
+        "prosedur ip cppob"
+      ],
       "perlu_verifikasi": true
     },
     {
       "id": "faq_dokumen_pemeriksaan",
       "kategori": "Pemeriksaan",
-      "pertanyaan": "Apa saja dokumen yang biasanya disiapkan untuk pemeriksaan sarana?",
-      "jawaban": "Umumnya mencakup legalitas usaha (misalnya NIB), dokumen prosedur dan catatan produksi, catatan pembersihan dan sanitasi, catatan pengendalian mutu, data bahan baku dan pemasok, serta catatan pelatihan personel. Daftar pasti menyesuaikan jenis sarana dan ruang lingkup pemeriksaan.",
-      "kata_kunci": ["dokumen", "pemeriksaan", "persiapan", "checklist"],
+      "pertanyaan": "Apa saja dokumen yang perlu disiapkan untuk pemeriksaan sarana?",
+      "jawaban": "Dokumen yang diperiksa umumnya menggambarkan bahwa praktik baik benar-benar dijalankan, bukan sekadar dinyatakan. Daftar pastinya menyesuaikan jenis sarana dan ruang lingkup pemeriksaan.\n\nYang umum disiapkan meliputi: legalitas usaha seperti NIB dan izin terkait; prosedur tertulis untuk kegiatan pokok; catatan produksi tiap bets termasuk penimbangan bahan; catatan pembersihan dan sanitasi beserta jadwalnya; catatan pengendalian hama; data bahan baku dan pemasok termasuk spesifikasi bahan dan kemasan; catatan pengawasan mutu dan hasil pengujian bila ada; catatan pelatihan atau sosialisasi personel; data penetapan masa simpan produk; serta rancangan label yang digunakan.\n\nSusun dokumen tersebut agar mudah ditemukan saat diminta. Petugas umumnya memeriksa ketertelusuran, misalnya dengan mengambil satu produk jadi lalu menelusurinya kembali sampai ke bahan baku. Bila rantai catatan terputus di salah satu titik, hal itu menjadi temuan.\n\nBila ada dokumen yang memang belum tersedia, sampaikan apa adanya beserta rencana pemenuhannya. Itu jauh lebih baik daripada membuat dokumen secara mendadak.",
+      "kata_kunci": [
+        "dokumen",
+        "pemeriksaan",
+        "persiapan",
+        "checklist",
+        "berkas",
+        "siap diperiksa"
+      ],
       "perlu_verifikasi": true
     },
     {
       "id": "faq_susun_capa",
       "kategori": "CAPA",
       "pertanyaan": "Bagaimana menyusun CAPA yang baik?",
-      "jawaban": "CAPA disusun berdasarkan kondisi sebenarnya di sarana. Mulai dari menuliskan temuan apa adanya, menelusuri akar masalah, menetapkan tindakan perbaikan untuk mengatasi temuan, menetapkan tindakan pencegahan agar tidak berulang, menyiapkan bukti objektif, menunjuk PIC, menetapkan target waktu, dan merencanakan verifikasi efektivitas. Gunakan menu Bantuan CAPA untuk menyusun draft.",
-      "kata_kunci": ["capa", "menyusun", "cara membuat", "format"],
+      "jawaban": "CAPA yang baik selalu berangkat dari kondisi sebenarnya di sarana Anda dan menyasar akar masalah, bukan sekadar menutup gejala yang terlihat.\n\nMulailah dengan menuliskan temuan apa adanya sesuai berita acara pemeriksaan. Lanjutkan dengan menelusuri akar masalahnya bersama pelaksana di lapangan — metode 5 Why sederhana namun efektif. Contohnya, temuan \"catatan pembersihan tidak lengkap\" bisa berakar pada belum adanya jadwal tertulis, formulir yang tidak tersedia di lokasi, atau petugas yang belum memahami cara mengisinya. Akar yang berbeda menuntut tindakan yang berbeda pula.\n\nSetelah itu tetapkan tindakan perbaikan untuk menyelesaikan kondisi temuan, lalu tindakan pencegahan agar tidak berulang — biasanya berupa prosedur tertulis, jadwal, penyediaan sarana, dan sosialisasi kepada personel. Siapkan bukti objektif berupa foto, catatan, atau dokumen yang benar-benar ada. Tunjuk PIC dan tetapkan target waktu yang realistis, lalu rencanakan cara memverifikasi bahwa tindakan tersebut benar-benar berjalan efektif.\n\nSatu hal yang perlu ditegaskan: jangan pernah membuat bukti yang tidak ada. Bila bukti belum tersedia, tuliskan apa adanya beserta rencana pemenuhannya. Gunakan menu Bantuan CAPA pada aplikasi ini untuk menyusun draftnya secara terstruktur.",
+      "kata_kunci": [
+        "capa",
+        "menyusun",
+        "cara membuat",
+        "format",
+        "contoh capa",
+        "tindak lanjut temuan"
+      ],
       "perlu_verifikasi": true
     },
     {
       "id": "faq_label_wajib",
       "kategori": "Label",
-      "pertanyaan": "Informasi apa saja yang umumnya harus ada pada label?",
-      "jawaban": "Umumnya meliputi nama produk, komposisi, berat/isi bersih, nama dan alamat produsen, kode produksi, serta tanggal kedaluwarsa. Untuk pangan olahan tertentu dapat ditambahkan informasi nilai gizi, peringatan, dan petunjuk penyimpanan. Kelengkapan wajib berbeda menurut kategori produk sehingga perlu diverifikasi.",
-      "kata_kunci": ["label", "wajib", "informasi", "kelengkapan"],
+      "pertanyaan": "Informasi apa saja yang harus ada pada label produk?",
+      "jawaban": "Kelengkapan label berbeda menurut kategori produk, namun ada sejumlah keterangan yang umumnya selalu diperlukan.\n\nUntuk pangan olahan, label umumnya memuat: nama produk yang menggambarkan produk sebenarnya; daftar bahan atau komposisi yang biasanya diurutkan dari yang terbanyak; berat bersih atau isi bersih; nama dan alamat produsen, atau importir untuk produk impor; nomor izin edar bila sudah dimiliki; kode produksi atau nomor bets; serta tanggal kedaluwarsa. Sesuai jenis produknya, dapat pula diperlukan informasi nilai gizi, keterangan alergen, peringatan, petunjuk penyimpanan, dan cara penyajian.\n\nUntuk kosmetika, label umumnya memuat nama produk, komposisi bahan, isi bersih, nama dan alamat produsen atau importir, nomor notifikasi, nomor bets, kegunaan dan cara penggunaan, serta peringatan bila diperlukan.\n\nSelain kelengkapan, perhatikan juga keterbacaan: ukuran huruf yang memadai, kontras warna yang cukup, dan penempatan yang tidak tertutup segel atau lipatan kemasan. Gunakan menu Cek Label pada aplikasi ini untuk meninjau desain Anda sebelum dicetak dalam jumlah besar — kesalahan label yang baru diketahui setelah kemasan dicetak massal termasuk kerugian yang paling sering dialami pelaku usaha.",
+      "kata_kunci": [
+        "label",
+        "wajib",
+        "informasi",
+        "kelengkapan",
+        "isi label",
+        "keterangan kemasan"
+      ],
       "perlu_verifikasi": true
     },
     {
       "id": "faq_btp",
       "kategori": "Pangan",
       "pertanyaan": "Bagaimana memastikan penggunaan BTP sudah sesuai?",
-      "jawaban": "Pastikan jenis BTP termasuk yang diizinkan untuk kategori pangan produk Anda dan penggunaannya tidak melebihi batas maksimum yang ditetapkan untuk kategori tersebut. Simpan dokumen spesifikasi BTP dari pemasok dan catatan penimbangan pada proses produksi. Batas dan jenis yang berlaku harus dicek pada ketentuan resmi terbaru.",
-      "kata_kunci": ["btp", "batas", "pengawet", "pewarna", "sesuai"],
+      "jawaban": "Ada tiga hal yang perlu dipastikan: jenis bahannya diizinkan, kadarnya tidak melebihi batas, dan penggunaannya tercatat.\n\nPertama, pastikan BTP yang Anda gunakan termasuk jenis yang diizinkan untuk kategori pangan produk Anda. Jenis yang diizinkan berbeda antar kategori — bahan yang boleh dipakai pada satu jenis pangan belum tentu boleh untuk jenis lain. Kedua, pastikan kadarnya tidak melebihi batas maksimum yang ditetapkan untuk kategori tersebut. Ketiga, simpan spesifikasi BTP dari pemasok dan catat penimbangannya pada setiap bets produksi agar penggunaannya dapat ditelusuri.\n\nPerlu ditegaskan bahwa beberapa bahan dilarang keras digunakan pada pangan, antara lain boraks, formalin, rhodamin B, dan metanil yellow. Bahan-bahan ini bukan BTP dan penggunaannya merupakan pelanggaran serius yang membahayakan kesehatan konsumen.\n\nSemua BTP yang digunakan wajib dicantumkan pada komposisi di label. Karena daftar dan batas maksimum BTP dapat berubah, cek ketentuan terbaru melalui kanal resmi BPOM sebelum menetapkan formula produk Anda.",
+      "kata_kunci": [
+        "btp",
+        "batas",
+        "pengawet",
+        "pewarna",
+        "sesuai",
+        "boleh dipakai",
+        "bahan tambahan"
+      ],
       "perlu_verifikasi": true
     },
     {
-      "id": "faq_kosmetika",
+      "id": "faq_kosmetika_mulai",
       "kategori": "Kosmetika",
       "pertanyaan": "Apa yang perlu disiapkan pelaku usaha kosmetika?",
-      "jawaban": "Umumnya mencakup legalitas usaha, kesiapan sarana sesuai aspek CPKB, kejelasan formula dan bahan yang digunakan, dokumentasi produksi dan pengawasan mutu, serta label yang sesuai ketentuan. Jika produksi dilakukan melalui maklon, kejelasan perjanjian dan status sarana pembuat menjadi penting.",
-      "kata_kunci": ["kosmetika", "kosmetik", "cpkb", "maklon", "persiapan"],
+      "jawaban": "Kosmetika menempuh jalur notifikasi, bukan registrasi. Namun sebelum notifikasi diajukan, ada beberapa hal yang perlu siap terlebih dahulu.\n\nSiapkan legalitas usaha Anda, termasuk NIB melalui OSS. Pastikan sarana yang membuat produk memenuhi CPKB — ini berlaku juga bila Anda memproduksi secara maklon, karena pemenuhan CPKB melekat pada sarana yang benar-benar membuat produk. Siapkan kejelasan formula: seluruh bahan beserta kadarnya, dan pastikan tidak ada bahan yang dilarang atau melebihi batas yang diizinkan. Siapkan pula dokumentasi produksi dan pengawasan mutu, serta rancangan label yang sesuai ketentuan.\n\nUntuk klaim, berhati-hatilah. Kosmetika tidak boleh diklaim menyembuhkan penyakit atau memiliki efek layaknya obat. Klaim seperti memutihkan secara instan atau menghilangkan penyakit kulit berisiko melanggar ketentuan penandaan.\n\nNotifikasi memiliki masa berlaku dan perlu diperbarui sebelum berakhir. Karena daftar bahan yang diizinkan, dibatasi, dan dilarang diperbarui dari waktu ke waktu, sebaiknya formula Anda dicek terhadap ketentuan terbaru sebelum notifikasi diajukan.",
+      "kata_kunci": [
+        "kosmetika",
+        "kosmetik",
+        "cpkb",
+        "persiapan",
+        "skincare",
+        "notifikasi kosmetik",
+        "mulai kosmetik"
+      ],
       "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_biaya",
+      "kategori": "Perizinan",
+      "pertanyaan": "Berapa biaya mengurus izin edar?",
+      "jawaban": "Besaran biaya resmi layanan Badan POM diatur dalam ketentuan penerimaan negara bukan pajak dan dapat berubah, sehingga tidak dapat disebutkan angkanya di sini. Informasi tersebut perlu diverifikasi melalui kanal resmi BPOM agar Anda memperoleh angka yang berlaku saat ini.\n\nYang dapat disampaikan: seluruh pembayaran layanan resmi dilakukan melalui mekanisme pembayaran negara yang sah, bukan melalui perorangan. Berhati-hatilah terhadap pihak yang menjanjikan percepatan proses dengan imbalan di luar ketentuan.\n\nSelain biaya layanan, siapkan pula perkiraan biaya lain di luar BPOM, misalnya pengujian laboratorium, pembenahan sarana, dan pembuatan desain serta kemasan. Bagian ini sering luput dari perhitungan pelaku usaha pemula.\n\nUntuk memperoleh rincian biaya resmi sesuai jenis permohonan Anda, hubungi Balai POM di Jember melalui WhatsApp 08777-1500-533 atau telepon (0331) 5105533.",
+      "kata_kunci": [
+        "biaya",
+        "tarif",
+        "harga",
+        "berapa",
+        "ongkos",
+        "bayar",
+        "pnbp"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_lama_proses",
+      "kategori": "Perizinan",
+      "pertanyaan": "Berapa lama proses perizinannya?",
+      "jawaban": "Lama proses berbeda menurut jenis permohonan, kategori produk, dan tingkat risikonya, serta diatur dalam ketentuan layanan yang berlaku. Karena itu jangka waktunya tidak dapat dipastikan di sini dan perlu diverifikasi melalui kanal resmi BPOM.\n\nYang perlu dipahami, waktu proses resmi umumnya dihitung sejak berkas dinyatakan lengkap. Bila terdapat permintaan tambahan data, masa menunggu tanggapan dari pemohon biasanya tidak dihitung. Karena itu kelengkapan dan ketepatan berkas sejak awal sangat memengaruhi total waktu yang Anda perlukan.\n\nHal yang paling sering memperlambat proses adalah berkas yang harus diperbaiki berulang kali, label yang belum sesuai ketentuan, serta sarana yang belum siap saat diperiksa. Menyiapkan ketiganya dengan baik sejak awal biasanya lebih menentukan daripada mengejar percepatan proses.\n\nUntuk memperkirakan jadwal yang realistis bagi produk Anda, konsultasikan rencananya kepada petugas Balai POM di Jember.",
+      "kata_kunci": [
+        "lama",
+        "berapa hari",
+        "waktu proses",
+        "durasi",
+        "kapan selesai",
+        "prosesnya berapa lama"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_produk_sudah_beredar",
+      "kategori": "Perizinan",
+      "pertanyaan": "Produk saya sudah beredar tetapi belum punya izin edar, bagaimana?",
+      "jawaban": "Kondisi ini perlu segera dibenahi karena mengedarkan produk yang wajib izin edar tanpa memilikinya merupakan pelanggaran, dengan risiko yang menyangkut keamanan konsumen sekaligus kelangsungan usaha Anda.\n\nLangkah yang disarankan: hentikan dahulu perluasan peredaran produk, lalu segera konsultasikan kondisi sebenarnya kepada Balai POM di Jember. Menyampaikan keadaan secara terbuka dan menunjukkan iktikad memperbaiki adalah sikap yang jauh lebih baik daripada menunggu sampai ditemukan dalam pengawasan.\n\nSambil berkonsultasi, mulailah membenahi hal-hal pokok: pastikan kategori dan jalur perizinan produk Anda, benahi sarana agar memenuhi cara produksi yang baik, lengkapi legalitas usaha, dan perbaiki label sesuai ketentuan.\n\nPerlu diketahui, jalur perizinan yang tepat bisa jadi bukan ke BPOM. Sebagian pangan olahan justru menempuh SPP-IRT dari Dinas Kesehatan kabupaten/kota. Memastikan jalurnya lebih dahulu mencegah Anda menyiapkan berkas yang keliru.",
+      "kata_kunci": [
+        "sudah beredar",
+        "belum ada izin",
+        "sudah jual",
+        "terlanjur",
+        "belum daftar",
+        "sudah dipasarkan"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_cek_produk",
+      "kategori": "Layanan",
+      "pertanyaan": "Bagaimana mengecek suatu produk benar-benar terdaftar di BPOM?",
+      "jawaban": "Pengecekan dapat dilakukan sendiri melalui laman resmi cekbpom.pom.go.id. Pencarian bisa dilakukan berdasarkan nomor izin edar, nama produk, atau nama pendaftar.\n\nYang penting diperhatikan: jangan hanya mencocokkan nomornya. Pastikan nama produk dan nama pendaftar yang muncul juga sesuai dengan yang tertera pada kemasan. Ada praktik pencantuman nomor izin edar milik produk lain pada kemasan produk yang sebenarnya tidak terdaftar — hal ini hanya terdeteksi bila Anda memeriksa kesesuaian nama, bukan sekadar keberadaan nomornya.\n\nBila nomor tidak ditemukan sama sekali, atau data yang muncul tidak cocok dengan kemasan, produk tersebut patut dicurigai. Laporkan temuan itu kepada Balai POM di Jember melalui WhatsApp 08777-1500-533 atau email bpom_jember@pom.go.id.\n\nBagi Anda yang berencana menjadi reseller atau distributor, biasakan memeriksa keabsahan izin edar produk sebelum menyetujui kerja sama.",
+      "kata_kunci": [
+        "cek bpom",
+        "cekbpom",
+        "cek produk",
+        "nomor palsu",
+        "terdaftar",
+        "asli palsu",
+        "verifikasi nomor"
+      ],
+      "perlu_verifikasi": false
+    },
+    {
+      "id": "faq_lapor_produk",
+      "kategori": "Layanan",
+      "pertanyaan": "Bagaimana melaporkan produk yang mencurigakan atau bermasalah?",
+      "jawaban": "Laporan dapat disampaikan kepada Balai POM di Jember melalui WhatsApp 08777-1500-533, telepon (0331) 5105533, atau email bpom_jember@pom.go.id.\n\nAgar laporan mudah ditindaklanjuti, sertakan keterangan selengkap mungkin: nama produk, nomor izin edar bila tercantum, kode produksi dan tanggal kedaluwarsa, foto kemasan bagian depan dan belakang, tempat serta waktu pembelian, dan uraian keluhan atau kejadian yang dialami.\n\nSimpan produk beserta kemasannya dan jangan dibuang, karena dapat diperlukan untuk penelusuran lebih lanjut. Bila keluhan menyangkut gangguan kesehatan, utamakan penanganan medis terlebih dahulu, lalu simpan sisa produk sebagai bukti.\n\nLaporan masyarakat merupakan salah satu sumber informasi penting bagi pengawasan, sehingga keterangan yang Anda sampaikan sangat membantu.",
+      "kata_kunci": [
+        "lapor",
+        "pengaduan",
+        "produk bermasalah",
+        "mencurigakan",
+        "komplain",
+        "keracunan",
+        "melapor"
+      ],
+      "perlu_verifikasi": false
+    },
+    {
+      "id": "faq_temuan_pemeriksaan",
+      "kategori": "Pemeriksaan",
+      "pertanyaan": "Sarana saya mendapat temuan saat diperiksa, apa yang harus dilakukan?",
+      "jawaban": "Temuan pemeriksaan adalah hal yang lazim, terutama pada sarana yang baru pertama kali diperiksa. Yang dinilai selanjutnya bukan ada atau tidaknya temuan, melainkan bagaimana Anda menindaklanjutinya.\n\nMulailah dengan membaca berita acara pemeriksaan secara cermat dan memastikan Anda memahami maksud setiap temuan. Bila ada yang kurang jelas, tanyakan kepada petugas — lebih baik bertanya daripada menindaklanjuti hal yang salah. Perhatikan pula tenggat waktu yang diberikan untuk menyampaikan tanggapan.\n\nSelanjutnya susun CAPA: telusuri akar masalah tiap temuan, tetapkan tindakan perbaikan dan pencegahan, kumpulkan bukti objektif, tunjuk penanggung jawab, dan tetapkan target waktu yang realistis. Kerjakan perbaikannya sungguh-sungguh, lalu dokumentasikan prosesnya — foto sebelum dan sesudah, catatan baru yang mulai dijalankan, serta bukti sosialisasi kepada personel.\n\nJangan menyusun CAPA yang muluk namun tidak dapat dijalankan, dan jangan pernah membuat bukti yang tidak ada. Target sederhana yang benar-benar dipenuhi jauh lebih baik. Gunakan menu Bantuan CAPA pada aplikasi ini untuk menyusun draftnya.",
+      "kata_kunci": [
+        "temuan",
+        "dapat temuan",
+        "hasil pemeriksaan",
+        "berita acara",
+        "ditemukan",
+        "tindak lanjut"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_maklon",
+      "kategori": "Perizinan",
+      "pertanyaan": "Saya memproduksi lewat maklon, apa yang perlu diperhatikan?",
+      "jawaban": "Maklon adalah pola yang lazim bagi UMKM, tetapi perlu dipahami bahwa tanggung jawab atas mutu dan kepatuhan produk tidak berpindah seluruhnya kepada pihak pembuat.\n\nHal terpenting adalah memastikan sarana pembuat benar-benar memenuhi cara pembuatan yang baik sesuai jenis produk — CPPOB untuk pangan, CPKB untuk kosmetika, CPOTB untuk obat tradisional. Mintalah bukti kepatuhan tersebut sejak awal, bukan setelah produk beredar.\n\nBuat perjanjian kerja sama tertulis yang mengatur secara jelas: siapa yang bertanggung jawab atas mutu, siapa yang mengajukan izin edar atau notifikasi, bagaimana penanganan bila terjadi keluhan atau penarikan produk, serta hak dan kewajiban masing-masing pihak atas formula dan merek.\n\nPastikan pula keterangan produsen dan pemilik merek dicantumkan pada label sesuai ketentuan, dan simpan dokumen mutu dari sarana pembuat termasuk catatan bets produk Anda. Bila sewaktu-waktu ada penelusuran, dokumen inilah yang Anda perlukan.",
+      "kata_kunci": [
+        "maklon",
+        "makloon",
+        "titip produksi",
+        "pihak ketiga",
+        "oem",
+        "private label",
+        "produksi orang lain"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_halal",
+      "kategori": "Umum",
+      "pertanyaan": "Apakah sertifikat halal diurus di BPOM?",
+      "jawaban": "Tidak. Sertifikasi halal bukan kewenangan Badan POM. Penyelenggaraan jaminan produk halal dilakukan oleh BPJPH bersama lembaga pemeriksa halal, sehingga pertanyaan mengenai proses, persyaratan, biaya, dan masa berlaku sertifikat halal perlu diajukan kepada lembaga tersebut.\n\nSertifikat halal dan izin edar merupakan dua hal yang berbeda dan diurus secara terpisah. Memiliki izin edar tidak berarti produk otomatis bersertifikat halal, demikian pula sebaliknya.\n\nYang berkaitan dengan pengawasan Badan POM adalah pencantumannya pada label. Logo halal hanya boleh dicantumkan bila sertifikatnya benar-benar dimiliki dan masih berlaku. Mencantumkan logo halal tanpa sertifikat merupakan pelanggaran penandaan.\n\nHal yang sama berlaku untuk logo atau tanda sertifikasi lain: jangan mencantumkan apa pun yang belum benar-benar Anda miliki.",
+      "kata_kunci": [
+        "halal",
+        "sertifikat halal",
+        "bpjph",
+        "logo halal",
+        "mui",
+        "urus halal"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_klaim_boleh",
+      "kategori": "Label",
+      "pertanyaan": "Apakah saya boleh menulis klaim seperti 'menyehatkan' atau 'tanpa pengawet' di label?",
+      "jawaban": "Klaim diperbolehkan sepanjang benar, tidak menyesatkan, dan didukung bukti yang memadai. Namun tidak semua klaim dapat dicantumkan begitu saja — sebagian memiliki persyaratan khusus.\n\nKlaim kandungan gizi seperti \"sumber serat\" atau \"rendah gula\" memiliki persyaratan kadar tertentu yang harus dipenuhi dan dibuktikan melalui pengujian. Klaim kesehatan menuntut dukungan bukti ilmiah dan hanya boleh dicantumkan untuk produk yang memenuhi syarat. Klaim seperti \"tanpa pengawet\" hanya boleh bila produk memang benar-benar tidak menggunakan pengawet — termasuk pengawet yang terbawa dari bahan baku.\n\nYang jelas dilarang adalah klaim yang memberi kesan produk dapat mengobati atau menyembuhkan penyakit, bila produk Anda bukan obat. Ini berlaku untuk pangan, kosmetika, dan suplemen kesehatan. Kata seperti \"menyembuhkan\", \"mengobati\", atau menyebut nama penyakit tertentu sangat berisiko melanggar ketentuan.\n\nKetentuan ini berlaku pula pada iklan dan promosi di media sosial maupun lokapasar, termasuk yang disampaikan reseller atau pemengaruh. Bila ragu terhadap suatu klaim, konsultasikan lebih dahulu sebelum kemasan dicetak.",
+      "kata_kunci": [
+        "klaim",
+        "boleh tulis",
+        "menyehatkan",
+        "tanpa pengawet",
+        "alami",
+        "organik",
+        "menyembuhkan",
+        "khasiat"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_kedaluwarsa",
+      "kategori": "Pangan",
+      "pertanyaan": "Bagaimana menentukan tanggal kedaluwarsa produk saya?",
+      "jawaban": "Tanggal kedaluwarsa harus ditetapkan berdasarkan data, bukan perkiraan atau kebiasaan. Menetapkan masa simpan tanpa dasar merupakan risiko keamanan sekaligus temuan yang sering muncul saat pemeriksaan.\n\nMasa simpan dipengaruhi oleh sifat produk (kadar air, keasaman, kandungan lemak), proses produksi (pemanasan, pengeringan, sterilisasi), jenis kemasan dan kerapatannya, serta kondisi penyimpanan. Perubahan pada salah satu faktor tersebut dapat mengubah masa simpan, sehingga penetapan tidak bisa disalin begitu saja dari produk lain.\n\nPenetapan umumnya dilakukan melalui uji simpan, baik pada kondisi penyimpanan biasa maupun dengan metode dipercepat. Yang diamati antara lain perubahan mutu fisik, rasa, aroma, serta cemaran mikroba pada rentang waktu tertentu. Simpan seluruh data pendukungnya sebagai dokumen sarana, karena inilah yang diminta saat pemeriksaan.\n\nCantumkan tanggal kedaluwarsa dengan format yang jelas dan mudah dibaca, sertakan kode produksi untuk penelusuran, dan cantumkan kondisi penyimpanan bila memengaruhi keawetan produk.",
+      "kata_kunci": [
+        "kedaluwarsa",
+        "expired",
+        "masa simpan",
+        "shelf life",
+        "menentukan",
+        "berapa lama tahan"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_kemasan",
+      "kategori": "Pangan",
+      "pertanyaan": "Bagaimana memilih kemasan yang aman untuk produk pangan?",
+      "jawaban": "Kemasan merupakan bagian dari keamanan produk, bukan sekadar wadah. Bahan yang bersentuhan langsung dengan pangan harus aman dan tidak memindahkan zat berbahaya ke dalam produk.\n\nGunakan bahan kemasan yang memang diperuntukkan bagi pangan. Mintakan keterangan atau spesifikasi dari pemasok dan simpan sebagai dokumen — ini termasuk yang diperiksa saat pemeriksaan sarana. Hindari penggunaan kembali wadah bekas bahan kimia atau bahan non-pangan, meskipun terlihat bersih.\n\nPerhatikan kesesuaian kemasan dengan sifat produk. Produk berminyak, asam, atau yang dikemas dalam keadaan panas menuntut ketahanan bahan yang berbeda. Kemasan yang tidak sesuai dapat menyebabkan perpindahan zat dari kemasan ke produk, atau kemasan rusak sebelum masa simpan berakhir.\n\nPastikan pula kemasan mampu melindungi produk selama masa simpan yang Anda cantumkan, termasuk terhadap udara, cahaya, dan kelembapan sesuai kebutuhan produk. Uji simpan sebaiknya dilakukan menggunakan kemasan yang benar-benar akan dipakai, bukan kemasan sementara.",
+      "kata_kunci": [
+        "kemasan",
+        "food grade",
+        "plastik",
+        "wadah",
+        "aman",
+        "packaging",
+        "botol",
+        "pouch"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_mulai_usaha",
+      "kategori": "Umum",
+      "pertanyaan": "Saya baru mau memulai usaha makanan, harus mulai dari mana?",
+      "jawaban": "Urutan langkah yang tepat akan menghemat banyak waktu dan biaya. Kesalahan yang paling sering terjadi adalah mencetak kemasan dalam jumlah besar atau memasarkan produk lebih dahulu, baru kemudian mengurus perizinannya — sehingga banyak yang harus diulang.\n\nMulailah dengan menetapkan jenis produk dan kategorinya secara jelas, karena kategori inilah yang menentukan jalur perizinan Anda. Kemudian urus legalitas usaha, terutama NIB melalui sistem OSS, dan pastikan bidang usaha yang dipilih sesuai kegiatan sebenarnya.\n\nBersamaan dengan itu, siapkan sarana produksi agar memenuhi cara produksi yang baik: tata letak yang mencegah pencemaran silang, peralatan yang layak, sanitasi yang berjalan, dan yang kerap terlupakan — pencatatan. Biasakan mencatat sejak awal, karena membangun kebiasaan ini butuh waktu.\n\nSetelah itu konsultasikan jalur perizinan yang tepat ke Balai POM di Jember atau Dinas Kesehatan setempat, susun rancangan label dan periksa kelengkapannya sebelum dicetak banyak, lalu ajukan perizinan sesuai jalur. Gunakan menu Cek Produk dan Cek Label pada aplikasi ini untuk penilaian awal sebelum Anda berkonsultasi — hasilnya akan membuat konsultasi Anda lebih terarah.",
+      "kata_kunci": [
+        "mulai usaha",
+        "pemula",
+        "usaha baru",
+        "mulai dari mana",
+        "langkah awal",
+        "umkm baru",
+        "rintis"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_beda_ot",
+      "kategori": "Obat Tradisional",
+      "pertanyaan": "Apa beda jamu, OHT, dan fitofarmaka?",
+      "jawaban": "Ketiganya merupakan penggolongan obat tradisional berdasarkan kekuatan bukti ilmiah atas khasiat dan keamanannya. Semakin tinggi golongannya, semakin kuat pembuktian yang dipersyaratkan.\n\nJamu didasarkan pada bukti empiris, yaitu penggunaan turun-temurun yang dianggap aman dan bermanfaat. Obat Herbal Terstandar (OHT) telah melalui uji praklinik dan bahan bakunya terstandar, sehingga mutunya lebih terjamin konsisten. Fitofarmaka telah melalui uji klinik pada manusia, sehingga bukti ilmiahnya paling kuat di antara ketiganya.\n\nKonsekuensi penggolongan ini terlihat pada klaim yang boleh dicantumkan: semakin kuat bukti, semakin luas klaim yang diizinkan. Mencantumkan klaim melebihi bukti yang dimiliki merupakan pelanggaran penandaan.\n\nSatu hal yang berlaku untuk seluruh golongan: obat tradisional dilarang mengandung bahan kimia obat. Penambahan bahan kimia obat merupakan pelanggaran serius yang berisiko membahayakan konsumen dan ditindak tegas.",
+      "kata_kunci": [
+        "jamu",
+        "oht",
+        "fitofarmaka",
+        "obat herbal terstandar",
+        "beda",
+        "golongan",
+        "herbal"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_suplemen_klaim",
+      "kategori": "Suplemen",
+      "pertanyaan": "Bolehkah suplemen saya diklaim menyembuhkan penyakit?",
+      "jawaban": "Tidak boleh. Suplemen kesehatan bukan obat. Fungsinya melengkapi kebutuhan gizi serta memelihara, meningkatkan, atau memperbaiki fungsi kesehatan — bukan mengobati atau menyembuhkan penyakit.\n\nKlaim yang diperbolehkan terbatas pada pemeliharaan kesehatan sesuai bukti yang dimiliki produk. Menyebut nama penyakit tertentu, menjanjikan kesembuhan, atau memberi kesan produk dapat menggantikan obat merupakan pelanggaran penandaan yang serius.\n\nKetentuan ini berlaku pula pada iklan dan promosi, termasuk melalui media sosial, lokapasar, testimoni pelanggan, dan endorsement. Promosi yang dilakukan reseller maupun pemengaruh tetap menjadi tanggung jawab pemilik merek, sehingga sebaiknya Anda membekali mereka dengan materi promosi yang sudah sesuai ketentuan.\n\nPerlu ditegaskan pula bahwa penambahan bahan kimia obat pada suplemen merupakan pelanggaran berat. Suplemen yang memberi efek cepat menyerupai obat patut dicurigai mengandung bahan yang tidak semestinya.",
+      "kata_kunci": [
+        "suplemen",
+        "klaim",
+        "menyembuhkan",
+        "obat",
+        "vitamin",
+        "boleh klaim",
+        "khasiat suplemen"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_apotek",
+      "kategori": "Distribusi",
+      "pertanyaan": "Apa yang diperiksa pada sarana distribusi seperti apotek atau toko?",
+      "jawaban": "Pemeriksaan sarana distribusi berfokus pada tiga hal: keabsahan produk yang disalurkan, kondisi penyimpanannya, dan kelengkapan dokumen.\n\nPada keabsahan produk, petugas memastikan produk yang dijual memiliki izin edar yang sah dan diperoleh dari pemasok resmi yang berhak menyalurkan. Produk tanpa izin edar, yang izinnya telah dicabut, atau yang diperoleh dari jalur tidak resmi merupakan temuan.\n\nPada penyimpanan, yang diperiksa antara lain kesesuaian kondisi penyimpanan dengan persyaratan produk — termasuk pemantauan suhu untuk produk yang memerlukannya — kerapian penataan, serta pemisahan produk kedaluwarsa, rusak, atau kembalian dari produk siap jual.\n\nPada dokumen, yang diperiksa adalah kelengkapan faktur atau surat jalan penerimaan dan catatan penyaluran, sehingga asal-usul dan tujuan produk dapat ditelusuri. Ketertelusuran ini menjadi sangat penting bila sewaktu-waktu terjadi penarikan produk.\n\nUntuk sarana yang menyalurkan obat, berlaku pula ketentuan CDOB termasuk keberadaan penanggung jawab yang berwenang.",
+      "kata_kunci": [
+        "apotek",
+        "toko obat",
+        "distributor",
+        "ritel",
+        "diperiksa",
+        "sarana distribusi",
+        "penyimpanan",
+        "warung"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_konsultasi",
+      "kategori": "Layanan",
+      "pertanyaan": "Bagaimana cara berkonsultasi langsung dengan petugas Balai POM di Jember?",
+      "jawaban": "Anda dapat menghubungi Balai POM di Jember melalui WhatsApp 08777-1500-533, telepon (0331) 5105533, email bpom_jember@pom.go.id, atau mengunjungi laman https://jember.pom.go.id/.\n\nAgar konsultasi berjalan efektif, siapkan lebih dahulu keterangan berikut: jenis dan kategori produk Anda, cara produksi (sendiri atau maklon), lokasi sarana, status legalitas usaha seperti NIB, kondisi sarana saat ini, serta rancangan label bila sudah ada. Semakin jelas gambaran yang Anda sampaikan, semakin terarah jawaban yang dapat diberikan petugas.\n\nAnda juga dapat menggunakan menu Cek Produk pada aplikasi ini terlebih dahulu. Hasil penilaian awalnya dapat Anda bawa sebagai bahan konsultasi sehingga pembahasan langsung masuk ke hal yang perlu dibenahi.\n\nWilayah kerja Balai POM di Jember meliputi Jember, Banyuwangi, Bondowoso, Situbondo, dan Lumajang. Bila lokasi usaha Anda berada di luar wilayah tersebut, silakan menghubungi UPT BPOM yang sesuai dengan wilayah Anda.",
+      "kata_kunci": [
+        "konsultasi",
+        "tanya petugas",
+        "hubungi",
+        "kontak",
+        "datang",
+        "alamat",
+        "jam layanan",
+        "bertemu"
+      ],
+      "perlu_verifikasi": false,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_iklan",
+      "kategori": "Label",
+      "pertanyaan": "Apakah iklan dan promosi di media sosial juga diawasi?",
+      "jawaban": "Ya. Pengawasan penandaan tidak berhenti pada kemasan, tetapi mencakup pula iklan dan promosi, termasuk yang disampaikan melalui media sosial, lokapasar, dan endorsement.\n\nPrinsipnya, isi iklan tidak boleh melebihi klaim yang telah disetujui pada penandaan produk. Bila suatu klaim tidak boleh dicantumkan pada label, klaim tersebut juga tidak boleh disampaikan dalam iklan. Iklan harus objektif, tidak menyesatkan, dan tidak menjanjikan hasil pasti.\n\nBeberapa hal yang sering menjadi masalah: menjanjikan kesembuhan atau memberi kesan produk sebagai obat padahal bukan; testimoni yang menampilkan hasil berlebihan; pernyataan seolah produk telah direkomendasikan pemerintah atau tenaga kesehatan padahal tidak; serta mencantumkan tanda sertifikasi yang tidak dimiliki.\n\nPerlu diingat, promosi yang dilakukan reseller, afiliator, maupun pemengaruh tetap menjadi tanggung jawab pemilik merek. Karena itu sebaiknya Anda menyiapkan panduan dan materi promosi yang sudah sesuai ketentuan, lalu meminta mereka menggunakannya.",
+      "kata_kunci": [
+        "iklan",
+        "promosi",
+        "media sosial",
+        "endorse",
+        "tiktok",
+        "instagram",
+        "marketplace",
+        "testimoni",
+        "afiliasi"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_uji_lab",
+      "kategori": "Pemeriksaan",
+      "pertanyaan": "Apakah produk saya perlu diuji laboratorium?",
+      "jawaban": "Pada banyak jalur perizinan, hasil pengujian laboratorium termasuk berkas yang diperlukan. Jenis pengujiannya menyesuaikan kategori produk dan risikonya, sehingga tidak sama untuk setiap produk.\n\nSecara umum, pengujian dapat mencakup parameter cemaran mikroba, cemaran logam berat, kandungan zat tertentu, serta parameter mutu yang relevan dengan produk Anda. Untuk produk pangan, pengujian juga kerap diperlukan sebagai dasar penetapan masa simpan dan pencantuman informasi nilai gizi.\n\nPengujian sebaiknya dilakukan di laboratorium yang terakreditasi agar hasilnya dapat diterima. Gunakan sampel yang benar-benar mewakili produk Anda, dengan kemasan yang akan dipakai sebenarnya — bukan kemasan sementara — karena kemasan memengaruhi hasil.\n\nDi luar keperluan perizinan, pengujian mandiri secara berkala merupakan praktik kendali mutu yang baik dan membantu Anda mendeteksi masalah lebih awal. Untuk memastikan parameter uji yang diperlukan bagi produk Anda, konsultasikan kepada petugas Balai POM di Jember.",
+      "kata_kunci": [
+        "uji lab",
+        "pengujian",
+        "tes lab",
+        "laboratorium",
+        "hasil uji",
+        "parameter uji",
+        "perlu uji"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_pindah_alamat",
+      "kategori": "Perizinan",
+      "pertanyaan": "Saya pindah lokasi produksi atau mengubah formula, apakah perlu lapor?",
+      "jawaban": "Ya. Perubahan yang menyangkut data produk atau sarana umumnya perlu dilaporkan, karena izin yang telah diterbitkan didasarkan pada data yang Anda ajukan sebelumnya.\n\nPerubahan yang umumnya perlu dilaporkan antara lain: pindah lokasi sarana produksi; perubahan formula atau komposisi produk; perubahan kemasan yang memengaruhi mutu atau masa simpan; perubahan desain label terutama yang menyangkut klaim atau keterangan wajib; perubahan nama perusahaan atau penanggung jawab; serta perpindahan produksi ke sarana maklon lain.\n\nMengedarkan produk dengan data yang tidak lagi sesuai izin yang diterbitkan berisiko menjadi temuan. Selain itu, perubahan formula atau kemasan dapat mengubah masa simpan produk, sehingga penetapan tanggal kedaluwarsa sebelumnya mungkin tidak lagi berlaku.\n\nJenis perubahan menentukan prosedur yang harus ditempuh — ada yang cukup dilaporkan, ada pula yang memerlukan pengajuan tersendiri. Konsultasikan rencana perubahan Anda kepada Balai POM di Jember sebelum dilaksanakan, agar prosesnya tidak terlambat.",
+      "kata_kunci": [
+        "pindah",
+        "ubah formula",
+        "ganti kemasan",
+        "perubahan",
+        "lapor perubahan",
+        "ganti alamat",
+        "revisi label"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_pencatatan",
+      "kategori": "Pemeriksaan",
+      "pertanyaan": "Catatan produksi apa saja yang sebaiknya saya buat?",
+      "jawaban": "Pencatatan adalah bagian yang paling sering menjadi temuan pada sarana UMKM. Banyak pelaku usaha sudah menjalankan praktik yang benar, namun tidak mencatatnya sehingga tidak dapat dibuktikan kepada petugas.\n\nCatatan pokok yang sebaiknya ada meliputi: catatan penerimaan bahan baku dan kemasan beserta asal pemasok; catatan produksi tiap bets termasuk tanggal, jumlah, dan penimbangan bahan; catatan pembersihan dan sanitasi beserta jadwalnya; catatan pengendalian hama; catatan pemantauan proses seperti suhu atau lama pemanasan bila relevan; catatan pemeriksaan produk jadi; catatan penyimpanan dan pengiriman produk; catatan keluhan pelanggan dan tindak lanjutnya; serta catatan pelatihan atau sosialisasi personel.\n\nFormatnya tidak harus rumit. Formulir sederhana yang benar-benar diisi setiap hari jauh lebih bernilai daripada sistem yang rapi namun tidak berjalan. Letakkan formulir di dekat lokasi kegiatan agar mudah diisi, dan tetapkan siapa yang bertanggung jawab mengisinya.\n\nKunci penilaiannya adalah ketertelusuran: dari satu produk jadi, Anda harus dapat menelusuri kembali sampai ke bahan bakunya. Sesekali ujilah sendiri hal ini sebagai latihan sebelum pemeriksaan.",
+      "kata_kunci": [
+        "catatan",
+        "pencatatan",
+        "dokumentasi",
+        "form",
+        "rekaman",
+        "logbook",
+        "administrasi produksi"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_impor",
+      "kategori": "Perizinan",
+      "pertanyaan": "Saya ingin mengimpor produk untuk dijual, apa yang perlu disiapkan?",
+      "jawaban": "Produk impor yang wajib izin edar umumnya memperoleh nomor berawalan BPOM RI ML. Pemohonnya adalah pihak di Indonesia yang berhak mengedarkan produk tersebut, sehingga kejelasan hubungan Anda dengan produsen di luar negeri menjadi hal pertama yang perlu disiapkan.\n\nYang umumnya diperlukan meliputi: legalitas usaha Anda sebagai importir; surat penunjukan dari produsen atau pemilik merek di luar negeri; dokumen mutu dan keamanan produk dari produsen; keterangan bahwa produk beredar secara sah di negara asal; komposisi lengkap dan spesifikasi bahan; hasil pengujian sesuai kebutuhan; serta rancangan label berbahasa Indonesia.\n\nPerhatikan khusus pada label: produk impor tetap harus memenuhi ketentuan penandaan yang berlaku di Indonesia, termasuk penggunaan bahasa Indonesia untuk keterangan wajib serta pencantuman identitas importir. Label asal negara pembuat biasanya belum memenuhi ketentuan ini sehingga perlu penyesuaian.\n\nPerhatikan pula bahwa bahan yang diizinkan di negara asal belum tentu diizinkan di Indonesia. Periksa komposisinya terhadap ketentuan yang berlaku sebelum Anda berkomitmen memesan dalam jumlah besar.",
+      "kata_kunci": [
+        "impor",
+        "import",
+        "ml",
+        "produk luar negeri",
+        "importir",
+        "barang impor",
+        "dari luar"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_online",
+      "kategori": "Distribusi",
+      "pertanyaan": "Apakah berjualan online juga harus punya izin edar?",
+      "jawaban": "Ya. Kewajiban izin edar ditentukan oleh jenis produk dan kegiatan mengedarkannya, bukan oleh saluran penjualannya. Menjual melalui lokapasar, media sosial, atau pesan langsung tetap termasuk mengedarkan produk.\n\nKarena itu produk yang wajib memiliki izin edar tetap harus memilikinya, meskipun dijual sepenuhnya secara daring. Demikian pula ketentuan penandaan dan iklan berlaku sama, termasuk untuk foto produk, deskripsi di lokapasar, serta promosi oleh reseller dan afiliator.\n\nBagi Anda yang menjual produk milik pihak lain, biasakan memeriksa keabsahan izin edarnya melalui cekbpom.pom.go.id sebelum menyetujui kerja sama. Penjual turut bertanggung jawab atas produk yang diedarkannya, sehingga memastikan keabsahan produk sejak awal melindungi usaha Anda sendiri.\n\nPerhatikan pula penyimpanan dan pengiriman. Produk yang memerlukan kondisi penyimpanan tertentu harus tetap terjaga selama pengiriman, dan hal ini menjadi tanggung jawab penjual.",
+      "kata_kunci": [
+        "online",
+        "jualan online",
+        "marketplace",
+        "shopee",
+        "tokopedia",
+        "reseller",
+        "dropship",
+        "medsos"
+      ],
+      "perlu_verifikasi": true
+    },
+    {
+      "id": "faq_nilai_gizi",
+      "kategori": "Pangan",
+      "pertanyaan": "Kapan produk pangan wajib mencantumkan informasi nilai gizi?",
+      "jawaban": "Kewajiban pencantuman informasi nilai gizi bergantung pada jenis pangan olahan dan klaim yang dicantumkan pada label, sehingga tidak berlaku sama untuk semua produk.\n\nSebagai gambaran umum, informasi nilai gizi umumnya wajib bagi pangan olahan yang mencantumkan klaim gizi atau klaim kesehatan, serta bagi kategori pangan tertentu yang dipersyaratkan. Bila Anda mencantumkan klaim seperti \"sumber serat\" atau \"rendah gula\", maka klaim tersebut harus didukung data nilai gizi hasil pengujian.\n\nData nilai gizi diperoleh melalui pengujian laboratorium terhadap sampel yang mewakili produk Anda. Perhitungan berdasarkan tabel komposisi bahan dapat dipakai sebagai perkiraan awal, namun untuk pencantuman pada label umumnya diperlukan data hasil uji.\n\nPerhatikan pula takaran saji yang Anda tetapkan, karena seluruh angka pada informasi nilai gizi mengacu pada takaran tersebut. Menetapkan takaran saji yang tidak wajar agar angka terlihat lebih baik merupakan praktik yang menyesatkan. Untuk memastikan kewajiban yang berlaku bagi produk Anda, konsultasikan ke Balai POM di Jember.",
+      "kata_kunci": [
+        "nilai gizi",
+        "informasi nilai gizi",
+        "ing",
+        "takaran saji",
+        "kalori",
+        "gizi",
+        "wajib gizi"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
+    },
+    {
+      "id": "faq_sanksi",
+      "kategori": "Pemeriksaan",
+      "pertanyaan": "Apa akibatnya bila melanggar ketentuan Obat dan Makanan?",
+      "jawaban": "Tindak lanjut atas pelanggaran ditentukan oleh jenis, tingkat, dan dampak pelanggarannya, serta diatur dalam ketentuan yang berlaku. Karena itu bentuk dan besarannya tidak dapat disimpulkan sendiri dan perlu diverifikasi kepada petugas.\n\nSecara umum, pelanggaran administratif yang tidak membahayakan kesehatan umumnya ditindaklanjuti dengan langkah perbaikan kepatuhan. Sementara pelanggaran yang membahayakan kesehatan masyarakat — misalnya penggunaan bahan yang dilarang, penambahan bahan kimia obat, atau peredaran produk tanpa izin edar — ditangani jauh lebih tegas dan dapat berlanjut ke proses penindakan.\n\nYang perlu dipahami, iktikad baik dan kesungguhan memperbaiki merupakan hal yang diperhatikan. Menanggapi temuan dengan CAPA yang sungguh-sungguh dan melaksanakannya dengan bukti nyata adalah langkah terbaik yang dapat Anda lakukan.\n\nBila Anda menyadari ada ketidaksesuaian pada usaha Anda, jangan menunggu sampai ditemukan dalam pengawasan. Konsultasikan lebih dahulu kepada Balai POM di Jember — bersikap terbuka dan memperbaiki lebih awal selalu menempatkan Anda pada posisi yang lebih baik.",
+      "kata_kunci": [
+        "sanksi",
+        "melanggar",
+        "akibat",
+        "denda",
+        "pidana",
+        "hukuman",
+        "ditindak",
+        "konsekuensi"
+      ],
+      "perlu_verifikasi": true,
+      "arahkan_petugas": true
     },
     {
       "id": "faq_kontak",
       "kategori": "Layanan",
       "pertanyaan": "Bagaimana menghubungi Balai POM di Jember?",
-      "jawaban": "WhatsApp 08777-1500-533, telepon (0331) 5105533, email bpom_jember@pom.go.id, atau kunjungi https://jember.pom.go.id/. Wilayah kerja meliputi Jember, Banyuwangi, Bondowoso, Situbondo, dan Lumajang.",
-      "kata_kunci": ["kontak", "hubungi", "telepon", "whatsapp", "email", "alamat"],
+      "jawaban": "Balai POM di Jember dapat dihubungi melalui beberapa kanal resmi berikut:\n\n• WhatsApp: 08777-1500-533\n• Telepon: (0331) 5105533\n• Email: bpom_jember@pom.go.id\n• Website: https://jember.pom.go.id/\n\nWilayah kerja Balai POM di Jember meliputi Jember, Banyuwangi, Bondowoso, Situbondo, dan Lumajang. Bila lokasi usaha atau domisili Anda berada di luar wilayah tersebut, silakan menghubungi Unit Pelaksana Teknis BPOM yang sesuai dengan wilayah Anda.\n\nUntuk keputusan resmi, status permohonan, pengaduan, atau konsultasi yang membutuhkan petugas, gunakan kanal resmi di atas. Si Pandu AI membantu memberikan informasi dan persiapan awal, namun tidak dapat memberikan keputusan atau persetujuan resmi.",
+      "kata_kunci": [
+        "kontak",
+        "hubungi",
+        "telepon",
+        "whatsapp",
+        "email",
+        "alamat",
+        "nomor",
+        "wa"
+      ],
       "perlu_verifikasi": false
     }
   ],
   "regulasi_kategori": [
-    { "id": "pangan", "nama": "Pangan", "deskripsi": "Ketentuan terkait produksi, keamanan, mutu, dan peredaran pangan olahan.", "topik": ["cppob", "ip_cppob", "btp", "smkpo"] },
-    { "id": "kosmetika", "nama": "Kosmetika", "deskripsi": "Ketentuan terkait pembuatan, mutu, dan peredaran kosmetika.", "topik": ["cpkb"] },
-    { "id": "obat_tradisional", "nama": "Obat Tradisional", "deskripsi": "Ketentuan terkait pembuatan dan mutu obat tradisional.", "topik": ["cpotb"] },
-    { "id": "suplemen", "nama": "Suplemen Kesehatan", "deskripsi": "Ketentuan terkait suplemen kesehatan, termasuk mutu dan penandaan.", "topik": ["registrasi", "klaim"] },
-    { "id": "obat", "nama": "Obat", "deskripsi": "Ketentuan terkait pembuatan dan pengawasan mutu obat.", "topik": ["cpob"] },
-    { "id": "distribusi", "nama": "Distribusi", "deskripsi": "Ketentuan terkait distribusi dan peredaran produk Obat dan Makanan.", "topik": ["cdob", "cperpob"] },
-    { "id": "label", "nama": "Label", "deskripsi": "Ketentuan terkait pencantuman keterangan dan klaim pada label produk.", "topik": ["label", "klaim"] },
-    { "id": "capa", "nama": "CAPA", "deskripsi": "Tindak lanjut temuan hasil pemeriksaan sarana.", "topik": ["capa", "pemeriksaan_sarana"] }
+    {
+      "id": "pangan",
+      "nama": "Pangan",
+      "deskripsi": "Produksi, keamanan, mutu, penandaan, dan peredaran pangan olahan.",
+      "topik": [
+        "cppob",
+        "ip_cppob",
+        "btp",
+        "smkpo",
+        "kemasan",
+        "masa_simpan",
+        "pirt"
+      ]
+    },
+    {
+      "id": "kosmetika",
+      "nama": "Kosmetika",
+      "deskripsi": "Pembuatan, notifikasi, mutu, dan penandaan kosmetika.",
+      "topik": [
+        "cpkb",
+        "notifikasi_kosmetika"
+      ]
+    },
+    {
+      "id": "obat_tradisional",
+      "nama": "Obat Tradisional",
+      "deskripsi": "Pembuatan, penggolongan, dan mutu obat tradisional.",
+      "topik": [
+        "cpotb",
+        "golongan_ot"
+      ]
+    },
+    {
+      "id": "suplemen",
+      "nama": "Suplemen Kesehatan",
+      "deskripsi": "Mutu, keamanan, dan penandaan suplemen kesehatan.",
+      "topik": [
+        "suplemen",
+        "klaim"
+      ]
+    },
+    {
+      "id": "obat",
+      "nama": "Obat",
+      "deskripsi": "Pembuatan dan pengawasan mutu obat.",
+      "topik": [
+        "cpob"
+      ]
+    },
+    {
+      "id": "distribusi",
+      "nama": "Distribusi & Peredaran",
+      "deskripsi": "Distribusi, peredaran, dan sarana penyaluran produk Obat dan Makanan.",
+      "topik": [
+        "cdob",
+        "cperpob",
+        "sarana_distribusi"
+      ]
+    },
+    {
+      "id": "label",
+      "nama": "Label & Iklan",
+      "deskripsi": "Pencantuman keterangan, klaim, serta iklan dan promosi produk.",
+      "topik": [
+        "label",
+        "klaim",
+        "iklan"
+      ]
+    },
+    {
+      "id": "perizinan",
+      "nama": "Perizinan & Registrasi",
+      "deskripsi": "Izin edar, registrasi produk, legalitas usaha, dan pola maklon.",
+      "topik": [
+        "izin_edar",
+        "registrasi",
+        "nib_oss",
+        "maklon"
+      ]
+    },
+    {
+      "id": "pengawasan",
+      "nama": "Pengawasan & CAPA",
+      "deskripsi": "Pemeriksaan sarana, sampling, tindak lanjut temuan, dan penilaian mandiri.",
+      "topik": [
+        "pemeriksaan_sarana",
+        "capa",
+        "sampling",
+        "self_assessment",
+        "sanksi"
+      ]
+    },
+    {
+      "id": "layanan",
+      "nama": "Layanan & Informasi",
+      "deskripsi": "Layanan Balai POM di Jember, pengaduan, dan pengecekan produk terdaftar.",
+      "topik": [
+        "balai_jember",
+        "pengaduan",
+        "cek_produk_bpom",
+        "tentang_bpom",
+        "umkm_mulai",
+        "halal"
+      ]
+    }
   ],
   "regulasi": []
 }

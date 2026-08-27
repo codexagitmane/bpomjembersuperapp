@@ -19,11 +19,24 @@ export interface SumberJawaban {
   perlu_verifikasi: boolean;
 }
 
+export interface KontakPetugas {
+  nama: string;
+  whatsapp: string | null;
+  whatsapp_link: string | null;
+  telepon: string | null;
+  telepon_link: string | null;
+  email: string | null;
+  ajakan: string;
+}
+
 export interface JawabanAsisten {
   jawaban: string;
   sumber: SumberJawaban[];
   di_luar_lingkup: boolean;
   perlu_verifikasi: boolean;
+  /** Jawaban belum memadai — tawarkan penghubung ke petugas. */
+  butuh_petugas?: boolean;
+  petugas?: KontakPetugas | null;
   saran: string[];
 }
 

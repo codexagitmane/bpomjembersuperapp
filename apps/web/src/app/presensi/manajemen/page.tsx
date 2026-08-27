@@ -116,7 +116,7 @@ export default function ManajemenPresensiPage() {
               {wfh.map((w) => (
                 <div key={w.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                   <div className="min-w-0">
-                    <p className="font-semibold text-navy-900">{w.user.name}</p>
+                    <p className="font-semibold text-navy-900">{w.user?.name ?? "Pengguna tidak ditemukan"}</p>
                     <p className="text-xs text-navy-400">{w.user.email}</p>
                     <p className="mt-1 flex items-center gap-1.5 text-sm text-navy-600">
                       <MapPin className="size-3.5 text-navy-300" />

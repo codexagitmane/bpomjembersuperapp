@@ -50,7 +50,7 @@ export default function VerifikasiPage() {
       wfh.map((w) => ({
         id: w.id,
         label: w.label,
-        nama: w.user.name,
+        nama: w.user?.name ?? "Pengguna tidak ditemukan",
         latitude: w.latitude,
         longitude: w.longitude,
       })),
@@ -207,7 +207,7 @@ export default function VerifikasiPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-navy-900">{w.user.name}</p>
+                      <p className="text-sm font-bold text-navy-900">{w.user?.name ?? "Pengguna tidak ditemukan"}</p>
                       <Badge tone="info">{w.user.jenis_pegawai}</Badge>
                     </div>
                     <p className="mt-1 text-xs text-navy-500">
