@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import {
   MessageCircle, Search, Tag, Palette, ClipboardList, BookOpen, ShieldCheck,
-  ExternalLink, Phone, Mail, Globe, MapPin, ChevronDown, Info,
+  ExternalLink, Phone, Mail, Globe, MapPin, ChevronDown, Info, HelpCircle,
+  History, Building2,
 } from "lucide-react";
 import { Card, Badge } from "@/components/ui/Card";
 import { Maskot, EmptyState } from "@/components/pandu/Maskot";
@@ -43,6 +44,14 @@ const AKSI_CEPAT: { id: MenuPandu; label: string; ikon: React.ReactNode; warna: 
   { id: "edit_label", label: "Edit Label", ikon: <Palette className="size-5" />, warna: "from-violet-600 to-violet-500" },
   { id: "capa", label: "Buat CAPA", ikon: <ClipboardList className="size-5" />, warna: "from-amber-600 to-amber-500" },
   { id: "regulasi", label: "Regulasi", ikon: <BookOpen className="size-5" />, warna: "from-teal-600 to-teal-500" },
+];
+
+/** Menu penunjang — seluruh navigasi tersedia dari beranda (tanpa sidebar). */
+const MENU_LAIN: { id: MenuPandu; label: string; teks: string; ikon: React.ReactNode }[] = [
+  { id: "faq", label: "FAQ", teks: "Pertanyaan yang sering diajukan pelaku usaha.", ikon: <HelpCircle className="size-5 text-bpom-600" /> },
+  { id: "kontak", label: "Hubungi BPOM Jember", teks: "WhatsApp, telepon, email, dan wilayah kerja.", ikon: <Phone className="size-5 text-bpom-600" /> },
+  { id: "riwayat", label: "Riwayat", teks: "Catatan konsultasi, review label, dan CAPA Anda.", ikon: <History className="size-5 text-bpom-600" /> },
+  { id: "profil", label: "Profil Usaha", teks: "Data usaha agar panduan lebih sesuai.", ikon: <Building2 className="size-5 text-bpom-600" /> },
 ];
 
 const LAYANAN = [
@@ -105,6 +114,26 @@ export function DashboardView({ boot, pindah }: { boot: Bootstrap | null; pindah
             >
               <p className="text-sm font-bold text-navy-900">{l.judul}</p>
               <p className="mt-1 text-xs leading-relaxed text-navy-500">{l.teks}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Menu penunjang */}
+      <div>
+        <JudulBagian ikon={<HelpCircle className="size-4 text-bpom-600" />} judul="Menu lainnya" />
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+          {MENU_LAIN.map((m) => (
+            <button
+              key={m.id}
+              onClick={() => pindah(m.id)}
+              className="flex items-start gap-3 rounded-2xl border border-navy-900/5 bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-bpom-200 hover:shadow-md"
+            >
+              <span className="mt-0.5 shrink-0">{m.ikon}</span>
+              <span className="min-w-0">
+                <span className="block text-sm font-bold text-navy-900">{m.label}</span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-navy-500">{m.teks}</span>
+              </span>
             </button>
           ))}
         </div>
