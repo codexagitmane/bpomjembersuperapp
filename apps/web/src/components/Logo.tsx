@@ -1,40 +1,32 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Emblem LENTERA — lentera bercahaya hijau dengan perisai-centang BPOM.
- * SVG murni agar tajam di semua ukuran (splash, login, sidebar, favicon).
+ * Emblem LENTERA — memakai berkas logo resmi (PNG), bukan gambar tiruan.
+ *
+ * Berkas sumber `public/logo.png` berukuran 1254×1254 (±1,1 MB) sehingga tidak
+ * pernah dipakai langsung: yang dikirim ke peramban adalah turunannya pada
+ * ukuran wajar (64/128/192 px) lewat `srcSet`, agar layar biasa memuat berkas
+ * kecil dan layar beresolusi tinggi tetap tajam.
+ *
+ * Ukuran tampilan tetap diatur lewat `className` (mis. `size-8`) persis seperti
+ * sebelumnya, jadi seluruh pemakaian yang sudah ada tidak perlu diubah.
  */
 export function LenteraMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true">
-      <defs>
-        <radialGradient id="lentera-glow" cx="50%" cy="45%" r="60%">
-          <stop offset="0%" stopColor="#66d69a" />
-          <stop offset="70%" stopColor="#17a361" />
-          <stop offset="100%" stopColor="#0d6a41" />
-        </radialGradient>
-      </defs>
-      {/* gantungan */}
-      <path d="M20.5 7.5a3.5 3.5 0 0 1 7 0" stroke="#122649" strokeWidth="2.4" strokeLinecap="round" />
-      {/* tutup atas */}
-      <path d="M15 11h18l-2.4 4.2H17.4z" fill="#122649" />
-      <rect x="13.5" y="9" width="21" height="2.6" rx="1.3" fill="#0b1f3a" />
-      {/* rangka badan */}
-      <rect x="15.5" y="15" width="17" height="20" rx="3" fill="#122649" />
-      {/* kaca bercahaya */}
-      <rect x="18.2" y="17.6" width="11.6" height="14.8" rx="2.4" fill="url(#lentera-glow)" />
-      {/* perisai centang */}
-      <path
-        d="M20.6 24.6l2.7 3.1 4.6-5.6"
-        stroke="#fff"
-        strokeWidth="2.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* alas */}
-      <path d="M16.5 35h15l-2 4.2h-11z" fill="#122649" />
-      <circle cx="24" cy="37.1" r="1.15" fill="#35bd79" />
-    </svg>
+    // Sengaja memakai <img> biasa, bukan next/image: keluaran `standalone`
+    // menjalankan pengoptimal gambar di server, sedangkan turunan logo sudah
+    // dibuat pada ukuran pas lewat srcSet — jadi tidak ada yang perlu
+    // dioptimalkan saat permintaan datang.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logo-mark-128.png"
+      srcSet="/logo-mark-64.png 64w, /logo-mark-128.png 128w, /logo-mark-192.png 192w"
+      sizes="96px"
+      alt="Logo LENTERA BPOM Jember"
+      width={128}
+      height={128}
+      className={cn("object-contain", className)}
+    />
   );
 }
 

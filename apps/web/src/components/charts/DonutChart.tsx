@@ -19,43 +19,46 @@ export function DonutChart({ slices, centerLabel }: { slices: DonutSlice[]; cent
   const circumference = 2 * Math.PI * radius;
   const [hover, setHover] = useState<number | null>(null);
 
-  let offsetAcc = 0;
+  // Panjang busur tiap potongan beserta titik mulainya dihitung lebih dulu.
+  // Sebelumnya penggeseran diakumulasi di dalam map() saat render berlangsung —
+  // pola yang menghasilkan sudut tidak konsisten pada render berikutnya.
+  const busur = slices.map((s) => (s.value / total) * circumference);
+  const mulai = busur.reduce<number[]>(
+    (acc, panjang, i) => [...acc, (acc[i] ?? 0) + panjang],
+    [0]
+  );
 
   return (
-    <div className="flex items-center gap-6">
-      <svg viewBox="0 0 160 160" className="size-40 shrink-0 -rotate-90">
+    // Di layar ponsel cincin + legenda berdampingan melebihi lebar layar,
+    // sehingga ditumpuk ke bawah dan cincinnya diperkecil.
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
+      <svg viewBox="0 0 160 160" className="size-32 shrink-0 -rotate-90 sm:size-40">
         <circle cx={80} cy={80} r={radius} fill="none" stroke="#eef1f6" strokeWidth={stroke} />
-        {slices.map((s, i) => {
-          const frac = s.value / total;
-          const dash = frac * circumference;
-          const el = (
-            <circle
-              key={s.label}
-              cx={80}
-              cy={80}
-              r={radius}
-              fill="none"
-              stroke={s.color}
-              strokeWidth={hover === i ? stroke + 4 : stroke}
-              strokeDasharray={`${dash} ${circumference - dash}`}
-              strokeDashoffset={-offsetAcc}
-              className="transition-all"
-              onMouseEnter={() => setHover(i)}
-              onMouseLeave={() => setHover(null)}
-              strokeLinecap={slices.length === 1 ? "round" : "butt"}
-            />
-          );
-          offsetAcc += dash;
-          return el;
-        })}
+        {slices.map((s, i) => (
+          <circle
+            key={s.label}
+            cx={80}
+            cy={80}
+            r={radius}
+            fill="none"
+            stroke={s.color}
+            strokeWidth={hover === i ? stroke + 4 : stroke}
+            strokeDasharray={`${busur[i]} ${circumference - busur[i]}`}
+            strokeDashoffset={-mulai[i]}
+            className="transition-all"
+            onMouseEnter={() => setHover(i)}
+            onMouseLeave={() => setHover(null)}
+            strokeLinecap={slices.length === 1 ? "round" : "butt"}
+          />
+        ))}
       </svg>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto">
         {centerLabel && <p className="text-xs font-semibold text-navy-400">{centerLabel}</p>}
         {slices.map((s, i) => (
           <div
             key={s.label}
-            className="flex items-center gap-2 text-sm"
+            className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm"
             onMouseEnter={() => setHover(i)}
             onMouseLeave={() => setHover(null)}
           >

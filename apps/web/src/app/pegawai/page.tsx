@@ -10,7 +10,6 @@ import {
   Trash2,
   KeyRound,
   X,
-  Loader2,
   Copy,
   Check,
   ShieldCheck,
@@ -52,18 +51,24 @@ interface Opsi {
   jenis_pegawai: string[];
 }
 
-const STATUS_ORDER = ["asn", "pppk", "outsourcing", "magang"];
+// Urutan kelompok pada daftar. Setiap kelompok yang dikirim API WAJIB ada di
+// sini: kelompok yang tidak terdaftar akan terhitung pada kartu ringkasan
+// tetapi daftarnya tidak pernah ditampilkan sama sekali.
+const STATUS_ORDER = ["asn", "pppk", "outsourcing", "magang", "lainnya", "masyarakat"];
 const STATUS_TONE: Record<string, "info" | "success" | "warning" | "neutral"> = {
   asn: "info",
   pppk: "success",
   outsourcing: "warning",
   magang: "neutral",
+  lainnya: "neutral",
+  masyarakat: "info",
 };
 const STATUS_ACCENT: Record<string, string> = {
   asn: "from-navy-500 to-navy-700",
   pppk: "from-bpom-400 to-bpom-600",
   outsourcing: "from-amber-400 to-amber-500",
   magang: "from-navy-300 to-navy-400",
+  lainnya: "from-navy-200 to-navy-300",
   masyarakat: "from-sky-400 to-sky-600",
 };
 
@@ -199,15 +204,15 @@ export default function PegawaiPage() {
     <AppShell>
     <div className="mx-auto max-w-6xl">
       {/* Header */}
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-navy-900">Data Pegawai</h1>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl font-extrabold text-navy-900 sm:text-2xl">Data Pegawai</h1>
           <p className="mt-1 text-sm text-navy-500">
             Direktori pengguna LENTERA — PNS, PPPK, Outsourcing, Magang &amp; Masyarakat.
           </p>
         </div>
         {isAdmin && (
-          <Button variant="secondary" onClick={openCreate}>
+          <Button variant="secondary" onClick={openCreate} className="w-full sm:w-auto">
             <Plus className="size-4" /> Tambah Pegawai
           </Button>
         )}
@@ -284,7 +289,7 @@ export default function PegawaiPage() {
             <X className="size-3.5" /> Hapus filter
           </button>
         )}
-        <span className="text-sm font-medium text-navy-400">{filtered.length} pegawai</span>
+        <span className="text-sm font-medium text-navy-400">{filtered.length} pengguna</span>
       </div>
 
       {/* Content */}
@@ -331,14 +336,18 @@ export default function PegawaiPage() {
                       </div>
                       <div className="mt-2 flex items-end justify-between gap-2">
                         <div className="min-w-0 text-xs text-navy-500">
-                          <p className="font-mono">{p.nip_nik ?? "—"}</p>
-                          <p className="truncate">{p.jabatan ?? "—"}</p>
+                          <p className="font-mono">{identitas(p)}</p>
+                          <p className="truncate">{keterangan(p)}</p>
                         </div>
                         {isAdmin && (
                           <div className="flex shrink-0 items-center gap-1">
-                            <IconBtn title="Edit" onClick={() => openEdit(p)}>
-                              <Pencil className="size-4" />
-                            </IconBtn>
+                            {/* Akun masyarakat tidak disunting lewat formulir pegawai:
+                                formulir ini memaksa status kepegawaian & peran internal. */}
+                            {!eksternal(p) && (
+                              <IconBtn title="Edit" onClick={() => openEdit(p)}>
+                                <Pencil className="size-4" />
+                              </IconBtn>
+                            )}
                             <IconBtn title="Reset password" onClick={() => handleReset(p)}>
                               <KeyRound className="size-4" />
                             </IconBtn>
@@ -380,8 +389,8 @@ export default function PegawaiPage() {
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3 font-mono text-xs text-navy-600">{p.nip_nik ?? "—"}</td>
-                          <td className="px-4 py-3 text-navy-600">{p.jabatan ?? "—"}</td>
+                          <td className="px-4 py-3 font-mono text-xs text-navy-600">{identitas(p)}</td>
+                          <td className="px-4 py-3 text-navy-600">{keterangan(p)}</td>
                           <td className="px-4 py-3">
                             {p.is_active ? (
                               <Badge tone="success">
@@ -394,9 +403,11 @@ export default function PegawaiPage() {
                           {isAdmin && (
                             <td className="px-4 py-3">
                               <div className="flex items-center justify-end gap-1">
-                                <IconBtn title="Edit" onClick={() => openEdit(p)}>
-                                  <Pencil className="size-4" />
-                                </IconBtn>
+                                {!eksternal(p) && (
+                                  <IconBtn title="Edit" onClick={() => openEdit(p)}>
+                                    <Pencil className="size-4" />
+                                  </IconBtn>
+                                )}
                                 <IconBtn title="Reset password" onClick={() => handleReset(p)}>
                                   <KeyRound className="size-4" />
                                 </IconBtn>
@@ -523,6 +534,23 @@ export default function PegawaiPage() {
 const inputCls =
   "w-full rounded-xl border border-navy-200 bg-white px-3.5 py-2.5 text-sm text-navy-900 placeholder:text-navy-400 focus:border-navy-400 focus:outline-none focus:ring-2 focus:ring-navy-200";
 
+/** Akun masyarakat (eksternal) — bukan pegawai internal. */
+function eksternal(p: Pegawai): boolean {
+  return p.status_kepegawaian === "masyarakat";
+}
+
+/** Kolom identitas: NIP/NIK untuk pegawai, nomor HP untuk akun masyarakat. */
+function identitas(p: Pegawai): string {
+  return (eksternal(p) ? p.phone : p.nip_nik) ?? "—";
+}
+
+/** Kolom keterangan: jabatan untuk pegawai, penanda akun untuk masyarakat. */
+function keterangan(p: Pegawai): string {
+  if (eksternal(p)) return "Akun masyarakat";
+
+  return p.jabatan ?? "—";
+}
+
 function FormField({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <label className="block">
@@ -563,20 +591,22 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-navy-950/40 backdrop-blur-sm" onClick={onClose} />
+      {/* Di layar ponsel formulir lebih tinggi daripada layar; batasi tinggi
+          dan biarkan isinya digulung agar tombol simpan selalu terjangkau. */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative z-10 w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl"
+        className="relative z-10 flex max-h-[88vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white p-5 shadow-2xl sm:p-6"
       >
-        <div className="mb-5 flex items-center justify-between">
-          <h3 className="flex items-center gap-2 text-lg font-bold text-navy-900">
-            <IdCard className="size-5 text-bpom-600" /> {title}
+        <div className="mb-5 flex shrink-0 items-center justify-between">
+          <h3 className="flex items-center gap-2 text-base font-bold text-navy-900 sm:text-lg">
+            <IdCard className="size-5 shrink-0 text-bpom-600" /> {title}
           </h3>
           <button onClick={onClose} className="flex size-8 items-center justify-center rounded-lg text-navy-400 hover:bg-navy-50">
             <X className="size-4.5" />
           </button>
         </div>
-        {children}
+        <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">{children}</div>
       </motion.div>
     </div>
   );

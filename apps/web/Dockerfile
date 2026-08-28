@@ -29,8 +29,13 @@ RUN pnpm --filter @bpom/web build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=build /repo/apps/web/public ./public
+# PENTING (monorepo): keluaran `standalone` mempertahankan struktur workspace,
+# sehingga server berada di /app/apps/web/server.js — dan ia mencari `public/`
+# serta `.next/` RELATIF terhadap dirinya sendiri, bukan terhadap /app.
+# Menyalin public ke ./public membuat SELURUH isinya 404 tanpa pesan galat:
+# manifest PWA, ikon aplikasi, service worker, maskot Si Pandu, semuanya.
 COPY --from=build /repo/apps/web/.next/standalone ./
+COPY --from=build /repo/apps/web/public ./apps/web/public
 COPY --from=build /repo/apps/web/.next/static ./apps/web/.next/static
 EXPOSE 3000
 CMD ["node", "apps/web/server.js"]

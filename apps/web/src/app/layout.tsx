@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { PasangAplikasi } from "@/components/PasangAplikasi";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
   title: "LENTERA BPOM Jember — Sistem Terintegrasi Balai POM di Jember",
   description:
     "Sistem Informasi Terintegrasi Balai Pengawas Obat dan Makanan (BPOM) di Jember — layanan internal & publik dalam satu platform.",
-  manifest: "/manifest.webmanifest",
+  // Tautan manifest disisipkan otomatis oleh konvensi berkas app/manifest.ts,
+  // jadi tidak perlu (dan tidak boleh) dideklarasikan lagi di sini.
   applicationName: "LENTERA",
   // Ikon dibuat pada ukuran yang persis sesuai deklarasi manifest; ukuran yang
   // tidak cocok membuat Android menolak ikon dan memakai lambang bawaan.
@@ -59,6 +61,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ServiceWorkerRegister />
         <AuthProvider>{children}</AuthProvider>
+        <PasangAplikasi />
       </body>
     </html>
   );

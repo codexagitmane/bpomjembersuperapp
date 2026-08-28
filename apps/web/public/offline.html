@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LENTERA — Tidak Ada Koneksi</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #f5f7fa;
+    color: #122649;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    text-align: center;
+  }
+  .kotak { max-width: 22rem; }
+  img { width: 88px; height: 88px; object-fit: contain; }
+  h1 { margin: 20px 0 8px; font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+  p { margin: 0; font-size: 14px; line-height: 1.6; color: #55607a; }
+  button {
+    margin-top: 22px;
+    width: 100%;
+    padding: 13px 20px;
+    border: 0;
+    border-radius: 14px;
+    background: #122649;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:hover { background: #0b1f3a; }
+</style>
+</head>
+<body>
+  <div class="kotak">
+    <img src="/logo-mark-192.png" alt="Logo LENTERA BPOM Jember">
+    <h1>Tidak ada koneksi</h1>
+    <p>LENTERA membutuhkan jaringan untuk memuat data terbaru. Periksa koneksi internet Anda, lalu coba lagi.</p>
+    <button type="button" onclick="location.reload()">Coba Lagi</button>
+  </div>
+</body>
+</html>

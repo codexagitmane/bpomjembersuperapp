@@ -27,10 +27,28 @@ class UserController extends Controller
         'masyarakat' => 'Masyarakat',
     ];
 
+    /**
+     * Kelompok untuk pegawai internal yang status kepegawaiannya belum diisi.
+     *
+     * Sengaja TIDAK dimasukkan ke STATUS_LABEL agar tidak ikut muncul sebagai
+     * pilihan pada formulir — ini penanda data yang belum lengkap, bukan status
+     * yang boleh ditetapkan. Tanpa kelompok ini akun seperti Kepala Balai dan
+     * Kasubag TU tidak pernah tampil di direktori.
+     */
+    private const KELOMPOK_LAINNYA = 'lainnya';
+
+    private const LABEL_LAINNYA = 'Belum Ditetapkan';
+
     /** Kelompok tampilan: status kepegawaian untuk internal, 'masyarakat' untuk eksternal. */
     private function kelompok(User $u): string
     {
-        return $u->account_type === 'eksternal' ? 'masyarakat' : (string) $u->status_kepegawaian;
+        if ($u->account_type === 'eksternal') {
+            return 'masyarakat';
+        }
+
+        $status = (string) $u->status_kepegawaian;
+
+        return isset(self::STATUS_LABEL[$status]) ? $status : self::KELOMPOK_LAINNYA;
     }
 
     private function serialize(User $u): array
@@ -46,7 +64,7 @@ class UserController extends Controller
             'account_type' => $u->account_type,
             'jenis_pegawai' => $u->jenis_pegawai,
             'status_kepegawaian' => $this->kelompok($u),
-            'status_label' => self::STATUS_LABEL[$this->kelompok($u)] ?? '—',
+            'status_label' => self::STATUS_LABEL[$this->kelompok($u)] ?? self::LABEL_LAINNYA,
             'jabatan' => $u->jabatan,
             'penugasan' => $u->penugasan,
             'role' => $role,
@@ -78,6 +96,10 @@ class UserController extends Controller
         if ($status = $request->query('status')) {
             if ($status === 'masyarakat') {
                 $q->where('account_type', 'eksternal');
+            } elseif ($status === self::KELOMPOK_LAINNYA) {
+                $q->where('account_type', 'internal')
+                    ->where(fn ($w) => $w->whereNull('status_kepegawaian')
+                        ->orWhereNotIn('status_kepegawaian', array_keys(self::STATUS_LABEL)));
             } else {
                 $q->where('account_type', 'internal')->where('status_kepegawaian', $status);
             }
@@ -108,6 +130,21 @@ class UserController extends Controller
 
             return ['status' => $key, 'label' => $label, 'jumlah' => $jumlah];
         })->values();
+
+        // Pegawai internal yang status kepegawaiannya belum diisi tetap dihitung
+        // dan tetap tampil; kartunya hanya muncul bila memang ada datanya.
+        $belumDitetapkan = User::where('account_type', 'internal')
+            ->where(fn ($w) => $w->whereNull('status_kepegawaian')
+                ->orWhereNotIn('status_kepegawaian', array_keys(self::STATUS_LABEL)))
+            ->count();
+
+        if ($belumDitetapkan > 0) {
+            $ringkasan->push([
+                'status' => self::KELOMPOK_LAINNYA,
+                'label' => self::LABEL_LAINNYA,
+                'jumlah' => $belumDitetapkan,
+            ]);
+        }
 
         return response()->json([
             'data' => $users,

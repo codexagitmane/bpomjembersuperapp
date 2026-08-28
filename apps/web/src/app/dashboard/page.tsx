@@ -159,23 +159,27 @@ export default function DashboardPage() {
             {/* Tren kehadiran per periode */}
             <SectionTitle>Tren Kehadiran</SectionTitle>
             <Card>
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <p className="text-sm font-semibold text-navy-700">
                   Kehadiran & keterlambatan — {PERIODE_LABEL[periode]} terakhir
                 </p>
-                <div className="flex rounded-xl bg-navy-50 p-1">
-                  {(Object.keys(PERIODE_LABEL) as Periode[]).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => setPeriode(p)}
-                      className={cn(
-                        "rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
-                        periode === p ? "bg-navy-900 text-white shadow-sm" : "text-navy-500 hover:text-navy-800"
-                      )}
-                    >
-                      {PERIODE_LABEL[p]}
-                    </button>
-                  ))}
+                {/* Empat tombol periode tidak muat berdampingan di layar sempit;
+                    barisnya dibuat dapat digeser, bukan meluber ke luar kartu. */}
+                <div className="-mx-1 overflow-x-auto px-1 sm:mx-0 sm:overflow-visible sm:px-0">
+                  <div className="inline-flex rounded-xl bg-navy-50 p-1">
+                    {(Object.keys(PERIODE_LABEL) as Periode[]).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPeriode(p)}
+                        className={cn(
+                          "whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors",
+                          periode === p ? "bg-navy-900 text-white shadow-sm" : "text-navy-500 hover:text-navy-800"
+                        )}
+                      >
+                        {PERIODE_LABEL[p]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               {data.tren_kehadiran.length > 0 ? (
@@ -305,7 +309,7 @@ export default function DashboardPage() {
               )}
               <div className="divide-y divide-navy-900/5">
                 {data.aktivitas_terbaru.map((a) => (
-                  <div key={a.id} className="flex items-center gap-3 px-5 py-3">
+                  <div key={a.id} className="flex items-center gap-3 px-4 py-3 sm:px-5">
                     <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-navy-50 text-navy-500">
                       <Activity className="size-4" />
                     </div>
@@ -325,7 +329,11 @@ export default function DashboardPage() {
                         WIB
                       </p>
                     </div>
-                    {a.modul && <Badge tone="neutral">{a.modul}</Badge>}
+                    {a.modul && (
+                      <span className="hidden shrink-0 sm:inline-flex">
+                        <Badge tone="neutral">{a.modul}</Badge>
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

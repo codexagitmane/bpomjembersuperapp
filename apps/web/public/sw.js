@@ -1,43 +1,88 @@
 /*
  * Service worker LENTERA.
  *
- * Tujuannya HANYA memenuhi syarat pemasangan PWA agar aplikasi terpasang
- * sebagai aplikasi sungguhan (memakai ikon LENTERA), bukan sekadar pintasan
- * peramban yang memakai favicon dan berlencana Chrome.
+ * Dua tugasnya:
+ *   1. Memenuhi syarat pemasangan PWA. Chrome hanya menawarkan "Pasang
+ *      aplikasi" bila ada service worker DAN halaman tetap memberi jawaban
+ *      saat jaringan mati. Tanpa keduanya yang terpasang cuma pintasan
+ *      peramban — berikon favicon dan berlencana Chrome, bukan ikon LENTERA.
+ *   2. Menampilkan halaman "tidak ada koneksi" yang rapi, bukan galat bawaan.
  *
- * Penanganan fetch sengaja dibuat "teruskan ke jaringan" tanpa menyimpan
- * salinan apa pun. Ini disengaja: penyimpanan agresif pernah membuat
- * pembaruan aplikasi tidak muncul di perangkat pengguna. Dengan pola ini,
- * setiap permintaan selalu mengambil versi terbaru dari server.
+ * Yang TIDAK dilakukan: menyimpan salinan halaman atau jawaban API. Penyimpanan
+ * agresif pernah membuat pembaruan aplikasi tidak muncul di perangkat pengguna,
+ * jadi setiap permintaan selalu diambil dari jaringan lebih dulu. Isi cache
+ * hanya berkas cadangan luring yang jumlahnya tetap.
  */
 
-self.addEventListener('install', () => {
-  // Versi baru langsung menggantikan yang lama tanpa menunggu tab ditutup.
-  self.skipWaiting();
+const CACHE = 'lentera-luring-v1';
+
+// Berkas cadangan saat jaringan mati. Semuanya statis dan jarang berubah.
+const BERKAS_LURING = ['/offline.html', '/logo-mark-192.png'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE);
+      await cache.addAll(BERKAS_LURING);
+      // Versi baru langsung menggantikan yang lama tanpa menunggu tab ditutup.
+      await self.skipWaiting();
+    })()
+  );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      // Bersihkan sisa cache dari versi terdahulu, bila ada.
+      // Bersihkan cache dari versi terdahulu, sisakan yang sedang dipakai.
       const kunci = await caches.keys();
-      await Promise.all(kunci.map((k) => caches.delete(k)));
+      await Promise.all(kunci.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
       await self.clients.claim();
     })()
   );
 });
 
 self.addEventListener('fetch', (event) => {
-  // Hanya permintaan GET yang ditangani; sisanya dibiarkan apa adanya.
-  if (event.request.method !== 'GET') return;
+  const permintaan = event.request;
 
+  // Hanya GET satu asal yang ditangani; unggahan dan permintaan lintas-asal
+  // (mis. ubin peta OpenStreetMap) dibiarkan lewat apa adanya.
+  if (permintaan.method !== 'GET') return;
+  if (new URL(permintaan.url).origin !== self.location.origin) return;
+
+  // Perpindahan halaman: jaringan dulu, lalu halaman luring sebagai cadangan.
+  if (permintaan.mode === 'navigate') {
+    event.respondWith(
+      (async () => {
+        try {
+          return await fetch(permintaan);
+        } catch {
+          const cache = await caches.open(CACHE);
+          const luring = await cache.match('/offline.html');
+
+          return luring ?? new Response('Jaringan tidak tersedia.', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          });
+        }
+      })()
+    );
+
+    return;
+  }
+
+  // Berkas lain: jaringan dulu; bila gagal, pakai salinan cadangan bila ada.
   event.respondWith(
-    fetch(event.request).catch(async () => {
-      // Saat jaringan padam, tampilkan halaman terakhir yang masih tersimpan
-      // peramban bila ada; jika tidak, biarkan peramban menampilkan galatnya.
-      const tersimpan = await caches.match(event.request);
-      if (tersimpan) return tersimpan;
-      throw new Error('Jaringan tidak tersedia');
-    })
+    (async () => {
+      try {
+        return await fetch(permintaan);
+      } catch {
+        const tersimpan = await caches.match(permintaan);
+
+        return tersimpan ?? new Response('', {
+          status: 504,
+          statusText: 'Jaringan tidak tersedia',
+        });
+      }
+    })()
   );
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 export interface LineSeries {
   name: string;
@@ -23,7 +23,27 @@ export function LineChart({ labels, series, height = 220 }: LineChartProps) {
   const gid = useId();
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
 
-  const width = 640;
+  // Lebar viewBox mengikuti lebar wadah. Dengan viewBox tetap 640, di layar
+  // ponsel gambar diperkecil ±2x sehingga teks sumbu ikut menyusut jadi ~5 px
+  // dan menyisakan ruang kosong di atas-bawah. Mengukur wadah membuat skala
+  // gambar selalu 1:1 — teks tetap terbaca pada ukuran layar mana pun.
+  const wadah = useRef<HTMLDivElement>(null);
+  const [lebar, setLebar] = useState(640);
+
+  useEffect(() => {
+    const el = wadah.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+
+    const pengamat = new ResizeObserver(([entri]) => {
+      const w = Math.round(entri.contentRect.width);
+      if (w > 0) setLebar(w);
+    });
+    pengamat.observe(el);
+
+    return () => pengamat.disconnect();
+  }, []);
+
+  const width = lebar;
   const padding = { top: 16, right: 16, bottom: 28, left: 32 };
   const innerW = width - padding.left - padding.right;
   const innerH = height - padding.top - padding.bottom;
@@ -46,7 +66,7 @@ export function LineChart({ labels, series, height = 220 }: LineChartProps) {
   const gridLines = 4;
 
   return (
-    <div className="relative">
+    <div className="relative" ref={wadah}>
       {series.length > 1 && (
         <div className="mb-3 flex flex-wrap items-center gap-4 text-xs font-semibold">
           {series.map((s) => (
@@ -82,7 +102,10 @@ export function LineChart({ labels, series, height = 220 }: LineChartProps) {
 
         {/* label sumbu-x (selektif agar tidak padat) */}
         {labels.map((l, i) => {
-          const showEvery = Math.ceil(labels.length / 8);
+          // Jumlah label menyesuaikan lebar: satu label per ±72 px agar tidak
+          // saling tindih di layar sempit.
+          const muat = Math.max(2, Math.floor(innerW / 72));
+          const showEvery = Math.max(1, Math.ceil(labels.length / muat));
           if (i % showEvery !== 0 && i !== labels.length - 1) return null;
           return (
             <text
