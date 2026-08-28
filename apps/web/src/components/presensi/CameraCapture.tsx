@@ -61,6 +61,32 @@ export function CameraCapture({ onCapture, facingToggle = false, timer = false }
     };
   }, [facing]);
 
+  // Pasang ulang stream ke elemen <video>.
+  //
+  // Elemen video kini selalu ada di DOM (pratinjau ditumpuk di atasnya), tetapi
+  // pemasangan ini tetap dijalankan sebagai pengaman: bila peramban sempat
+  // menjeda pemutaran — misalnya saat tab berpindah atau layar terkunci —
+  // kamera hidup kembali tanpa perlu memuat ulang halaman. Sebelumnya elemen
+  // video dibongkar saat pratinjau tampil, sehingga "Ambil Ulang" hanya
+  // memunculkan kotak hitam dan presensi tidak bisa dilanjutkan.
+  useEffect(() => {
+    const video = videoRef.current;
+    const stream = streamRef.current;
+    if (!video || !stream) return;
+
+    if (video.srcObject !== stream) video.srcObject = stream;
+    void video.play().catch(() => {
+      // Pemutaran otomatis ditolak — pengguna cukup mengetuk tombol jepret.
+    });
+  }, [previewUrl, ready]);
+
+  // Bebaskan URL objek pratinjau lama agar tidak menumpuk di memori.
+  useEffect(() => {
+    if (!previewUrl) return;
+
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
+
   const takePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
@@ -111,6 +137,13 @@ export function CameraCapture({ onCapture, facingToggle = false, timer = false }
   function handleRetake() {
     setPreviewUrl(null);
     onCapture(null);
+
+    // Lanjutkan pemutaran seketika, tanpa menunggu efek berjalan.
+    const video = videoRef.current;
+    if (video && streamRef.current) {
+      if (video.srcObject !== streamRef.current) video.srcObject = streamRef.current;
+      void video.play().catch(() => {});
+    }
   }
 
   if (error) {
@@ -125,16 +158,23 @@ export function CameraCapture({ onCapture, facingToggle = false, timer = false }
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative aspect-square w-full max-w-xs overflow-hidden rounded-2xl bg-navy-950">
-        {previewUrl ? (
+        {/* Video SELALU terpasang di DOM. Membongkarnya saat pratinjau tampil
+            membuat React membuang elemennya beserta srcObject, sehingga
+            "Ambil Ulang" hanya menampilkan layar hitam. Pratinjau ditumpuk
+            di atas video, bukan menggantikannya. */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={cn("h-full w-full object-cover", isFront && "scale-x-[-1]")}
+        />
+        {previewUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={previewUrl} alt="Hasil foto" className="h-full w-full object-cover" />
-        ) : (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            className={cn("h-full w-full object-cover", isFront && "scale-x-[-1]")}
+          <img
+            src={previewUrl}
+            alt="Hasil foto"
+            className="absolute inset-0 h-full w-full object-cover"
           />
         )}
         {!ready && !previewUrl && (

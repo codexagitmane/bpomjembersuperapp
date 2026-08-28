@@ -27,16 +27,16 @@ const KARTU: { kunci: keyof Kpi; label: string; ikon: React.ReactNode; nada: str
 export function KartuKpi({ kpi, muat }: { kpi: Kpi | null; muat: boolean }) {
   if (muat || !kpi) {
     return (
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
         {[...Array(6)].map((_, i) => <div key={i} className="h-24 animate-pulse rounded-2xl bg-navy-100/60" />)}
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
+    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6">
       {KARTU.map((k) => (
-        <Card key={k.kunci} className="!p-3.5">
+        <Card key={k.kunci} className="min-w-0 !p-3 sm:!p-3.5">
           <div className={cn("mb-2 flex size-8 items-center justify-center rounded-xl", k.nada)}>{k.ikon}</div>
           <p className="text-2xl font-extrabold tabular-nums text-navy-900">{kpi[k.kunci]}</p>
           <p className="mt-0.5 text-[11px] font-semibold leading-tight text-navy-600">{k.label}</p>

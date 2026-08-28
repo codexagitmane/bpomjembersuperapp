@@ -166,7 +166,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const mobileQuick = mobileAll.slice(0, 3);
 
   return (
-    <div className="flex min-h-screen flex-1 bg-background">
+    <div className="flex min-h-screen w-full max-w-full flex-1 overflow-x-hidden bg-background">
       {/* Sidebar — desktop */}
       <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-navy-900/5 bg-white px-5 py-6 md:flex">
         <Link href="/beranda" className="mb-8 flex items-center gap-2.5 px-1">
@@ -207,11 +207,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </button>
       </aside>
 
-      <div className="flex flex-1 flex-col">
+      {/* `min-w-0` WAJIB: tanpa itu kolom ini tidak boleh menyusut di bawah
+          lebar min-content isinya. Nama pengguna yang panjang pada header
+          membuat kolom melebar melewati layar, dan SELURUH halaman di dalam
+          <main> ikut terpotong di sisi kanan pada ponsel. */}
+      <div className="flex min-w-0 flex-1 flex-col">
         {/* Header */}
-        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-navy-900/5 bg-white/80 px-5 py-3.5 backdrop-blur-md md:px-8">
-          <div className="flex items-center gap-2 md:hidden">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-navy-50 ring-1 ring-navy-900/5">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-navy-900/5 bg-white/80 px-4 py-3 backdrop-blur-md sm:px-5 sm:py-3.5 md:px-8">
+          <div className="flex min-w-0 items-center gap-2 md:hidden">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-navy-50 ring-1 ring-navy-900/5">
               <LenteraMark className="size-7" />
             </div>
             <span className="text-sm font-extrabold tracking-tight text-navy-900">
@@ -220,26 +224,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="hidden md:block" />
 
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <NotifikasiBell />
-          <Link href="/beranda/profil" className="flex items-center gap-2.5">
-            <div className="text-right">
-              <p className="text-sm font-semibold text-navy-900">{user.name}</p>
-              <p className="text-xs text-navy-400">{roleDisplay}</p>
-            </div>
-            <div className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-navy-100 text-sm font-bold text-navy-700">
-              {user.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatar_url} alt={user.name} className="size-full object-cover" />
-              ) : (
-                user.name.slice(0, 1).toUpperCase()
-              )}
-            </div>
-          </Link>
+            <Link href="/beranda/profil" className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+              {/* Nama dipotong bila panjang, bukan melebarkan header. */}
+              <div className="min-w-0 max-w-[42vw] text-right sm:max-w-[16rem]">
+                <p className="truncate text-sm font-semibold text-navy-900">{user.name}</p>
+                <p className="truncate text-xs text-navy-400">{roleDisplay}</p>
+              </div>
+              <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-navy-100 text-sm font-bold text-navy-700">
+                {user.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatar_url} alt={user.name} className="size-full object-cover" />
+                ) : (
+                  user.name.slice(0, 1).toUpperCase()
+                )}
+              </div>
+            </Link>
           </div>
         </header>
 
-        <main className="w-full flex-1 overflow-x-hidden px-5 pb-24 pt-5 md:px-8 md:pb-8 md:pt-6">{children}</main>
+        <main className="w-full min-w-0 max-w-full flex-1 overflow-x-hidden px-4 pb-24 pt-5 sm:px-5 md:px-8 md:pb-8 md:pt-6">
+          {children}
+        </main>
       </div>
 
       <TwoFactorNudge />
@@ -290,7 +297,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="absolute inset-x-0 bottom-0 rounded-t-3xl bg-background p-5 pb-8 shadow-2xl"
+              /* Daftar menu bisa lebih panjang daripada layar ponsel; batasi
+                 tingginya dan biarkan digulung agar item terakhir terjangkau. */
+              className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-background p-5 pb-8 shadow-2xl"
             >
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-navy-200" />
               <div className="mb-4 flex items-center justify-between">

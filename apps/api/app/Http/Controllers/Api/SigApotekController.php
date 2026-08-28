@@ -13,6 +13,7 @@ use App\Models\SigApotek;
 use App\Rules\EmailAman;
 use App\Services\Sig\AnalitikApotekService;
 use App\Services\Sig\ApotekBerkasService;
+use App\Services\Sig\AsistenSigService;
 use App\Services\Sig\PrioritasMonitoringService;
 use App\Services\Sig\WilayahService;
 use Illuminate\Database\Eloquent\Builder;
@@ -118,6 +119,34 @@ class SigApotekController extends Controller
         return response()->json([
             'data' => $this->analitik->kualitasData($this->saring($request)),
             'catatan' => 'Potensi duplikat hanya ditandai untuk dikonfirmasi. Sistem tidak menghapus data secara otomatis.',
+        ]);
+    }
+
+    /**
+     * Asisten SIG — ringkasan eksekutif dan tanya jawab.
+     *
+     * Tanpa parameter: mengembalikan ringkasan yang dihitung dari data beserta
+     * daftar pertanyaan contoh. Dengan `pertanyaan`: menjawab satu pertanyaan.
+     */
+    public function asisten(Request $request, AsistenSigService $asisten)
+    {
+        $data = $request->validate([
+            'pertanyaan' => ['nullable', 'string', 'max:300'],
+        ]);
+
+        $pertanyaan = trim((string) ($data['pertanyaan'] ?? ''));
+
+        if ($pertanyaan === '') {
+            return response()->json([
+                'ringkasan' => $asisten->ringkasanEksekutif(),
+                'saran' => AsistenSigService::SARAN,
+            ]);
+        }
+
+        return response()->json([
+            'pertanyaan' => $pertanyaan,
+            'jawaban' => $asisten->jawab($pertanyaan),
+            'saran' => AsistenSigService::SARAN,
         ]);
     }
 

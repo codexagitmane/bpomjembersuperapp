@@ -253,6 +253,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/analisis', [SigApotekController::class, 'analisis']);
         Route::get('/prioritas', [SigApotekController::class, 'prioritas']);
         Route::get('/kualitas-data', [SigApotekController::class, 'kualitasData']);
+        // Asisten SIG: ringkasan eksekutif (tanpa parameter) & tanya jawab.
+        Route::post('/asisten', [SigApotekController::class, 'asisten'])->middleware('throttle:30,1');
 
         // Temuan & distribusi lintas sarana
         Route::get('/temuan', [SigApotekController::class, 'temuan']);

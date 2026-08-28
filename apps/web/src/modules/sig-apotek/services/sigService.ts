@@ -2,6 +2,7 @@ import { api } from "@/lib/api";
 import type {
   Apotek, Bootstrap, DetailApotek, FilterSig, GarisDistribusi, Kpi, KualitasData,
   BarisPrioritas, Peringatan, RekapKabupaten, RekapKecamatan, SimpulDistribusi, Temuan,
+  JawabanAsisten, RingkasanAsisten,
 } from "../types";
 
 /**
@@ -202,5 +203,23 @@ export const exportService = {
     a.download = nama;
     a.click();
     URL.revokeObjectURL(url);
+  },
+};
+
+/**
+ * Asisten SIG — ringkasan eksekutif dan tanya jawab.
+ *
+ * Endpoint yang sama melayani keduanya: tanpa `pertanyaan` ia mengembalikan
+ * ringkasan, dengan `pertanyaan` ia mengembalikan jawaban.
+ */
+export const asistenService = {
+  async ringkasan(): Promise<{ ringkasan: RingkasanAsisten; saran: string[] }> {
+    const { data } = await api.post("/sig-apotek/asisten", {});
+    return data;
+  },
+
+  async tanya(pertanyaan: string): Promise<{ jawaban: JawabanAsisten; saran: string[] }> {
+    const { data } = await api.post("/sig-apotek/asisten", { pertanyaan });
+    return data;
   },
 };

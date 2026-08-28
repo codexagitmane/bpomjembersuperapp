@@ -1,0 +1,140 @@
+{
+  "catatan": "Basis pengetahuan Asisten SIG. Berisi penjelasan istilah dan cara kerja modul monitoring — BUKAN kutipan peraturan. Nomor peraturan, tarif, tenggat, dan sanksi sengaja TIDAK dicantumkan agar sistem tidak pernah menyampaikan ketentuan yang tidak dapat dipastikan. Pertanyaan yang menyentuh ketentuan formal diarahkan ke petugas.",
+  "entri": [
+    {
+      "kunci": "skor_prioritas",
+      "judul": "Cara Skor Prioritas Monitoring dihitung",
+      "kata_kunci": ["skor", "prioritas", "bobot", "perhitungan skor", "cara hitung", "skor prioritas", "ranking"],
+      "ringkasan": "Skor Prioritas Monitoring adalah alat bantu penjadwalan internal untuk menentukan sarana mana yang paling layak dikunjungi lebih dulu. Skor berkisar 0–100 dan dihitung dari lima parameter dengan bobot tetap.",
+      "poin": [
+        "Jarak waktu sejak pemeriksaan terakhir — bobot 30. Semakin lama tidak diperiksa, semakin tinggi nilainya; sarana yang belum pernah diperiksa memperoleh nilai penuh.",
+        "Tindak lanjut yang belum selesai — bobot 25. Tindak lanjut yang melewati tanggal target menambah nilai lebih besar.",
+        "Temuan yang masih aktif — bobot 20. Dihitung dari temuan berstatus belum atau dalam proses.",
+        "Kelengkapan data sarana — bobot 15. Data yang tidak lengkap menyulitkan perencanaan kunjungan sehingga menaikkan prioritas.",
+        "Status sarana — bobot 10. Sarana yang statusnya belum diverifikasi diprioritaskan untuk dipastikan keberadaannya."
+      ],
+      "penting": "Skor ini BUKAN skor pelanggaran dan bukan penilaian kepatuhan. Skor tinggi berarti sarana perlu dikunjungi lebih dulu, bukan berarti sarana tersebut melanggar."
+    },
+    {
+      "kunci": "tingkat_prioritas",
+      "judul": "Arti tingkat prioritas",
+      "kata_kunci": ["tingkat", "tinggi", "rendah", "kategori prioritas", "arti warna"],
+      "ringkasan": "Skor diterjemahkan menjadi tiga tingkat agar mudah dibaca di peta dan tabel.",
+      "poin": [
+        "Tinggi — skor 80 ke atas; paling mendesak dijadwalkan.",
+        "Sedang — skor 50 sampai 79; dijadwalkan pada periode berikutnya.",
+        "Rendah — skor di bawah 50; data dan riwayat pemeriksaannya relatif mutakhir."
+      ]
+    },
+    {
+      "kunci": "perlu_monitoring",
+      "judul": "Apa itu \"Perlu Monitoring\"",
+      "kata_kunci": ["perlu monitoring", "belum diperiksa", "12 bulan", "kadaluarsa pemeriksaan"],
+      "ringkasan": "Kartu \"Perlu Monitoring\" menghitung sarana yang belum pernah tercatat diperiksa, atau yang pemeriksaan terakhirnya lebih dari 12 bulan lalu.",
+      "poin": [
+        "Ambang 12 bulan adalah ambang kerja modul ini untuk membantu penjadwalan, bukan tenggat yang ditetapkan peraturan.",
+        "Sarana yang baru ditambahkan otomatis masuk kategori ini sampai pemeriksaan pertamanya dicatat."
+      ]
+    },
+    {
+      "kunci": "temuan_tindak_lanjut",
+      "judul": "Alur temuan dan tindak lanjut",
+      "kata_kunci": ["temuan", "tindak lanjut", "capa", "status temuan", "target", "verifikasi"],
+      "ringkasan": "Setiap pemeriksaan dapat menghasilkan temuan. Temuan ditindaklanjuti oleh sarana, lalu diverifikasi petugas.",
+      "poin": [
+        "Status temuan: belum, proses, selesai. Temuan berstatus belum atau proses dihitung sebagai temuan aktif.",
+        "Setiap temuan dapat diberi tanggal target penyelesaian. Temuan aktif yang melewati target ditandai sebagai lewat target.",
+        "Tindak lanjut dicatat bertahap: tanggapan, tindakan, lalu selesai. Tindak lanjut yang sudah diverifikasi petugas ditandai terverifikasi.",
+        "Kategori temuan yang tersedia pada modul ini: dokumen, penyimpanan, sarana, dan penandaan."
+      ]
+    },
+    {
+      "kunci": "kualitas_data",
+      "judul": "Kualitas data dan mengapa penting",
+      "kata_kunci": ["kualitas data", "data kosong", "koordinat kosong", "duplikat", "kelengkapan"],
+      "ringkasan": "Panel Kualitas Data memeriksa kelengkapan tiap sarana: koordinat, alamat, NIB, wilayah, dan penanggung jawab.",
+      "poin": [
+        "Sarana tanpa koordinat tidak muncul di peta sehingga luput dari analisis sebaran.",
+        "Sarana tanpa wilayah tidak terhitung pada rekap per kabupaten dan per kecamatan.",
+        "Deteksi duplikat membandingkan kemiripan nama dan alamat; hasilnya berupa dugaan yang tetap perlu diperiksa manusia, bukan keputusan otomatis."
+      ]
+    },
+    {
+      "kunci": "distribusi",
+      "judul": "Peta hubungan distribusi",
+      "kata_kunci": ["distribusi", "rantai pasok", "distributor", "penerima", "jalur"],
+      "ringkasan": "Lapisan distribusi menggambarkan hubungan penyaluran yang tercatat antar sarana: dari sumber ke penerima.",
+      "poin": [
+        "Garis pada peta hanya menggambarkan hubungan yang datanya sudah dimasukkan; tidak menyimpulkan adanya penyaluran yang tidak tercatat.",
+        "Data distribusi berguna untuk menelusuri sebaran satu produk ketika diperlukan penelusuran."
+      ]
+    },
+    {
+      "kunci": "batas_wilayah",
+      "judul": "Sumber batas wilayah pada peta",
+      "kata_kunci": ["batas wilayah", "geojson", "peta", "kecamatan", "poligon"],
+      "ringkasan": "Lapisan batas wilayah dibangun dari data batas desa turunan OpenStreetMap yang digabung menjadi kecamatan dan kabupaten.",
+      "poin": [
+        "Wilayah kerja yang dicakup: Jember, Banyuwangi, Bondowoso, Situbondo, dan Lumajang.",
+        "Kawasan yang bukan bagian dari desa mana pun — misalnya hutan negara dan taman nasional — tidak tercakup, sehingga luas poligon dapat lebih kecil daripada luas administratif resmi.",
+        "Lapisan ini adalah bantu visual, bukan batas administratif resmi."
+      ]
+    },
+    {
+      "kunci": "data_demo",
+      "judul": "Data demo pada modul ini",
+      "kata_kunci": ["demo", "data palsu", "contoh", "dummy"],
+      "ringkasan": "Sarana yang namanya berakhiran (DEMO) adalah data rekaan untuk uji coba dan ditandai khusus di basis data.",
+      "poin": [
+        "Nama, NIB, nomor izin, dan penanggung jawab pada data demo seluruhnya rekaan; tidak ada identitas sarana nyata yang dipakai.",
+        "Titik koordinatnya ditempatkan di dalam poligon kecamatan agar sebarannya masuk akal, namun tetap bukan lokasi sebenarnya.",
+        "Data demo dapat dibersihkan tanpa memengaruhi data sarana yang sebenarnya."
+      ]
+    },
+    {
+      "kunci": "peran_akses",
+      "judul": "Siapa yang boleh mengubah data",
+      "kata_kunci": ["hak akses", "peran", "role", "boleh ubah", "siapa yang bisa", "siapa yang boleh", "boleh mengubah", "boleh menghapus", "wewenang"],
+      "ringkasan": "Modul memisahkan peran pengelola data dan peran pembaca.",
+      "poin": [
+        "Superadmin dan pegawai teknis dapat menambah, mengubah, mengimpor, serta mencatat pemeriksaan dan tindak lanjut.",
+        "Pimpinan dapat melihat seluruh data dan analitik.",
+        "Setiap perubahan tercatat pada jejak audit sarana beserta pelakunya."
+      ]
+    },
+    {
+      "kunci": "impor_ekspor",
+      "judul": "Impor dan ekspor data sarana",
+      "kata_kunci": ["impor", "import", "ekspor", "export", "excel", "template", "unggah"],
+      "ringkasan": "Data sarana dapat dimasukkan massal lewat berkas Excel/CSV memakai template yang disediakan modul.",
+      "poin": [
+        "Impor berjalan dua tahap: pratinjau memvalidasi seluruh baris tanpa menyimpan apa pun, lalu penyimpanan hanya memproses baris yang lolos validasi.",
+        "Baris yang bermasalah dilaporkan beserta nomor barisnya sehingga dapat diperbaiki di berkas asal.",
+        "Ekspor menghasilkan berkas berisi data sesuai saringan yang sedang aktif."
+      ]
+    },
+    {
+      "kunci": "istilah_sarana",
+      "judul": "Istilah jenis sarana",
+      "kata_kunci": ["apotek", "toko obat", "distributor", "jenis sarana", "pbf"],
+      "ringkasan": "Modul membedakan tiga jenis sarana agar analitiknya tepat sasaran.",
+      "poin": [
+        "Apotek — sarana pelayanan kefarmasian tempat praktik apoteker dan penyerahan sediaan farmasi kepada masyarakat.",
+        "Toko obat — sarana yang menyalurkan obat bebas dan obat bebas terbatas.",
+        "Distributor — sarana penyaluran yang memasok sarana lain, bukan melayani konsumen akhir."
+      ]
+    },
+    {
+      "kunci": "status_sarana",
+      "judul": "Arti status sarana",
+      "kata_kunci": ["status sarana", "aktif", "nonaktif", "belum diverifikasi"],
+      "ringkasan": "Status menunjukkan kondisi pendataan sarana pada sistem ini.",
+      "poin": [
+        "Aktif — sarana tercatat beroperasi menurut data terakhir yang dimiliki.",
+        "Nonaktif — sarana tercatat tidak lagi beroperasi.",
+        "Belum diverifikasi — keberadaan atau kelengkapan datanya belum dipastikan petugas.",
+        "Status ini adalah status pendataan internal, bukan pernyataan mengenai keabsahan izin sarana."
+      ]
+    }
+  ]
+}

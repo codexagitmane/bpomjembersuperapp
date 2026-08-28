@@ -10,6 +10,7 @@ import {
   Clock3,
   CalendarRange,
   ClipboardList,
+  Users,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ const TABS = [
   { href: "/presensi", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
   { href: "/presensi/absen", label: "Absen", icon: Fingerprint, adminOnly: false },
   { href: "/presensi/riwayat", label: "Riwayat", icon: History, adminOnly: false },
+  { href: "/presensi/kehadiran", label: "Kehadiran", icon: Users, adminOnly: true },
   { href: "/presensi/manajemen", label: "Manajemen", icon: SlidersHorizontal, adminOnly: true },
   { href: "/rekap-presensi", label: "Rekap", icon: CalendarRange, adminOnly: true },
   { href: "/manajemen-patroli", label: "Patroli", icon: ClipboardList, adminOnly: true },
@@ -33,14 +35,16 @@ export function PresensiTabs() {
   return (
     <div className="mb-6">
       <div className="flex items-center gap-3">
-        <div className="flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-bpom-400 to-navy-700 shadow-md">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-bpom-400 to-navy-700 shadow-md">
           <Clock3 className="size-6 text-white" />
         </div>
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-navy-900">
+        <div className="min-w-0">
+          <h1 className="text-xl font-extrabold tracking-tight text-navy-900 sm:text-2xl">
             ON<span className="text-bpom-600">TIME</span>
           </h1>
-          <p className="text-xs text-navy-500">Presensi & Kehadiran Pegawai — Balai POM di Jember</p>
+          <p className="truncate text-xs text-navy-500">
+            Presensi &amp; Kehadiran Pegawai — Balai POM di Jember
+          </p>
         </div>
       </div>
 

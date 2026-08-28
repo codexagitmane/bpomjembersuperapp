@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   MapPinned, Plus, Upload, Download, SlidersHorizontal, BarChart3, Table2,
-  Gauge, ShieldCheck, Share2, Loader2, ChevronRight, Home, MapPin,
+  Gauge, ShieldCheck, Share2, Loader2, ChevronRight, Home, MapPin, Sparkles,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/Card";
@@ -29,6 +29,7 @@ import { DetailApotekPanel } from "@/modules/sig-apotek/components/DetailApotek"
 import { AnalisisSpasial, PanelPrioritas, PanelKualitasData } from "@/modules/sig-apotek/components/AnalisisPanels";
 import { PanelDistribusi } from "@/modules/sig-apotek/components/DistribusiPanel";
 import { ImporDialog } from "@/modules/sig-apotek/components/ImporDialog";
+import { AsistenPanel } from "@/modules/sig-apotek/components/AsistenPanel";
 
 // Leaflet memerlukan objek window sehingga peta dimuat hanya di sisi klien.
 const PetaApotek = dynamic(
@@ -45,7 +46,7 @@ const PetaApotek = dynamic(
   }
 );
 
-type Tab = "peta" | "tabel" | "prioritas" | "analisis" | "distribusi" | "kualitas";
+type Tab = "peta" | "tabel" | "prioritas" | "analisis" | "distribusi" | "kualitas" | "asisten";
 
 const TAB: { id: Tab; label: string; ikon: React.ReactNode }[] = [
   { id: "peta", label: "Peta", ikon: <MapPinned className="size-4" /> },
@@ -54,6 +55,7 @@ const TAB: { id: Tab; label: string; ikon: React.ReactNode }[] = [
   { id: "analisis", label: "Analisis Spasial", ikon: <BarChart3 className="size-4" /> },
   { id: "distribusi", label: "Distribusi", ikon: <Share2 className="size-4" /> },
   { id: "kualitas", label: "Kualitas Data", ikon: <ShieldCheck className="size-4" /> },
+  { id: "asisten", label: "Asisten", ikon: <Sparkles className="size-4" /> },
 ];
 
 export default function SigApotekPage() {
@@ -233,9 +235,10 @@ export default function SigApotekPage() {
         </nav>
 
         <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="flex items-center gap-2 text-xl font-extrabold text-navy-900 sm:text-2xl">
-              <MapPinned className="size-6 shrink-0 text-bpom-600" /> SIG Monitoring Distribusi Apotek
+          <div className="min-w-0">
+            <h1 className="flex items-start gap-2 text-lg font-extrabold leading-tight text-navy-900 sm:text-2xl">
+              <MapPinned className="mt-0.5 size-5 shrink-0 text-bpom-600 sm:size-6" />
+              <span className="min-w-0">SIG Monitoring Distribusi Apotek</span>
             </h1>
             <p className="mt-1 text-sm font-semibold text-navy-600">Monitoring Apotek Berbasis Geospasial</p>
             <p className="mt-0.5 max-w-2xl text-xs leading-relaxed text-navy-500">
@@ -243,8 +246,8 @@ export default function SigApotekPage() {
             </p>
           </div>
 
-          {/* Aksi cepat */}
-          <div className="flex flex-wrap gap-2">
+          {/* Aksi cepat — di layar sempit dibuat rata agar tidak meluber. */}
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto [&>*]:flex-1 sm:[&>*]:flex-none">
             {bolehUbah && (
               <>
                 <Button size="sm" onClick={() => { setForm({ buka: true, awal: null }); setTitikBaru(null); }}>
@@ -395,6 +398,8 @@ export default function SigApotekPage() {
                 ? <PanelKualitasData data={kualitas.data} catatan={kualitas.catatan} onDetail={(id) => setDetailId(id)} />
                 : <Muat pesan="Memeriksa kualitas data…" />
             )}
+
+            {tab === "asisten" && <AsistenPanel />}
 
             <div className="mt-4">
               <DisclaimerSig teks={boot?.disclaimer} />

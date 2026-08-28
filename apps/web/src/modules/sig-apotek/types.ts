@@ -274,3 +274,34 @@ export const LABEL_STATUS_SARANA: Record<string, string> = {
   nonaktif: "Nonaktif",
   belum_diverifikasi: "Belum Diverifikasi",
 };
+
+// ── Asisten SIG ─────────────────────────────────────────────────────────────
+
+export interface JawabanAsisten {
+  jenis: "data" | "pengetahuan" | "diarahkan" | "tidak_tahu";
+  judul: string;
+  ringkasan: string;
+  poin: string[];
+  tabel: { kolom: string[]; baris: string[][] } | null;
+  butuh_petugas: boolean;
+  disclaimer: string;
+}
+
+export interface RingkasanAsisten {
+  kpi: Kpi;
+  sorotan: string[];
+  prioritas_teratas: {
+    id: number;
+    nama_apotek: string;
+    wilayah: string;
+    skor: number;
+    tingkat: string;
+  }[];
+  kelengkapan: {
+    total: number;
+    lengkap: number;
+    perlu_dilengkapi: number;
+    persen_lengkap: number;
+  };
+  disclaimer: string;
+}

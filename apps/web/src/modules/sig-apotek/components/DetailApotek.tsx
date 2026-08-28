@@ -59,9 +59,9 @@ export function DetailApotekPanel({
   return (
     <div className="fixed inset-0 z-[550] flex justify-end">
       <div className="absolute inset-0 bg-navy-950/40 backdrop-blur-sm" onClick={onTutup} />
-      <div className="relative flex h-full w-full max-w-3xl flex-col bg-background shadow-2xl">
+      <div className="relative flex h-full w-full min-w-0 max-w-3xl flex-col bg-background shadow-2xl">
         {/* Kepala */}
-        <div className="flex items-start justify-between gap-3 border-b border-navy-900/10 bg-gradient-to-br from-navy-900 to-navy-800 px-5 py-4 text-white">
+        <div className="flex items-start justify-between gap-3 border-b border-navy-900/10 bg-gradient-to-br from-navy-900 to-navy-800 px-4 py-3.5 text-white sm:px-5 sm:py-4">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-white/60">Profil Apotek</p>
             <h3 className="truncate text-lg font-extrabold">
@@ -92,7 +92,7 @@ export function DetailApotekPanel({
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-5">
           {muat && <div className="space-y-2">{[...Array(5)].map((_, i) => <div key={i} className="h-12 animate-pulse rounded-xl bg-navy-100/60" />)}</div>}
           {galat && <p className="rounded-xl bg-rose-500/10 px-4 py-3 text-sm text-rose-700">{galat}</p>}
 
