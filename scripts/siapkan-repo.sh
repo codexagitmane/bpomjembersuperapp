@@ -31,12 +31,16 @@ git config user.email >/dev/null 2>&1 || git config user.email "bahrowiq@gmail.c
 git config user.name  >/dev/null 2>&1 || git config user.name  "Qithfirul Bahrowi"
 
 # --- Repositori --------------------------------------------------------------
+# Nama cabang hanya ditentukan skrip pada repositori yang BARU dibuat. Bila
+# repositori sudah ada, cabangnya dipakai apa adanya — mengganti namanya diam-
+# diam membuat `git push <nama-lama>` gagal dengan "src refspec does not match".
 if [ ! -d .git ]; then
-	pesan "Membuat repositori git baru..."
+	pesan "Membuat repositori git baru pada cabang $CABANG..."
 	git init -q
 	git symbolic-ref HEAD "refs/heads/$CABANG"
 else
-	pesan "Repositori git sudah ada — dipakai apa adanya."
+	CABANG="$(git rev-parse --abbrev-ref HEAD)"
+	pesan "Repositori git sudah ada — memakai cabang $CABANG apa adanya."
 fi
 
 [ -f .gitignore ] || gagal ".gitignore tidak ditemukan. Jangan lanjut: vendor/, node_modules/, dan .env bisa ikut terdorong."
@@ -73,10 +77,8 @@ else
 	pesan "Remote origin ditambahkan: $REMOTE"
 fi
 
-SEKARANG="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$SEKARANG" != "$CABANG" ]; then
-	git branch -M "$CABANG"
-fi
+# Cabang tidak pernah diganti namanya di sini; $CABANG sudah menyesuaikan diri
+# dengan cabang yang sedang aktif pada repositori yang sudah ada.
 
 cat <<PETUNJUK
 
