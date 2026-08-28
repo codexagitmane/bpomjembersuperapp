@@ -245,11 +245,22 @@ class UserController extends Controller
     public function resetPassword(User $user)
     {
         $plain = Str::password(10, symbols: false);
-        $user->update(['password' => $plain]);
+
+        // Penguncian otomatis akibat lima kali salah kata sandi ikut dilepas.
+        // Tanpa ini pengguna yang baru direset tetap ditolak sampai masa kunci
+        // habis, padahal kata sandinya sudah diganti admin.
+        $terkunci = $user->isLocked();
+        $user->forceFill([
+            'password' => $plain,
+            'failed_login_attempts' => 0,
+            'locked_until' => null,
+        ])->save();
 
         return response()->json([
             'generated_password' => $plain,
-            'message' => "Password {$user->name} berhasil direset.",
+            'message' => $terkunci
+                ? "Password {$user->name} berhasil direset dan kunci akun dilepas."
+                : "Password {$user->name} berhasil direset.",
         ]);
     }
 

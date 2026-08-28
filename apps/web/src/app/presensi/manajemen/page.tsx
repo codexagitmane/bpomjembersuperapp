@@ -154,7 +154,7 @@ export default function ManajemenPresensiPage() {
           <LinkCard href="/persetujuan" icon={<CalendarOff className="size-5" />} title="Persetujuan Izin, Cuti & Sakit" desc="Setujui/tolak pengajuan izin, cuti tahunan, dan sakit pegawai." />
           <LinkCard href="/rekap-presensi" icon={<CalendarRange className="size-5" />} title="Rekapitulasi Presensi" desc="Rekap harian/bulanan/tahunan + ekspor Excel & PDF." />
           <LinkCard href="/roster-keamanan" icon={<ShieldCheck className="size-5" />} title="Roster Shift Keamanan" desc="Atur jadwal shift petugas keamanan (pagi/malam)." />
-          <LinkCard href="/pegawai" icon={<Home className="size-5" />} title="Data Pegawai" desc="Kelola akun, jenis pegawai, dan status kepegawaian." />
+          <LinkCard href="/pegawai" icon={<Home className="size-5" />} title="Data User" desc="Kelola akun pegawai dan masyarakat, jenis pegawai, dan status kepegawaian." />
         </div>
       </div>
     </AppShell>

@@ -660,7 +660,9 @@ function DaftarBmn() {
     ctx.strokeStyle = "#16a34a"; ctx.lineWidth = 2.5; rr(cx - box / 2, cy - box / 2, box, box, 20); ctx.stroke();
     // Coba muat logo maskot Si Pandu Aja; jika tidak ada, gambar lentera sebagai fallback.
     const logo = new Image();
-    const logoOk = await new Promise<boolean>((res) => { logo.onload = () => res(true); logo.onerror = () => res(false); logo.src = "/pandu-mascot.png"; });
+    // Turunan 192 px sudah cukup untuk kotak tengah QR dan jauh lebih ringan
+    // daripada berkas asli 1254 px.
+    const logoOk = await new Promise<boolean>((res) => { logo.onload = () => res(true); logo.onerror = () => res(false); logo.src = "/pandu-mascot-192.png"; });
     if (logoOk) {
       const pad = 12, s = box - pad * 2;
       ctx.save(); rr(cx - s / 2, cy - s / 2, s, s, 12); ctx.clip();

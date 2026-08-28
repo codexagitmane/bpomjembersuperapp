@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Sparkles, ShieldCheck, KeyRound } from "lucide-react";
 import { loginSchema, extractApiErrorMessage } from "@bpom/shared";
@@ -10,6 +10,25 @@ import { useAuth } from "@/lib/auth-context";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { LenteraMark } from "@/components/Logo";
+
+/**
+ * Keterangan mengapa pengguna kembali ke halaman masuk.
+ *
+ * `useSearchParams` membuat halaman dirender saat permintaan datang, sehingga
+ * dipisahkan ke komponen kecil di dalam <Suspense> agar sisa halaman masuk
+ * tetap dapat dibangun sebagai halaman statis.
+ */
+function KeteranganSesi() {
+  const alasan = useSearchParams().get("alasan");
+  if (alasan !== "diam") return null;
+
+  return (
+    <div className="mb-4 rounded-xl bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-700">
+      Sesi berakhir otomatis karena aplikasi tidak digunakan selama 3 menit.
+      Silakan masuk kembali.
+    </div>
+  );
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -115,7 +134,13 @@ export default function LoginPage() {
               : "Gunakan akun email dan password Anda yang sudah terdaftar."}
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+          <div className="mt-6">
+            <Suspense fallback={null}>
+              <KeteranganSesi />
+            </Suspense>
+          </div>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {!twoFA ? (
               <>
                 <Input

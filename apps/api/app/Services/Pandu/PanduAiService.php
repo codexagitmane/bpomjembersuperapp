@@ -224,13 +224,44 @@ class PanduAiService
             array_unshift($langkah, 'Produk disebut sudah beredar namun belum memiliki izin — segera konsultasikan kondisi ini ke Balai POM di Jember.');
         }
 
+        // Skor kesiapan: proporsi informasi yang sudah terisi dari sepuluh
+        // medan di atas. Sengaja dibuat sesederhana ini supaya dapat
+        // dijelaskan apa adanya — ia mengukur KELENGKAPAN ISIAN, bukan
+        // kelayakan produk, dan bukan penilaian resmi apa pun.
+        $totalMedan = count($medan);
+        $skor = $totalMedan > 0 ? (int) round(count($tersedia) / $totalMedan * 100) : 0;
+
+        [$tingkat, $judulTingkat, $arti] = match (true) {
+            $skor >= 85 => ['siap', 'Berkas Anda hampir lengkap', 'Sebagian besar informasi dasar sudah terisi. Langkah berikutnya adalah menyiapkan dokumen pendukung dan mengonfirmasi jalur layanan ke Balai POM di Jember.'],
+            $skor >= 55 => ['sebagian', 'Masih ada yang perlu dilengkapi', 'Informasi inti sudah ada, tetapi beberapa bagian penting masih kosong. Lengkapi dulu agar penilaian awal ini lebih menggambarkan kondisi Anda.'],
+            default => ['awal', 'Baru tahap awal', 'Sebagian besar informasi belum diisi, sehingga gambaran kesiapan masih kasar. Isi selengkap mungkin sebelum menyiapkan dokumen.'],
+        };
+
+        // Tindakan tunggal yang paling layak dikerjakan lebih dulu.
+        $prioritas = match (true) {
+            ($d['sudah_beredar'] ?? '') === 'ya' && ($d['punya_izin'] ?? '') === 'belum' =>
+                'Konsultasikan ke Balai POM di Jember — produk disebut sudah beredar namun belum memiliki izin.',
+            blank($d['nib'] ?? null) => 'Urus NIB terlebih dahulu; legalitas usaha menjadi dasar seluruh pengajuan berikutnya.',
+            blank($d['komposisi'] ?? null) => 'Susun daftar komposisi lengkap beserta spesifikasi bahan dari pemasok.',
+            blank($d['cara_produksi'] ?? null) => 'Tuliskan alur produksi Anda; ini menjadi dasar penyusunan prosedur dan catatan produksi.',
+            $perluDilengkapi !== [] => 'Lengkapi bagian yang masih kosong: '.implode(', ', array_slice($perluDilengkapi, 0, 3)).'.',
+            default => 'Konfirmasi jalur layanan dan persyaratan resmi ke Balai POM di Jember sebelum mengajukan permohonan.',
+        };
+
         return [
+            'skor_kesiapan' => $skor,
+            'tingkat' => $tingkat,
+            'judul_tingkat' => $judulTingkat,
+            'arti_tingkat' => $arti,
+            'prioritas' => $prioritas,
+            'terisi' => count($tersedia),
+            'total_medan' => $totalMedan,
             'tersedia' => $tersedia,
             'perlu_dilengkapi' => $perluDilengkapi,
             'jalur_layanan' => $jalur,
             'dokumen' => $dokumen,
             'langkah' => $langkah,
-            'catatan' => 'Hasil ini merupakan self-assessment awal berbasis informasi yang Anda isikan, bukan penilaian atau persetujuan resmi BPOM.',
+            'catatan' => 'Skor kesiapan mengukur kelengkapan informasi yang Anda isikan pada formulir ini — bukan kelayakan produk, bukan pula penilaian atau persetujuan resmi BPOM.',
         ];
     }
 

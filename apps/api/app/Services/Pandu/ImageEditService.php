@@ -12,6 +12,12 @@ use Illuminate\Support\Str;
  * Yang dihasilkan adalah rencana perubahan (design brief) yang terstruktur,
  * ditambah penjagaan agar informasi regulatori tidak diubah sembarangan.
  *
+ * Sebagai gantinya layanan ini menyusun DENAH TATA LETAK: urutan blok
+ * informasi beserta porsi ruang dan tingkat penekanannya. Denah itu digambar
+ * ulang oleh antarmuka sebagai kerangka desain yang dapat langsung diserahkan
+ * kepada desainer — bukan hasil suntingan atas karya pengguna, dan disebut
+ * demikian secara terang-terangan.
+ *
  * TODO: HUBUNGKAN KE LAYANAN IMAGE EDITING.
  *  - Gunakan gambar asli sebagai base image.
  *  - Pertahankan bentuk kemasan, brand, tipografi, dan seluruh informasi produk.
@@ -91,7 +97,86 @@ class ImageEditService
             'ditolak' => $ditolak,
             'sumber_path' => $path,
             'hasil_path' => null,
-            'catatan' => 'Layanan pengeditan gambar otomatis belum aktif, sehingga Si Pandu AI menyusun rencana perubahan yang dapat Anda serahkan kepada desainer. Si Pandu AI tidak membuat logo sertifikasi maupun nomor sertifikat.',
+            'denah' => $this->denah($teks),
+            'catatan' => 'Si Pandu AI tidak menyunting karya Anda secara otomatis. Yang disusun adalah denah tata letak dan rencana perubahan yang dapat langsung diserahkan kepada desainer. Si Pandu AI juga tidak membuat logo sertifikasi maupun nomor sertifikat.',
+        ];
+    }
+
+    /**
+     * Denah tata letak label: urutan blok, porsi ruang, dan penekanannya.
+     *
+     * Urutan bakunya mengikuti alur baca kemasan pada umumnya — identitas
+     * merek, nama produk, visual, lalu informasi wajib di bagian bawah.
+     * Instruksi pengguna hanya menggeser penekanan dan menambah catatan;
+     * blok informasi wajib tidak pernah dihilangkan.
+     *
+     * @return array{catatan:string,blok:array<int,array<string,mixed>>}
+     */
+    private function denah(string $teks): array
+    {
+        $minimalis = str_contains($teks, 'minimalis') || str_contains($teks, 'modern')
+            || str_contains($teks, 'bersih') || str_contains($teks, 'simpel');
+
+        $blok = [
+            [
+                'peran' => 'merek',
+                'judul' => 'Logo & Nama Merek',
+                'porsi' => 14,
+                'penekanan' => str_contains($teks, 'logo') ? 'kuat' : 'sedang',
+                'catatan' => str_contains($teks, 'logo')
+                    ? 'Tempatkan pada posisi yang Anda minta, ukurannya proporsional terhadap nama produk.'
+                    : 'Ukuran proporsional, tidak menyaingi nama produk.',
+            ],
+            [
+                'peran' => 'nama_produk',
+                'judul' => 'Nama Produk & Varian',
+                'porsi' => 20,
+                'penekanan' => 'kuat',
+                'catatan' => 'Elemen paling menonjol; varian dibuat satu tingkat lebih kecil.',
+            ],
+            [
+                'peran' => 'visual',
+                'judul' => 'Visual Produk',
+                'porsi' => $minimalis ? 28 : 24,
+                'penekanan' => 'sedang',
+                'catatan' => $minimalis
+                    ? 'Beri ruang kosong lebih lega; kurangi elemen dekoratif di sekitarnya.'
+                    : 'Jaga agar visual tidak menutupi teks informasi.',
+            ],
+            [
+                'peran' => 'pendukung',
+                'judul' => 'Klaim & Informasi Pendukung',
+                'porsi' => $minimalis ? 8 : 12,
+                'penekanan' => 'lemah',
+                'catatan' => 'Hanya klaim yang benar-benar dapat Anda dukung dengan bukti.',
+            ],
+            [
+                'peran' => 'komposisi',
+                'judul' => 'Komposisi & Informasi Nilai Gizi',
+                'porsi' => 12,
+                'penekanan' => 'sedang',
+                'catatan' => 'Isi tetap seperti aslinya; hanya keterbacaannya yang ditingkatkan.',
+            ],
+            [
+                'peran' => 'netto',
+                'judul' => 'Berat / Isi Bersih',
+                'porsi' => 6,
+                'penekanan' => 'sedang',
+                'catatan' => 'Ditempatkan agar mudah ditemukan, tidak tertimpa elemen lain.',
+            ],
+            [
+                'peran' => 'produsen',
+                'judul' => 'Produsen, Alamat, Kode Produksi & Tanggal',
+                'porsi' => 12,
+                'penekanan' => 'lemah',
+                'catatan' => 'Informasi wajib; boleh kecil, tetapi harus tetap terbaca jelas.',
+            ],
+        ];
+
+        return [
+            'catatan' => 'Denah ini adalah kerangka tata letak, bukan hasil suntingan atas desain Anda. '
+                .'Angka persentase menunjukkan porsi ruang yang disarankan, bukan ukuran mutlak.',
+            'blok' => $blok,
         ];
     }
 }

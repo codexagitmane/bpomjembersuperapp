@@ -45,7 +45,17 @@ export function createApiClient(opts: CreateApiClientOptions): AxiosInstance {
 
 export function extractApiErrorMessage(error: unknown): string {
   if (axios.isAxiosError<ApiErrorResponse>(error)) {
-    return error.response?.data?.message ?? "Terjadi kesalahan pada server.";
+    const data = error.response?.data;
+
+    // Galat validasi (422) membawa alasan sebenarnya di `errors`, sedangkan
+    // `message` hanya berisi kalimat umum "Data yang dikirim tidak valid."
+    // Tanpa membaca `errors`, pengguna tidak pernah tahu penyebab aslinya —
+    // misalnya "Email atau kata sandi salah" atau "Akun belum aktif".
+    const pertama = Object.values(data?.errors ?? {})
+      .flat()
+      .find((pesan) => typeof pesan === "string" && pesan.trim() !== "");
+
+    return pertama ?? data?.message ?? "Terjadi kesalahan pada server.";
   }
   return "Terjadi kesalahan yang tidak diketahui.";
 }

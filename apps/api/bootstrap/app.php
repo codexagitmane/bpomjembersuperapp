@@ -40,8 +40,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->is('api/*')) {
+                // Pesan diambil dari galat pertama, bukan kalimat umum. Kalimat
+                // umum menyembunyikan alasan sebenarnya — "Email atau kata sandi
+                // salah" atau "Akun belum aktif" tidak pernah sampai ke pengguna
+                // dan setiap kegagalan terlihat sama saja.
+                $pertama = collect($e->errors())->flatten()->first();
+
                 return response()->json([
-                    'message' => 'Data yang dikirim tidak valid.',
+                    'message' => is_string($pertama) && $pertama !== ''
+                        ? $pertama
+                        : 'Data yang dikirim tidak valid.',
                     'errors' => $e->errors(),
                 ], 422);
             }

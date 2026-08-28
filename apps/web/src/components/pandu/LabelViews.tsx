@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Maskot, PanduLoading } from "@/components/pandu/Maskot";
 import { Disclaimer, JudulBagian } from "@/components/pandu/InfoViews";
 import {
-  panduService, type Bootstrap, type HasilLabel, type HasilEditLabel, type ItemLabel,
+  panduService, type BlokDenah, type Bootstrap, type HasilLabel, type HasilEditLabel, type ItemLabel,
 } from "@/lib/pandu-service";
 import { extractApiErrorMessage } from "@bpom/shared";
 import { cn } from "@/lib/utils";
@@ -467,20 +467,16 @@ export function EditLabelView() {
           ))}
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-navy-900/10 p-3">
-              <p className="mb-2 text-xs font-bold text-navy-700">Sebelum</p>
+            <div className="min-w-0 rounded-2xl border border-navy-900/10 p-3">
+              <p className="mb-2 text-xs font-bold text-navy-700">Label Anda sekarang</p>
               {pratinjau && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={pratinjau} alt="Label sebelum diedit" className="max-h-56 w-full rounded-xl object-contain" />
+                <img src={pratinjau} alt="Label yang diunggah" className="max-h-56 w-full rounded-xl object-contain" />
               )}
             </div>
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-navy-200 bg-navy-50/40 p-3 text-center">
-              <p className="mb-2 self-start text-xs font-bold text-navy-700">Sesudah</p>
-              <Maskot size={56} />
-              <p className="mt-2 text-[11px] leading-relaxed text-navy-500">
-                Pengeditan gambar otomatis belum aktif, sehingga gambar hasil belum dapat ditampilkan.
-                Gunakan rencana di bawah sebagai panduan bagi desainer Anda.
-              </p>
+            <div className="min-w-0 rounded-2xl border border-navy-900/10 bg-navy-50/40 p-3">
+              <p className="mb-2 text-xs font-bold text-navy-700">Denah tata letak usulan</p>
+              <DenahLabel denah={hasil.denah} />
             </div>
           </div>
 
@@ -519,6 +515,68 @@ export function EditLabelView() {
           <Disclaimer />
         </Card>
       )}
+    </div>
+  );
+}
+
+/** Warna blok denah menurut tingkat penekanannya. */
+const NADA_BLOK: Record<string, string> = {
+  kuat: "bg-navy-800 text-white border-navy-800",
+  sedang: "bg-white text-navy-800 border-navy-300",
+  lemah: "bg-navy-50 text-navy-500 border-navy-200",
+};
+
+/**
+ * Kerangka tata letak label yang diusulkan.
+ *
+ * Digambar dari denah yang dikirim server: tiap blok memakai porsi tinggi
+ * sesuai persentasenya, sehingga proporsi ruang langsung terlihat. Ini
+ * kerangka desain — bukan hasil suntingan atas karya pengguna, dan disebut
+ * demikian secara terbuka agar tidak disalahartikan sebagai gambar jadi.
+ */
+function DenahLabel({ denah }: { denah?: { catatan: string; blok: BlokDenah[] } }) {
+  if (!denah || denah.blok.length === 0) {
+    return (
+      <p className="py-6 text-center text-[11px] leading-relaxed text-navy-400">
+        Denah tata letak belum tersedia untuk permintaan ini.
+      </p>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex h-56 flex-col gap-1 rounded-xl border border-navy-200 bg-white p-1.5">
+        {denah.blok.map((b, i) => (
+          <div
+            key={b.peran}
+            style={{ flexGrow: b.porsi }}
+            title={b.catatan}
+            className={cn(
+              "flex min-h-0 items-center gap-1.5 overflow-hidden rounded-lg border px-2",
+              NADA_BLOK[b.penekanan] ?? NADA_BLOK.sedang
+            )}
+          >
+            <span className="shrink-0 text-[9px] font-bold tabular-nums opacity-60">{i + 1}</span>
+            <span className="truncate text-[10px] font-bold leading-tight">{b.judul}</span>
+            <span className="ml-auto shrink-0 text-[9px] tabular-nums opacity-60">{b.porsi}%</span>
+          </div>
+        ))}
+      </div>
+
+      <ol className="mt-2.5 space-y-1">
+        {denah.blok.map((b, i) => (
+          <li key={b.peran} className="flex gap-1.5 text-[10px] leading-relaxed text-navy-500">
+            <span className="shrink-0 font-bold text-navy-700">{i + 1}.</span>
+            <span className="min-w-0">
+              <span className="font-semibold text-navy-700">{b.judul}</span> — {b.catatan}
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      <p className="mt-2.5 border-t border-navy-900/5 pt-2 text-[10px] leading-relaxed text-navy-400">
+        {denah.catatan}
+      </p>
     </div>
   );
 }

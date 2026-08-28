@@ -36,7 +36,7 @@ const MANAJEMEN: Record<string, Tile[]> = {
   superadmin: [
     { href: "/dashboard", label: "Dashboard Kabalai", icon: LayoutDashboard },
     { href: "/dashboard-tu", label: "Dashboard TU", icon: Building2 },
-    { href: "/pegawai", label: "Data Pegawai", icon: Users },
+    { href: "/pegawai", label: "Data User", icon: Users },
     { href: "/persetujuan", label: "Persetujuan", icon: ClipboardCheck },
     { href: "/admin/verifikasi", label: "Verifikasi Akun", icon: UserCheck },
     { href: "/admin/ttd", label: "Daftar TTD", icon: QrCode },

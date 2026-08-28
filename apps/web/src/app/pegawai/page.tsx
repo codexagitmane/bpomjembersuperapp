@@ -206,7 +206,7 @@ export default function PegawaiPage() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl font-extrabold text-navy-900 sm:text-2xl">Data Pegawai</h1>
+          <h1 className="text-xl font-extrabold text-navy-900 sm:text-2xl">Data User</h1>
           <p className="mt-1 text-sm text-navy-500">
             Direktori pengguna LENTERA — PNS, PPPK, Outsourcing, Magang &amp; Masyarakat.
           </p>

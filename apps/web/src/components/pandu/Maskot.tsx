@@ -7,7 +7,11 @@ import { cn } from "@/lib/utils";
 /**
  * Maskot SI PANDU AI.
  *
- * Berkas maskot diletakkan pada `apps/web/public/pandu-mascot.png`.
+ * Berkas asli `public/pandu-mascot.png` berukuran 1254×1254 (±1,9 MB) dan
+ * latarnya putih pekat, sehingga tampak sebagai kotak putih di atas permukaan
+ * gelap. Yang dipakai di sini adalah turunannya yang latarnya sudah transparan
+ * dan ukurannya wajar (96/192/288 px), dipilih peramban lewat `srcSet`.
+ *
  * Bila berkas belum tersedia, komponen menampilkan lambang cadangan agar
  * tata letak tidak rusak — karakter maskot tidak pernah diganti dengan
  * karakter lain.
@@ -42,7 +46,9 @@ export function Maskot({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/pandu-mascot.png"
+      src="/pandu-mascot-192.png"
+      srcSet="/pandu-mascot-96.png 96w, /pandu-mascot-192.png 192w, /pandu-mascot-288.png 288w"
+      sizes={`${size}px`}
       alt="Maskot Si Pandu AI"
       width={size}
       height={size}

@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { PasangAplikasi } from "@/components/PasangAplikasi";
+import { AutoLogout } from "@/components/AutoLogout";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -60,7 +61,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ServiceWorkerRegister />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AutoLogout />
+          {children}
+        </AuthProvider>
         <PasangAplikasi />
       </body>
     </html>

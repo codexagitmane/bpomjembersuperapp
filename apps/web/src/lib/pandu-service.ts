@@ -76,6 +76,15 @@ export interface Bootstrap {
 }
 
 export interface HasilProduk {
+  /** Kelengkapan isian formulir, 0–100. Bukan penilaian kelayakan produk. */
+  skor_kesiapan: number;
+  tingkat: "siap" | "sebagian" | "awal";
+  judul_tingkat: string;
+  arti_tingkat: string;
+  /** Satu tindakan yang paling layak dikerjakan lebih dulu. */
+  prioritas: string;
+  terisi: number;
+  total_medan: number;
   tersedia: string[];
   perlu_dilengkapi: string[];
   jalur_layanan: TopikKnowledge[];
@@ -118,6 +127,16 @@ export interface HasilCapa {
   catatan: string;
 }
 
+/** Satu blok pada denah tata letak label. */
+export interface BlokDenah {
+  peran: string;
+  judul: string;
+  /** Porsi ruang yang disarankan, dalam persen tinggi label. */
+  porsi: number;
+  penekanan: "kuat" | "sedang" | "lemah";
+  catatan: string;
+}
+
 export interface HasilEditLabel {
   status: string;
   instruksi: string;
@@ -127,6 +146,7 @@ export interface HasilEditLabel {
   ditolak: string[];
   sumber_url?: string;
   hasil_path: string | null;
+  denah?: { catatan: string; blok: BlokDenah[] };
   catatan: string;
 }
 

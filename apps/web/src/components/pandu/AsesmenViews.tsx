@@ -130,8 +130,11 @@ export function CekProdukView() {
       </Card>
 
       {hasil && (
+        <>
+          <KartuKesiapan hasil={hasil} />
+
         <Card>
-          <JudulBagian ikon={<ClipboardList className="size-4 text-bpom-600" />} judul="Analisis Awal Produk" />
+          <JudulBagian ikon={<ClipboardList className="size-4 text-bpom-600" />} judul="Rincian Penilaian Awal" />
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-bpom-200 bg-bpom-50/40 p-4">
@@ -203,8 +206,71 @@ export function CekProdukView() {
           <p className="mt-3 rounded-xl bg-navy-50 px-4 py-3 text-[11px] leading-relaxed text-navy-600">{hasil.catatan}</p>
           <Disclaimer />
         </Card>
+        </>
       )}
     </div>
+  );
+}
+
+const NADA_KESIAPAN: Record<string, { cincin: string; teks: string; pil: string }> = {
+  siap: { cincin: "#15915a", teks: "text-bpom-700", pil: "bg-bpom-50 text-bpom-700" },
+  sebagian: { cincin: "#d99a1e", teks: "text-amber-700", pil: "bg-amber-500/10 text-amber-700" },
+  awal: { cincin: "#8291ab", teks: "text-navy-600", pil: "bg-navy-100 text-navy-600" },
+};
+
+/**
+ * Kartu utama hasil Cek Produk: satu angka, satu kalimat kesimpulan, dan satu
+ * tindakan berikutnya. Sebelumnya hasil hanya berupa deretan daftar sehingga
+ * pengguna sulit menangkap "sudah sampai mana saya".
+ *
+ * Angka yang ditampilkan adalah kelengkapan isian formulir — disebutkan
+ * demikian di kartunya sendiri supaya tidak disalahartikan sebagai penilaian
+ * kelayakan produk atau keputusan resmi.
+ */
+function KartuKesiapan({ hasil }: { hasil: HasilProduk }) {
+  const nada = NADA_KESIAPAN[hasil.tingkat] ?? NADA_KESIAPAN.awal;
+  const keliling = 2 * Math.PI * 42;
+  const terisi = (hasil.skor_kesiapan / 100) * keliling;
+
+  return (
+    <Card className="overflow-hidden !p-0">
+      <div className="flex flex-col gap-4 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900 p-5 text-white sm:flex-row sm:items-center sm:gap-6">
+        <div className="relative mx-auto size-28 shrink-0 sm:mx-0">
+          <svg viewBox="0 0 100 100" className="size-full -rotate-90">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="9" />
+            <circle
+              cx="50" cy="50" r="42" fill="none"
+              stroke={nada.cincin} strokeWidth="9" strokeLinecap="round"
+              strokeDasharray={`${terisi} ${keliling - terisi}`}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-extrabold tabular-nums">{hasil.skor_kesiapan}</span>
+            <span className="text-[9px] font-semibold uppercase tracking-wide text-white/60">dari 100</span>
+          </div>
+        </div>
+
+        <div className="min-w-0 flex-1 text-center sm:text-left">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-white/55">Skor Kesiapan</p>
+          <h3 className="mt-0.5 text-lg font-extrabold sm:text-xl">{hasil.judul_tingkat}</h3>
+          <p className="mt-1.5 text-xs leading-relaxed text-white/75">{hasil.arti_tingkat}</p>
+          <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold backdrop-blur">
+            <ClipboardList className="size-3" />
+            {hasil.terisi} dari {hasil.total_medan} informasi sudah diisi
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3 border-t border-navy-900/5 p-4 sm:p-5">
+        <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${nada.pil}`}>
+          <Target className="size-4.5" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-navy-400">Kerjakan ini lebih dulu</p>
+          <p className={`mt-0.5 text-sm font-semibold leading-relaxed ${nada.teks}`}>{hasil.prioritas}</p>
+        </div>
+      </div>
+    </Card>
   );
 }
 
