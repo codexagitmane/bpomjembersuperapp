@@ -131,16 +131,9 @@ export default function PengajuanBmnPage() {
         {importMsg && <div className="mt-3 rounded-xl bg-navy-50 px-4 py-2.5 text-sm font-medium text-navy-700">{importMsg}</div>}
 
         {bisaAntrean && (
-          <div className="mt-4 inline-flex flex-wrap rounded-2xl border border-navy-900/5 bg-white p-1 shadow-sm">
+          <div className="mt-4 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <TabBtn active={tab === "saya"} onClick={() => setTab("saya")} icon={<ClipboardList className="size-4" />}>Permohonan Saya</TabBtn>
-            <TabBtn active={tab === "antrean"} onClick={() => setTab("antrean")} icon={<Inbox className="size-4" />}>
-              Perlu Tindakan
-              {perlu > 0 && (
-                <span className="ml-1 inline-flex min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[11px] font-bold leading-5 text-white">
-                  {perlu}
-                </span>
-              )}
-            </TabBtn>
+            <TabBtn active={tab === "antrean"} onClick={() => setTab("antrean")} icon={<Inbox className="size-4" />} badge={perlu}>Perlu Tindakan</TabBtn>
             <TabBtn active={tab === "daftar"} onClick={() => setTab("daftar")} icon={<Boxes className="size-4" />}>Daftar BMN</TabBtn>
             <TabBtn active={tab === "jadwal"} onClick={() => setTab("jadwal")} icon={<CalendarClock className="size-4" />}>Jadwal Pemeliharaan</TabBtn>
             <TabBtn active={tab === "laporan"} onClick={() => setTab("laporan")} icon={<FileBarChart2 className="size-4" />}>Laporan Pemeliharaan</TabBtn>
@@ -202,10 +195,23 @@ export default function PengajuanBmnPage() {
   );
 }
 
-function TabBtn({ active, onClick, icon, children }: { active: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode }) {
+function TabBtn({ active, onClick, icon, children, badge }: { active: boolean; onClick: () => void; icon: React.ReactNode; children: React.ReactNode; badge?: number }) {
   return (
-    <button onClick={onClick} className={cn("inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition-colors",
-      active ? "bg-navy-900 text-white" : "text-navy-500 hover:text-navy-800")}>{icon}{children}</button>
+    <button onClick={onClick} className={cn(
+      "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-semibold transition-all",
+      active
+        ? "bg-navy-900 text-white shadow-md shadow-navy-900/25"
+        : "bg-white text-navy-600 ring-1 ring-navy-900/10 hover:bg-navy-50 hover:text-navy-900",
+    )}>
+      {icon}
+      {children}
+      {badge != null && badge > 0 && (
+        <span className={cn("inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[11px] font-bold leading-5",
+          active ? "bg-white/25 text-white" : "bg-rose-500 text-white")}>
+          {badge}
+        </span>
+      )}
+    </button>
   );
 }
 
