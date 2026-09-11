@@ -175,23 +175,17 @@ class PemeliharaanExportService
         $sheet->getStyle("B5:B{$akhirTabel}")->getAlignment()->setWrapText(true);
         $sheet->getStyle("G5:G{$akhirTabel}")->getAlignment()->setWrapText(true);
 
-        // Tanda tangan
+        // Tanda tangan (sesuai format: nama saja, tanpa NIP)
         $tt = $data['penandatangan'];
         $r += 2;
         $sheet->setCellValue("B{$r}", 'Mengetahui,');
         $sheet->setCellValue("F{$r}", 'Pengelola BMN,');
-        $sheet->setCellValue('B'.($r + 1), 'Kepala Sub Bagian Tata Usaha');
+        $sheet->setCellValue('B'.($r + 1), 'Kepala Sub bagian Tata Usaha');
         $rTtd = $r + 5;
         $sheet->setCellValue("B{$rTtd}", $tt['kasubag_nama']);
         $sheet->setCellValue("F{$rTtd}", $tt['pengelola_nama']);
-        $sheet->getStyle("B{$rTtd}")->getFont()->setUnderline(true)->setBold(true);
-        $sheet->getStyle("F{$rTtd}")->getFont()->setUnderline(true)->setBold(true);
-        if ($tt['kasubag_nip']) {
-            $sheet->setCellValue('B'.($rTtd + 1), 'NIP. '.$tt['kasubag_nip']);
-        }
-        if ($tt['pengelola_nip']) {
-            $sheet->setCellValue('F'.($rTtd + 1), 'NIP. '.$tt['pengelola_nip']);
-        }
+        $sheet->getStyle("B{$rTtd}")->getFont()->setBold(true);
+        $sheet->getStyle("F{$rTtd}")->getFont()->setBold(true);
 
         $namaFile = 'Laporan-Pemeliharaan-BMN-'.$this->slugPeriode($data['periode_label']).'.xlsx';
 
@@ -203,26 +197,35 @@ class PemeliharaanExportService
     // ===================================================================
 
     /**
+     * Bagian pemeliharaan pada kartu beserta jumlah baris kosong yang
+     * disediakan untuk diisi Pengelola BMN. Baris sengaja dibiarkan kosong:
+     * petugas menuliskan jenis kegiatan (mis. service AC, bersih filter),
+     * lalu mengisi tanggal, hasil, paraf, dan verifikasi tiap bulan.
+     */
+    public const BAGIAN_KARTU = [
+        'Rutin Bulanan' => 4,
+        'Service Rutin' => 2,
+        'Lain-lain' => 2,
+    ];
+
+    /**
      * Bangun dataset kartu pemeliharaan satu BMN untuk satu tahun.
      *
-     * @return array{bmn:array, tahun:int, kondisi_label:string, triwulan:array, bulan_realisasi:array, penandatangan:array, dicetak:string}
+     * Kartu berupa formulir kosong siap isi — tanpa kondisi terkini dan tanpa
+     * penandaan realisasi — dipisah per triwulan (satu triwulan satu halaman).
+     *
+     * @return array{bmn:array, tahun:int, triwulan:array, bagian:array, penandatangan:array, dicetak:string}
      */
     public function kartuData(BmnItem $bmn, int $tahun): array
     {
-        $j = JadwalPemeliharaanBmn::where('bmn_item_id', $bmn->id)->where('tahun', $tahun)->first();
-        $realisasi = $this->bulanRealisasi($j?->bulan ?? [], range(1, 12));
-
         $triwulan = [];
         foreach ([1, 4, 7, 10] as $idx => $mulai) {
             $bulan = [];
             for ($m = $mulai; $m < $mulai + 3; $m++) {
-                $bulan[] = [
-                    'no' => $m,
-                    'nama' => self::BULAN[$m],
-                    'realisasi' => in_array($m, $realisasi, true),
-                ];
+                $bulan[] = ['no' => $m, 'nama' => self::BULAN[$m]];
             }
             $triwulan[] = [
+                'romawi' => ['I', 'II', 'III', 'IV'][$idx],
                 'label' => 'Triwulan '.['I', 'II', 'III', 'IV'][$idx],
                 'bulan' => $bulan,
             ];
@@ -235,26 +238,37 @@ class PemeliharaanExportService
                 'lokasi' => $bmn->lokasi ?: '-',
             ],
             'tahun' => $tahun,
-            'kondisi_label' => self::KONDISI_LABEL[$bmn->kondisi ?? 'baik'] ?? 'Baik',
             'triwulan' => $triwulan,
-            'bulan_realisasi' => $realisasi,
+            'bagian' => self::BAGIAN_KARTU,
             'penandatangan' => $this->penandatangan(),
             'dicetak' => now()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d F Y H:i').' WIB',
         ];
     }
 
     /**
-     * Unduh kartu sebagai Excel. Bulan disusun sebagai baris (12 bulan) untuk
-     * tiap jenis pemeliharaan, agar mudah diisi dan disunting secara digital.
+     * Unduh kartu sebagai Excel. Setiap triwulan menempati satu sheet
+     * tersendiri (sejalan dengan cetak PDF: satu triwulan satu halaman),
+     * lengkap dengan baris kosong siap isi dan blok tanda tangan.
      */
     public function kartuExcel(array $data): StreamedResponse
     {
         $ss = new Spreadsheet();
-        $sheet = $ss->getActiveSheet();
-        $sheet->setTitle('Kartu Pemeliharaan');
+        $ss->removeSheetByIndex(0);
 
-        $headers = ['No', 'Bulan', 'Tanggal', 'Pelaksana', 'Hasil', 'Verifikator', 'Keterangan'];
-        $last = Coordinate::stringFromColumnIndex(count($headers)); // G
+        foreach ($data['triwulan'] as $i => $tw) {
+            $sheet = $ss->createSheet($i);
+            $this->isiSheetTriwulan($sheet, $data, $tw);
+        }
+        $ss->setActiveSheetIndex(0);
+
+        return $this->unduh($ss, 'Kartu-Pemeliharaan-'.$this->slug($data['bmn']['nama']).'-'.$data['tahun'].'.xlsx');
+    }
+
+    /** Isi satu sheet Excel untuk satu triwulan kartu pemeliharaan. */
+    private function isiSheetTriwulan(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet, array $data, array $tw): void
+    {
+        $sheet->setTitle('Triwulan '.$tw['romawi']);
+        $last = 'M'; // A jenis + 3 bulan x 4 kolom = 13 kolom (A..M)
 
         $sheet->setCellValue('A1', 'KARTU PEMELIHARAAN / PERBAIKAN BARANG');
         $sheet->mergeCells("A1:{$last}1");
@@ -264,7 +278,7 @@ class PemeliharaanExportService
         $sheet->mergeCells("A2:{$last}2");
         $sheet->getStyle('A2')->getFont()->setBold(true);
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->setCellValue('A3', 'POM-14.01/CFM.01/SOP.01/IK.33B.01/F.01 revisi 06');
+        $sheet->setCellValue('A3', 'POM-14.01/CFM.01/SOP.01/IK.33B.01/F.01 revisi 06  •  '.$tw['label']);
         $sheet->mergeCells("A3:{$last}3");
         $sheet->getStyle('A3')->getFont()->setSize(9)->setItalic(true);
         $sheet->getStyle('A3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -275,57 +289,68 @@ class PemeliharaanExportService
         $sheet->setCellValue('C6', ': '.$data['bmn']['nomor']);
         $sheet->setCellValue('A7', 'Lokasi');
         $sheet->setCellValue('C7', ': '.$data['bmn']['lokasi']);
-        $sheet->setCellValue('A8', 'Kondisi Terkini');
-        $sheet->setCellValue('C8', ': '.$data['kondisi_label']);
-        $sheet->getStyle('A5:A8')->getFont()->setBold(true);
+        $sheet->getStyle('A5:A7')->getFont()->setBold(true);
 
-        $r = 10;
+        // Header tabel (2 baris): Jenis + tiap bulan (Tanggal, Hasil, Paraf, Verifikasi)
+        $r = 9;
         $awalTabel = $r;
-        foreach (['Mandiri', 'Pihak Ketiga', 'Lain-lain'] as $jenis) {
-            $sheet->setCellValue("A{$r}", strtoupper($jenis));
+        $sheet->setCellValue("A{$r}", 'Jenis Pemeliharaan / Kegiatan');
+        $sheet->mergeCells("A{$r}:A".($r + 1));
+        $kolom = 2;
+        foreach ($tw['bulan'] as $b) {
+            $c1 = Coordinate::stringFromColumnIndex($kolom);
+            $c4 = Coordinate::stringFromColumnIndex($kolom + 3);
+            $sheet->setCellValue("{$c1}{$r}", 'Bulan '.$b['nama']);
+            $sheet->mergeCells("{$c1}{$r}:{$c4}{$r}");
+            $sub = ['Tanggal', 'Hasil Pemeliharaan', 'Paraf', 'Verifikasi'];
+            foreach ($sub as $k => $judul) {
+                $sheet->setCellValue(Coordinate::stringFromColumnIndex($kolom + $k).($r + 1), $judul);
+            }
+            $kolom += 4;
+        }
+        $sheet->getStyle("A{$r}:{$last}".($r + 1))->getFont()->setBold(true)->setSize(9);
+        $sheet->getStyle("A{$r}:{$last}".($r + 1))->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('CDD7EA');
+        $sheet->getStyle("A{$r}:{$last}".($r + 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $r += 2;
+
+        // Bagian + baris kosong
+        foreach ($data['bagian'] as $nama => $jumlah) {
+            $sheet->setCellValue("A{$r}", $nama);
             $sheet->mergeCells("A{$r}:{$last}{$r}");
-            $sheet->getStyle("A{$r}:{$last}{$r}")->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
-            $sheet->getStyle("A{$r}:{$last}{$r}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('4E6EB5');
-            $r++;
-
-            $sheet->fromArray($headers, null, "A{$r}");
             $sheet->getStyle("A{$r}:{$last}{$r}")->getFont()->setBold(true);
-            $sheet->getStyle("A{$r}:{$last}{$r}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E4E9F2');
-            $sheet->getStyle("A{$r}:{$last}{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle("A{$r}:{$last}{$r}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('DBE3F1');
             $r++;
-
-            foreach (self::BULAN as $m => $namaBulan) {
-                // Untuk pemeliharaan Mandiri, bulan yang sudah terealisasi pada
-                // jadwal langsung ditandai hasilnya dengan kondisi terkini.
-                $hasil = ($jenis === 'Mandiri' && in_array($m, $data['bulan_realisasi'], true))
-                    ? $data['kondisi_label'] : '';
-                $sheet->fromArray([$m, $namaBulan, '', '', $hasil, '', ''], null, "A{$r}");
-                $sheet->getStyle("A{$r}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-                if ($hasil !== '') {
-                    $sheet->getStyle("E{$r}")->getFont()->setBold(true)->getColor()->setRGB('15803D');
-                }
+            for ($i = 0; $i < $jumlah; $i++) {
+                $sheet->getRowDimension($r)->setRowHeight(22);
                 $r++;
             }
         }
         $akhirTabel = $r - 1;
         $sheet->getStyle("A{$awalTabel}:{$last}{$akhirTabel}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
-        foreach (['A' => 5, 'B' => 14, 'C' => 16, 'D' => 22, 'E' => 18, 'F' => 22, 'G' => 26] as $col => $w) {
-            $sheet->getColumnDimension($col)->setWidth($w);
+        // Lebar kolom
+        $sheet->getColumnDimension('A')->setWidth(26);
+        for ($c = 2; $c <= 13; $c++) {
+            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($c))->setWidth(12);
         }
 
-        // Keterangan + tanda tangan
+        // Keterangan + tanda tangan (di dalam halaman triwulan ini)
         $r += 1;
-        $sheet->setCellValue("A{$r}", 'Keterangan: * diisi nama dan paraf; ** diisi pemeliharaan selain pemeliharaan rutin (mandiri dan pihak ketiga).');
+        $sheet->setCellValue("A{$r}", 'Keterangan: Tanggal, Hasil, Paraf (Pengelola BMN), dan Verifikasi (Kepala Subag TU) diisi tiap pelaksanaan.');
         $sheet->mergeCells("A{$r}:{$last}{$r}");
         $sheet->getStyle("A{$r}")->getFont()->setItalic(true)->setSize(9);
-        $r += 2;
-        $sheet->setCellValue("E{$r}", 'Mengetahui,');
-        $sheet->setCellValue('E'.($r + 1), 'Petugas BMN');
-        $sheet->setCellValue('E'.($r + 5), $data['penandatangan']['pengelola_nama']);
-        $sheet->getStyle('E'.($r + 5))->getFont()->setUnderline(true)->setBold(true);
 
-        return $this->unduh($ss, 'Kartu-Pemeliharaan-'.$this->slug($data['bmn']['nama']).'-'.$data['tahun'].'.xlsx');
+        $tt = $data['penandatangan'];
+        $r += 2;
+        $sheet->setCellValue("C{$r}", 'Pengelola BMN,');
+        $sheet->setCellValue("J{$r}", 'Mengetahui,');
+        $sheet->setCellValue('J'.($r + 1), 'Kepala Sub bagian Tata Usaha');
+        $sheet->setCellValue('C'.($r + 5), $tt['pengelola_nama']);
+        $sheet->setCellValue('J'.($r + 5), $tt['kasubag_nama']);
+        $sheet->getStyle('C'.($r + 5))->getFont()->setBold(true);
+        $sheet->getStyle('J'.($r + 5))->getFont()->setBold(true);
+
+        $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
     }
 
     // ===================================================================

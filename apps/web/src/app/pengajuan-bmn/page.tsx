@@ -1215,16 +1215,6 @@ function LaporanPemeliharaan() {
         </div>
       </Card>
 
-      {/* Ringkasan */}
-      {data && (
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <RingkasKartu label="Total BMN" nilai={data.ringkasan.total_bmn} tone="neutral" />
-          <RingkasKartu label="Sudah Dipelihara" nilai={data.ringkasan.terpelihara} tone="success" />
-          <RingkasKartu label="Belum Dipelihara" nilai={data.ringkasan.belum} tone="warning" />
-          <RingkasKartu label="Rusak (R/S/B)" nilai={`${data.ringkasan.kondisi.rusak_ringan}/${data.ringkasan.kondisi.rusak_sedang}/${data.ringkasan.kondisi.rusak_berat}`} tone="danger" />
-        </div>
-      )}
-
       <p className="mt-3 text-sm font-bold text-navy-700">{data?.periode_label}</p>
 
       <div className="mt-2 overflow-hidden rounded-2xl border border-navy-900/5 bg-white">
@@ -1265,16 +1255,6 @@ function LaporanPemeliharaan() {
         </div>
       </div>
       <p className="mt-2 text-[11px] text-navy-400">Kolom “Hasil Pemeliharaan” diambil dari kondisi BMN pada Daftar BMN; “Keterangan” disinkronkan dengan realisasi Jadwal Pemeliharaan.</p>
-    </div>
-  );
-}
-
-function RingkasKartu({ label, nilai, tone }: { label: string; nilai: number | string; tone: "neutral" | "success" | "warning" | "danger" }) {
-  const warna = { neutral: "text-navy-700", success: "text-emerald-600", warning: "text-amber-600", danger: "text-rose-600" }[tone];
-  return (
-    <div className="rounded-xl border border-navy-900/5 bg-white px-3 py-2.5">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-navy-400">{label}</p>
-      <p className={cn("mt-0.5 text-lg font-extrabold tabular-nums", warna)}>{nilai}</p>
     </div>
   );
 }

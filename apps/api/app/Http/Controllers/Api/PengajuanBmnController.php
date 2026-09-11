@@ -397,9 +397,10 @@ class PengajuanBmnController extends Controller
     public function kartuPdf(Request $request, BmnItem $bmnItem, PemeliharaanExportService $svc)
     {
         $data = $svc->kartuData($bmnItem, $this->tahunKartu($request));
+        // Ukuran F4/Folio (215 × 330 mm) lanskap — satu triwulan satu halaman.
         $pdf = Pdf::loadView('pdf.kartu-pemeliharaan', [
             'data' => $data, 'logo' => $this->logoDataUri(),
-        ])->setPaper('A4', 'landscape');
+        ])->setPaper([0, 0, 609.45, 935.43], 'landscape');
 
         return $pdf->download('Kartu-Pemeliharaan-'.str_replace(['/', ' '], '-', $bmnItem->nama_barang).'-'.$data['tahun'].'.pdf');
     }
