@@ -10,6 +10,7 @@ use App\Models\TandaTangan;
 use App\Models\User;
 use App\Services\BmnExcelService;
 use App\Services\NotifikasiService;
+use App\Services\PemeliharaanExportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -330,6 +331,85 @@ class PengajuanBmnController extends Controller
         );
 
         return response()->json(['message' => 'Jadwal pemeliharaan disimpan.']);
+    }
+
+    // ===================== Laporan Pemeliharaan =====================
+
+    /** Validasi & normalisasi parameter periode laporan. */
+    private function periodeLaporan(Request $request): array
+    {
+        $v = $request->validate([
+            'tahun' => ['nullable', 'integer', 'min:2015', 'max:2100'],
+            'periode' => ['nullable', Rule::in(['bulan', 'semester', 'tahun'])],
+            'bulan' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'semester' => ['nullable', 'integer', 'min:1', 'max:2'],
+        ]);
+
+        return [
+            'tahun' => (int) ($v['tahun'] ?? now()->year),
+            'periode' => $v['periode'] ?? 'bulan',
+            'bulan' => (int) ($v['bulan'] ?? now()->month),
+            'semester' => (int) ($v['semester'] ?? 1),
+        ];
+    }
+
+    /** Pratinjau laporan pemeliharaan (JSON) untuk tabel di web. */
+    public function laporan(Request $request, PemeliharaanExportService $svc)
+    {
+        $p = $this->periodeLaporan($request);
+
+        return response()->json([
+            'data' => $svc->laporanData($p['tahun'], $p['periode'], $p['bulan'], $p['semester']),
+        ]);
+    }
+
+    /** Unduh laporan pemeliharaan sebagai PDF. */
+    public function laporanPdf(Request $request, PemeliharaanExportService $svc)
+    {
+        $p = $this->periodeLaporan($request);
+        $data = $svc->laporanData($p['tahun'], $p['periode'], $p['bulan'], $p['semester']);
+        $pdf = Pdf::loadView('pdf.laporan-pemeliharaan', [
+            'data' => $data, 'logo' => $this->logoDataUri(),
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->download('Laporan-Pemeliharaan-BMN-'.now()->format('Ymd-His').'.pdf');
+    }
+
+    /** Unduh laporan pemeliharaan sebagai Excel. */
+    public function laporanExcel(Request $request, PemeliharaanExportService $svc)
+    {
+        $p = $this->periodeLaporan($request);
+        $data = $svc->laporanData($p['tahun'], $p['periode'], $p['bulan'], $p['semester']);
+
+        return $svc->laporanExcel($data);
+    }
+
+    // ===================== Kartu Pemeliharaan =====================
+
+    private function tahunKartu(Request $request): int
+    {
+        $v = $request->validate(['tahun' => ['nullable', 'integer', 'min:2015', 'max:2100']]);
+
+        return (int) ($v['tahun'] ?? now()->year);
+    }
+
+    /** Unduh kartu pemeliharaan satu BMN sebagai PDF (format Formulir F.01). */
+    public function kartuPdf(Request $request, BmnItem $bmnItem, PemeliharaanExportService $svc)
+    {
+        $data = $svc->kartuData($bmnItem, $this->tahunKartu($request));
+        $pdf = Pdf::loadView('pdf.kartu-pemeliharaan', [
+            'data' => $data, 'logo' => $this->logoDataUri(),
+        ])->setPaper('A4', 'landscape');
+
+        return $pdf->download('Kartu-Pemeliharaan-'.str_replace(['/', ' '], '-', $bmnItem->nama_barang).'-'.$data['tahun'].'.pdf');
+    }
+
+    /** Unduh kartu pemeliharaan satu BMN sebagai Excel. */
+    public function kartuExcel(Request $request, BmnItem $bmnItem, PemeliharaanExportService $svc)
+    {
+        $data = $svc->kartuData($bmnItem, $this->tahunKartu($request));
+
+        return $svc->kartuExcel($data);
     }
 
     /** Unduh template Excel jadwal pemeliharaan untuk satu tahun. */

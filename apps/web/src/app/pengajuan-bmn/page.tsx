@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Wrench, Plus, X, Check, ChevronLeft, ChevronRight, ClipboardList, PackageOpen, ShieldCheck,
   Eye, Clock, CheckCircle2, QrCode, Inbox, CircleDot, FileDown, FileUp, Boxes, ZoomIn, ZoomOut, RotateCcw, Search, History,
-  Pencil, Trash2, CalendarClock,
+  Pencil, Trash2, CalendarClock, FileBarChart2, CreditCard, FileSpreadsheet,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Card, Badge } from "@/components/ui/Card";
@@ -61,7 +61,7 @@ export default function PengajuanBmnPage() {
     (r.status === "diajukan" && (isSuper || r.pengelola_bmn_id === user?.id)) ||
     (r.status === "diperbaiki" && isKasubag), [isSuper, isKasubag, user?.id]);
 
-  const [tab, setTab] = useState<"saya" | "antrean" | "daftar" | "jadwal">("saya");
+  const [tab, setTab] = useState<"saya" | "antrean" | "daftar" | "jadwal" | "laporan" | "kartu">("saya");
   const [rows, setRows] = useState<Row[]>([]);
   const [perlu, setPerlu] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -143,11 +143,17 @@ export default function PengajuanBmnPage() {
             </TabBtn>
             <TabBtn active={tab === "daftar"} onClick={() => setTab("daftar")} icon={<Boxes className="size-4" />}>Daftar BMN</TabBtn>
             <TabBtn active={tab === "jadwal"} onClick={() => setTab("jadwal")} icon={<CalendarClock className="size-4" />}>Jadwal Pemeliharaan</TabBtn>
+            <TabBtn active={tab === "laporan"} onClick={() => setTab("laporan")} icon={<FileBarChart2 className="size-4" />}>Laporan Pemeliharaan</TabBtn>
+            <TabBtn active={tab === "kartu"} onClick={() => setTab("kartu")} icon={<CreditCard className="size-4" />}>Kartu Pemeliharaan</TabBtn>
           </div>
         )}
 
         {tab === "jadwal" ? (
           <JadwalPemeliharaan />
+        ) : tab === "laporan" ? (
+          <LaporanPemeliharaan />
+        ) : tab === "kartu" ? (
+          <KartuPemeliharaan />
         ) : tab === "daftar" ? (
           <DaftarBmn key={importMsg /* refresh setelah import */} />
         ) : (
@@ -1128,3 +1134,224 @@ function JadwalPemeliharaan() {
     </div>
   );
 }
+
+// ===================== Laporan Pemeliharaan BMN =====================
+interface LaporanItem { no: number; nama: string; kode: string; nup: string | null; jumlah: number; hasil: string; keterangan: string }
+interface LaporanData {
+  judul: string; periode_label: string; tahun: number;
+  grup: Record<string, LaporanItem[]>;
+  total: number;
+  ringkasan: { total_bmn: number; terpelihara: number; belum: number; kondisi: Record<string, number> };
+}
+
+const HASIL_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
+  "Baik": "success", "Rusak Ringan": "warning", "Rusak Sedang": "warning", "Rusak Berat": "danger",
+};
+
+function LaporanPemeliharaan() {
+  const [tahunList, setTahunList] = useState<number[]>([]);
+  const [tahun, setTahun] = useState<number>(new Date().getFullYear());
+  const [periode, setPeriode] = useState<"bulan" | "semester" | "tahun">("bulan");
+  const [bulan, setBulan] = useState<number>(new Date().getMonth() + 1);
+  const [semester, setSemester] = useState<number>(new Date().getMonth() < 6 ? 1 : 2);
+  const [data, setData] = useState<LaporanData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [mengunduh, setMengunduh] = useState<"pdf" | "excel" | null>(null);
+
+  useEffect(() => { api.get("/pengajuan-bmn/jadwal-tahun").then(({ data }) => { setTahunList(data.data ?? []); if (data.data?.length && !data.data.includes(tahun)) setTahun(data.data[0]); }); }, []); // eslint-disable-line
+
+  const params = useMemo(() => {
+    const p: Record<string, string | number> = { tahun, periode };
+    if (periode === "bulan") p.bulan = bulan;
+    if (periode === "semester") p.semester = semester;
+    return p;
+  }, [tahun, periode, bulan, semester]);
+
+  const load = useCallback(() => {
+    setLoading(true);
+    api.get("/pengajuan-bmn/laporan", { params }).then(({ data }) => setData(data.data)).finally(() => setLoading(false));
+  }, [params]);
+  useEffect(() => { load(); }, [load]);
+
+  async function unduh(jenis: "pdf" | "excel") {
+    setMengunduh(jenis);
+    try {
+      const path = jenis === "pdf" ? "/pengajuan-bmn/laporan/pdf" : "/pengajuan-bmn/laporan/excel";
+      const ext = jenis === "pdf" ? "pdf" : "xlsx";
+      await downloadFile(path, `Laporan-Pemeliharaan-BMN-${tahun}.${ext}`, params);
+    } finally { setMengunduh(null); }
+  }
+
+  const grup = data ? Object.entries(data.grup) : [];
+
+  return (
+    <div className="mt-4">
+      {/* Kontrol periode */}
+      <Card className="!p-4">
+        <div className="flex flex-wrap items-end gap-3">
+          <Select label="Tahun" value={tahun} onChange={(e) => setTahun(Number(e.target.value))} className="min-w-[110px]">
+            {(tahunList.length ? tahunList : [tahun]).map((t) => <option key={t} value={t}>{t}</option>)}
+          </Select>
+          <Select label="Periode" value={periode} onChange={(e) => setPeriode(e.target.value as typeof periode)} className="min-w-[140px]">
+            <option value="bulan">Per Bulan</option>
+            <option value="semester">Per Semester</option>
+            <option value="tahun">Per Tahun</option>
+          </Select>
+          {periode === "bulan" && (
+            <Select label="Bulan" value={bulan} onChange={(e) => setBulan(Number(e.target.value))} className="min-w-[140px]">
+              {BULAN_PENUH.map((b, i) => <option key={b} value={i + 1}>{b}</option>)}
+            </Select>
+          )}
+          {periode === "semester" && (
+            <Select label="Semester" value={semester} onChange={(e) => setSemester(Number(e.target.value))} className="min-w-[190px]">
+              <option value={1}>Semester I (Jan–Jun)</option>
+              <option value={2}>Semester II (Jul–Des)</option>
+            </Select>
+          )}
+          <div className="ml-auto flex gap-2">
+            <Button size="sm" variant="outline" loading={mengunduh === "pdf"} disabled={!data || data.total === 0} onClick={() => unduh("pdf")}><FileDown className="size-4" /> PDF</Button>
+            <Button size="sm" variant="outline" loading={mengunduh === "excel"} disabled={!data || data.total === 0} onClick={() => unduh("excel")}><FileSpreadsheet className="size-4" /> Excel</Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Ringkasan */}
+      {data && (
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <RingkasKartu label="Total BMN" nilai={data.ringkasan.total_bmn} tone="neutral" />
+          <RingkasKartu label="Sudah Dipelihara" nilai={data.ringkasan.terpelihara} tone="success" />
+          <RingkasKartu label="Belum Dipelihara" nilai={data.ringkasan.belum} tone="warning" />
+          <RingkasKartu label="Rusak (R/S/B)" nilai={`${data.ringkasan.kondisi.rusak_ringan}/${data.ringkasan.kondisi.rusak_sedang}/${data.ringkasan.kondisi.rusak_berat}`} tone="danger" />
+        </div>
+      )}
+
+      <p className="mt-3 text-sm font-bold text-navy-700">{data?.periode_label}</p>
+
+      <div className="mt-2 overflow-hidden rounded-2xl border border-navy-900/5 bg-white">
+        <div className="overflow-x-auto">
+          <table className="min-w-[760px] text-sm">
+            <thead>
+              <tr className="border-b border-navy-900/10 bg-navy-50/60 text-left text-[11px] uppercase tracking-wide text-navy-500">
+                <th className="px-3 py-2 font-bold">No</th>
+                <th className="px-3 py-2 font-bold">Fasilitas</th>
+                <th className="px-3 py-2 font-bold">Kode Barang</th>
+                <th className="px-3 py-2 text-center font-bold">NUP</th>
+                <th className="px-3 py-2 text-center font-bold">Jml</th>
+                <th className="px-3 py-2 font-bold">Hasil Pemeliharaan</th>
+                <th className="px-3 py-2 font-bold">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-navy-900/5">
+              {loading && [...Array(6)].map((_, i) => <tr key={i}><td colSpan={7} className="px-3 py-3"><div className="h-5 animate-pulse rounded bg-navy-100/60" /></td></tr>)}
+              {!loading && grup.length === 0 && <tr><td colSpan={7} className="px-3 py-12 text-center text-sm text-navy-400">Belum ada data BMN untuk periode ini.</td></tr>}
+              {!loading && grup.map(([lokasi, items], gi) => (
+                <Fragment key={lokasi}>
+                  <tr className="bg-navy-50/70"><td className="px-3 py-1.5 text-center text-xs font-bold text-navy-500">{gi + 1}</td><td colSpan={6} className="px-3 py-1.5 text-sm font-bold text-navy-800">{lokasi}</td></tr>
+                  {items.map((it) => (
+                    <tr key={it.no} className="hover:bg-navy-50/40">
+                      <td className="px-3 py-2" />
+                      <td className="px-3 py-2 font-medium text-navy-900">{it.nama}</td>
+                      <td className="whitespace-nowrap px-3 py-2 font-mono text-[11px] text-navy-600">{it.kode}</td>
+                      <td className="px-3 py-2 text-center text-navy-600">{it.nup ?? "—"}</td>
+                      <td className="px-3 py-2 text-center tabular-nums text-navy-600">{it.jumlah}</td>
+                      <td className="px-3 py-2"><Badge tone={HASIL_TONE[it.hasil] ?? "neutral"}>{it.hasil}</Badge></td>
+                      <td className="px-3 py-2 text-xs text-navy-500">{it.keterangan}</td>
+                    </tr>
+                  ))}
+                </Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p className="mt-2 text-[11px] text-navy-400">Kolom “Hasil Pemeliharaan” diambil dari kondisi BMN pada Daftar BMN; “Keterangan” disinkronkan dengan realisasi Jadwal Pemeliharaan.</p>
+    </div>
+  );
+}
+
+function RingkasKartu({ label, nilai, tone }: { label: string; nilai: number | string; tone: "neutral" | "success" | "warning" | "danger" }) {
+  const warna = { neutral: "text-navy-700", success: "text-emerald-600", warning: "text-amber-600", danger: "text-rose-600" }[tone];
+  return (
+    <div className="rounded-xl border border-navy-900/5 bg-white px-3 py-2.5">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-navy-400">{label}</p>
+      <p className={cn("mt-0.5 text-lg font-extrabold tabular-nums", warna)}>{nilai}</p>
+    </div>
+  );
+}
+
+// ===================== Kartu Pemeliharaan BMN =====================
+function KartuPemeliharaan() {
+  const [tahunList, setTahunList] = useState<number[]>([]);
+  const [tahun, setTahun] = useState<number>(new Date().getFullYear());
+  const [items, setItems] = useState<BmnOpt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
+  const [unduh, setUnduh] = useState<string | null>(null);
+
+  useEffect(() => { api.get("/pengajuan-bmn/jadwal-tahun").then(({ data }) => { setTahunList(data.data ?? []); if (data.data?.length && !data.data.includes(tahun)) setTahun(data.data[0]); }); }, []); // eslint-disable-line
+  useEffect(() => {
+    setLoading(true);
+    api.get("/pengajuan-bmn/bmn-list").then(({ data }) => setItems(data.data ?? [])).finally(() => setLoading(false));
+  }, []);
+
+  const filtered = items.filter((b) => [b.nama_barang, b.kode_barang, b.lokasi].some((v) => (v ?? "").toLowerCase().includes(q.toLowerCase())));
+  useEffect(() => { setPage(1); }, [q]);
+  const paged = filtered.slice((page - 1) * 10, page * 10);
+
+  async function download(b: BmnOpt, jenis: "pdf" | "excel") {
+    const kunci = `${b.id}-${jenis}`;
+    setUnduh(kunci);
+    try {
+      const path = jenis === "pdf" ? `/pengajuan-bmn/bmn/${b.id}/kartu-pdf` : `/pengajuan-bmn/bmn/${b.id}/kartu-excel`;
+      const ext = jenis === "pdf" ? "pdf" : "xlsx";
+      const nama = b.nama_barang.replace(/[^\w]+/g, "-").replace(/^-|-$/g, "");
+      await downloadFile(path, `Kartu-Pemeliharaan-${nama}-${tahun}.${ext}`, { tahun });
+    } finally { setUnduh(null); }
+  }
+
+  return (
+    <div className="mt-4">
+      <Card className="!p-4">
+        <div className="flex flex-wrap items-end gap-3">
+          <Select label="Tahun" value={tahun} onChange={(e) => setTahun(Number(e.target.value))} className="min-w-[110px]">
+            {(tahunList.length ? tahunList : [tahun]).map((t) => <option key={t} value={t}>{t}</option>)}
+          </Select>
+          <div className="relative min-w-[200px] flex-1">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-navy-300" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari BMN / kode / lokasi…"
+              className="w-full rounded-xl border border-navy-900/10 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-bpom-500" />
+          </div>
+        </div>
+      </Card>
+
+      <div className="mt-3 space-y-2">
+        {loading && [...Array(5)].map((_, i) => <div key={i} className="h-16 animate-pulse rounded-2xl bg-navy-100/60" />)}
+        {!loading && filtered.length === 0 && (
+          <Card className="flex flex-col items-center gap-2 py-12 text-center">
+            <CreditCard className="size-8 text-navy-200" />
+            <p className="text-sm font-semibold text-navy-600">Tidak ada BMN yang cocok.</p>
+          </Card>
+        )}
+        {paged.map((b) => (
+          <Card key={b.id} className="!p-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate font-bold text-navy-900">{b.nama_barang}</p>
+                <p className="mt-0.5 text-[11px] text-navy-400"><span className="font-mono">{b.kode_barang}</span>{b.lokasi ? ` • ${b.lokasi}` : ""}</p>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button size="sm" variant="outline" loading={unduh === `${b.id}-pdf`} onClick={() => download(b, "pdf")}><FileDown className="size-4" /> Kartu PDF</Button>
+                <Button size="sm" variant="outline" loading={unduh === `${b.id}-excel`} onClick={() => download(b, "excel")}><FileSpreadsheet className="size-4" /> Excel</Button>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+      <Paginator page={page} setPage={setPage} total={filtered.length} />
+      <p className="mt-2 text-[11px] text-navy-400">Kartu mengikuti Formulir POM-14.01/CFM.01/SOP.01/IK.33B.01/F.01 revisi 06 — bagian Mandiri, Pihak Ketiga, dan Lain-lain. Bulan yang sudah terealisasi pada Jadwal Pemeliharaan ikut ditandai.</p>
+    </div>
+  );
+}
+
+const BULAN_PENUH = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];

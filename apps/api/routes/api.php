@@ -162,6 +162,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/jadwal-template', [PengajuanBmnController::class, 'jadwalTemplate']);
         Route::post('/jadwal-import', [PengajuanBmnController::class, 'jadwalImport'])->middleware('throttle:20,1');
         Route::post('/jadwal/{bmnItem}', [PengajuanBmnController::class, 'jadwalUpsert'])->middleware('throttle:120,1');
+        // Laporan & Kartu Pemeliharaan (didaftarkan sebelum rute wildcard /{pengajuan}).
+        Route::get('/laporan', [PengajuanBmnController::class, 'laporan']);
+        Route::get('/laporan/pdf', [PengajuanBmnController::class, 'laporanPdf']);
+        Route::get('/laporan/excel', [PengajuanBmnController::class, 'laporanExcel']);
+        Route::get('/bmn/{bmnItem}/kartu-pdf', [PengajuanBmnController::class, 'kartuPdf']);
+        Route::get('/bmn/{bmnItem}/kartu-excel', [PengajuanBmnController::class, 'kartuExcel']);
         Route::post('/', [PengajuanBmnController::class, 'store'])->middleware('throttle:20,1');
         Route::get('/{pengajuan}', [PengajuanBmnController::class, 'show']);
         Route::get('/{pengajuan}/pdf', [PengajuanBmnController::class, 'pdf']);
